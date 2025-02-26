@@ -1,7 +1,7 @@
 package io.izzel.arclight.common.mixin.core.world.entity;
 
 import com.google.common.collect.ImmutableList;
-import io.izzel.arclight.common.bridge.core.command.ICommandSourceBridge;
+import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
 import io.izzel.arclight.common.bridge.core.entity.EntityBridge;
 import io.izzel.arclight.common.bridge.core.entity.InternalEntityBridge;
 import io.izzel.arclight.common.bridge.core.entity.LivingEntityBridge;
@@ -29,7 +29,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -47,10 +46,8 @@ import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -108,7 +105,7 @@ import java.util.UUID;
 
 @SuppressWarnings("ConstantConditions")
 @Mixin(Entity.class)
-public abstract class EntityMixin implements InternalEntityBridge, EntityBridge, ICommandSourceBridge {
+public abstract class EntityMixin implements InternalEntityBridge, EntityBridge, CommandSourceBridge {
 
     // @formatter:off
     @Shadow private float yRot;

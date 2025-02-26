@@ -1,7 +1,7 @@
 package io.izzel.arclight.common.mixin.core.world.level.block.entity;
 
 import com.google.common.base.Joiner;
-import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
+import io.izzel.arclight.common.bridge.core.command.CommandSourceStackBridge;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.level.BaseCommandBlock;
@@ -22,7 +22,7 @@ public class CommandBlockLogicMixin {
             command = command.substring(1);
         }
 
-        ServerCommandEvent event = new ServerCommandEvent(((CommandSourceBridge) sender).bridge$getBukkitSender(), command);
+        ServerCommandEvent event = new ServerCommandEvent(((CommandSourceStackBridge) sender).bridge$getBukkitSender(), command);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;

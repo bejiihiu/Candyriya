@@ -1,7 +1,7 @@
 package io.izzel.arclight.common.mixin.core.world.level.block.entity;
 
+import io.izzel.arclight.common.bridge.core.command.CommandSourceStackBridge;
 import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
-import io.izzel.arclight.common.bridge.core.command.ICommandSourceBridge;
 import io.izzel.arclight.common.bridge.core.entity.EntityBridge;
 import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBridge;
 import io.izzel.arclight.common.bridge.core.tileentity.SignTileEntityBridge;
@@ -45,7 +45,7 @@ import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 @Mixin(SignBlockEntity.class)
-public abstract class SignBlockEntityMixin extends BlockEntityMixin implements SignTileEntityBridge, CommandSource, ICommandSourceBridge {
+public abstract class SignBlockEntityMixin extends BlockEntityMixin implements SignTileEntityBridge, CommandSource, CommandSourceBridge {
 
     // @formatter:off
     @Shadow public abstract ClientboundBlockEntityDataPacket getUpdatePacket();
@@ -117,7 +117,7 @@ public abstract class SignBlockEntityMixin extends BlockEntityMixin implements S
     @Redirect(method = "executeClickCommandsIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/SignBlockEntity;createCommandSourceStack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/commands/CommandSourceStack;"))
     private CommandSourceStack arclight$setSource(Player p_279428_, Level p_279359_, BlockPos p_279430_) {
         var stack = createCommandSourceStack(p_279428_, p_279359_, p_279430_);
-        ((CommandSourceBridge) stack).bridge$setSource(this);
+        ((CommandSourceStackBridge) stack).bridge$setSource(this);
         return stack;
     }
 

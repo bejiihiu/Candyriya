@@ -57,6 +57,8 @@ dependencies {
     shadowCommon(project(path: ':arclight-common', configuration: 'transformProductionFabric')) { transitive = false }
     common(project(':bootstrap')) { transitive = false }
     shadowCommon(project(':bootstrap')) { transitive = false }
+
+    include(modImplementation('me.lucko:fabric-permissions-api:0.3.3'))
 }
 
 java {

@@ -1,5 +1,6 @@
 package io.izzel.arclight.fabric.mixin.bukkit;
 
+import io.izzel.arclight.fabric.mod.permission.ArclightFabricPermissible;
 import io.izzel.arclight.i18n.ArclightConfig;
 import org.bukkit.craftbukkit.v.entity.CraftHumanEntity;
 import org.bukkit.permissions.PermissibleBase;
@@ -14,9 +15,7 @@ public abstract class CraftHumanEntityMixin_Fabric {
     @Redirect(method = "<init>", at = @At(value = "NEW", target = "(Lorg/bukkit/permissions/ServerOperator;)Lorg/bukkit/permissions/PermissibleBase;"))
     private PermissibleBase arclight$forge$forwardPerm(ServerOperator opable) {
         if (ArclightConfig.spec().getCompat().isForwardPermissionReverse()) {
-            return new PermissibleBase(opable);
-            // Todo: Permission API.
-//            return new ArclightFabricPermissible(opable);
+            return new ArclightFabricPermissible(opable);
         } else {
             return new PermissibleBase(opable);
         }

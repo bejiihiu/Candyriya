@@ -2,8 +2,8 @@ package io.izzel.arclight.common.mixin.core.commands;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.tree.CommandNode;
+import io.izzel.arclight.common.bridge.core.command.CommandSourceStackBridge;
 import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
-import io.izzel.arclight.common.bridge.core.command.ICommandSourceBridge;
 import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBridge;
 import io.izzel.arclight.common.mod.compat.CommandNodeHooks;
 import net.minecraft.commands.CommandSource;
@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(CommandSourceStack.class)
-public abstract class CommandSourceStackMixin implements CommandSourceBridge {
+public abstract class CommandSourceStackMixin implements CommandSourceStackBridge {
 
     // @formatter:off
     @Shadow @Final @Mutable public CommandSource source;
@@ -78,7 +78,7 @@ public abstract class CommandSourceStackMixin implements CommandSourceBridge {
     }
 
     public CommandSender getBukkitSender() {
-        return ((ICommandSourceBridge) this.source).bridge$getBukkitSender((CommandSourceStack) (Object) this);
+        return ((CommandSourceBridge) this.source).bridge$getBukkitSender((CommandSourceStack) (Object) this);
     }
 
     @Override

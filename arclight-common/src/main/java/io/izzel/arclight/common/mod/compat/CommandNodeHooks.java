@@ -2,7 +2,7 @@ package io.izzel.arclight.common.mod.compat;
 
 import com.mojang.brigadier.tree.CommandNode;
 import io.izzel.arclight.api.Unsafe;
-import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
+import io.izzel.arclight.common.bridge.core.command.CommandSourceStackBridge;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ public class CommandNodeHooks {
     }
 
     public static <S> boolean canUse(CommandNode<S> node, S source) {
-        if (source instanceof CommandSourceBridge s) {
+        if (source instanceof CommandSourceStackBridge s) {
             try {
                 s.bridge$setCurrentCommand(node);
                 return node.canUse(source);

@@ -3,7 +3,7 @@ package io.izzel.arclight.common.mixin.core.server;
 import com.mojang.datafixers.DataFixer;
 import io.izzel.arclight.api.ArclightVersion;
 import io.izzel.arclight.common.bridge.bukkit.CraftServerBridge;
-import io.izzel.arclight.common.bridge.core.command.ICommandSourceBridge;
+import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
 import io.izzel.arclight.common.bridge.core.server.MinecraftServerBridge;
 import io.izzel.arclight.common.bridge.core.world.WorldBridge;
 import io.izzel.arclight.common.mod.ArclightConstants;
@@ -92,7 +92,7 @@ import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<TickTask> implements MinecraftServerBridge, ICommandSourceBridge {
+public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<TickTask> implements MinecraftServerBridge, CommandSourceBridge {
 
     // @formatter:off
     @Shadow private int tickCount;

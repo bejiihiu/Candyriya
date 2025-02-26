@@ -1,6 +1,6 @@
 package io.izzel.arclight.common.mixin.core.world.level.block.entity;
 
-import io.izzel.arclight.common.bridge.core.command.ICommandSourceBridge;
+import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
 import io.izzel.arclight.common.bridge.core.entity.EntityBridge;
 import io.izzel.arclight.common.bridge.core.inventory.container.LecternContainerBridge;
 import net.minecraft.commands.CommandSource;
@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import javax.annotation.Nullable;
 
 @Mixin(LecternBlockEntity.class)
-public abstract class LecternBlockEntityMixin extends BlockEntityMixin implements CommandSource, ICommandSourceBridge {
+public abstract class LecternBlockEntityMixin extends BlockEntityMixin implements CommandSource, CommandSourceBridge {
 
     // @formatter:off
     @Shadow @Final public Container bookAccess;

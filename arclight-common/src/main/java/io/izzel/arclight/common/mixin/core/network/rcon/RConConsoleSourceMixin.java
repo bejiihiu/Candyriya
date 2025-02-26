@@ -1,6 +1,6 @@
 package io.izzel.arclight.common.mixin.core.network.rcon;
 
-import io.izzel.arclight.common.bridge.core.command.ICommandSourceBridge;
+import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
 import io.izzel.arclight.common.bridge.core.network.rcon.RConConsoleSourceBridge;
 import io.izzel.arclight.common.bridge.core.server.MinecraftServerBridge;
 import net.minecraft.commands.CommandSourceStack;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(RconConsoleSource.class)
-public class RConConsoleSourceMixin implements ICommandSourceBridge, RConConsoleSourceBridge {
+public class RConConsoleSourceMixin implements CommandSourceBridge, RConConsoleSourceBridge {
 
     // @formatter:off
     @Shadow @Final private StringBuffer buffer;

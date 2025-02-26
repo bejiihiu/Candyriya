@@ -1,6 +1,6 @@
 package io.izzel.arclight.common.bridge.core.entity;
 
-import io.izzel.arclight.common.bridge.core.command.ICommandSourceBridge;
+import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
 import io.izzel.arclight.common.bridge.inject.InjectEntityBridge;
 import io.izzel.tools.product.Product;
 import io.izzel.tools.product.Product4;
@@ -17,7 +17,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.List;
 
-public interface EntityBridge extends ICommandSourceBridge, InjectEntityBridge {
+public interface EntityBridge extends CommandSourceBridge, InjectEntityBridge {
 
     void bridge$setOnFire(float seconds, boolean callEvent);
 
