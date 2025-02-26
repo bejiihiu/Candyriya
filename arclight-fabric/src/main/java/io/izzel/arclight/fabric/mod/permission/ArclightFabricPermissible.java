@@ -20,21 +20,21 @@ public class ArclightFabricPermissible extends PermissibleBase {
 
     @Override
     public boolean isPermissionSet(@NotNull String name) {
-        return player != null && Permissions.getPermissionValue(player.getHandle().createCommandSourceStack(), name) != TriState.DEFAULT;
+        return player != null && Permissions.getPermissionValue(player.getHandle(), name) != TriState.DEFAULT;
     }
 
     @Override
     public boolean isPermissionSet(@NotNull Permission perm) {
-        return player != null && Permissions.getPermissionValue(player.getHandle().createCommandSourceStack(), perm.getName()) != TriState.DEFAULT;
+        return player != null && Permissions.getPermissionValue(player.getHandle(), perm.getName()) != TriState.DEFAULT;
     }
 
     @Override
     public boolean hasPermission(@NotNull String name) {
-        return player != null && Permissions.check(player.getHandle().createCommandSourceStack(), name);
+        return player != null && Permissions.check(player.getHandle(), name);
     }
 
     @Override
     public boolean hasPermission(@NotNull Permission perm) {
-        return player != null && Permissions.check(player.getHandle().createCommandSourceStack(), perm.getName());
+        return player != null && Permissions.check(player.getHandle(), perm.getName());
     }
 }
