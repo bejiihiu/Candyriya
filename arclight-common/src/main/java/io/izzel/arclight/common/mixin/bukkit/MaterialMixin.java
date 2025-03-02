@@ -293,6 +293,9 @@ public abstract class MaterialMixin implements MaterialBridge {
 
     @Override
     public Function<CraftMetaItem, ItemMeta> bridge$itemMetaFactory() {
+        if (arclight$metaFunc == null && !arclight$spec.isPresent) {
+            arclight$setupCommon();
+        }
         return arclight$metaFunc;
     }
 
@@ -305,6 +308,9 @@ public abstract class MaterialMixin implements MaterialBridge {
 
     @Override
     public Function<CraftBlock, BlockState> bridge$blockStateFactory() {
+        if (arclight$stateFunc == null && !arclight$spec.isPresent) {
+            arclight$setupCommon();
+        }
         return arclight$stateFunc;
     }
 
