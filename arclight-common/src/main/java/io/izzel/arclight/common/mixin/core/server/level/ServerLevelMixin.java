@@ -124,6 +124,14 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
         return this.typeKey;
     }
 
+    // Multiworld support: per-world seed storage
+    @Inject(method = "getSeed", at = @At("HEAD"), cancellable = true)
+    private void arclight$getSeed(CallbackInfoReturnable<Long> cir) {
+        if (K != null) {
+            cir.setReturnValue(K.worldGenOptions().seed());
+        }
+    }
+
     @ShadowConstructor
     public void arclight$constructor(MinecraftServer minecraftServer, Executor backgroundExecutor, LevelStorageSource.LevelStorageAccess levelSave, ServerLevelData worldInfo, ResourceKey<Level> dimension, LevelStem levelStem, ChunkProgressListener statusListener, boolean isDebug, long seed, List<CustomSpawner> specialSpawners, boolean shouldBeTicking, RandomSequences seq) {
         throw new RuntimeException();
