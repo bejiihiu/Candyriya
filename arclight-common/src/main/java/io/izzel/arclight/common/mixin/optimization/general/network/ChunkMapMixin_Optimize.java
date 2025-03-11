@@ -40,6 +40,10 @@ public class ChunkMapMixin_Optimize {
         return new ObjectArraySet<>();
     }
 
+    /*
+     * This will result in Citizens2 generating NPC (is ServerPlayer) not known
+     * by clients joining earlier than itself. Disabled for fix.
+     */
     @Inject(method = "tick()V", cancellable = true, at = @At("HEAD"))
     private void arclight$optimizedTick(CallbackInfo ci) {
         var list = new ArrayList<ChunkMap.TrackedEntity>(this.level.players().size());
