@@ -111,7 +111,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
             list.add(new InsnNode(Opcodes.DUP));
 
             list.add(ifnonnull);
-            list.add(new LineNumberNode(-102, getfield));
+            list.add(new LineNumberNode(-102, ifnonnull));
             list.add(new JumpInsnNode(Opcodes.IFNONNULL, aret));
 
             list.add(putfield);
