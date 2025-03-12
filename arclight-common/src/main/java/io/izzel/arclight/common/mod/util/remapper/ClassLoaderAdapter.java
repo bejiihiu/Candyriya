@@ -100,7 +100,6 @@ public class ClassLoaderAdapter implements PluginTransformer {
              */
             InsnList list = new InsnList();
             LabelNode getfield = new LabelNode();
-            LabelNode ifnonnull = new LabelNode();
             LabelNode putfield = new LabelNode();
             LabelNode aret = new LabelNode();
 
@@ -108,21 +107,15 @@ public class ClassLoaderAdapter implements PluginTransformer {
             list.add(new LineNumberNode(-101, getfield));
             list.add(new VarInsnNode(Opcodes.ALOAD, 0));
             list.add(new FieldInsnNode(Opcodes.GETFIELD, node.name, remapConfig.name, remapConfig.desc));
-            list.add(new InsnNode(Opcodes.DUP));
-
-            list.add(ifnonnull);
-            list.add(new LineNumberNode(-102, ifnonnull));
             list.add(new JumpInsnNode(Opcodes.IFNONNULL, aret));
 
             list.add(putfield);
             list.add(new LineNumberNode(-103, putfield));
-            list.add(new InsnNode(Opcodes.POP));
             list.add(new TypeInsnNode(Opcodes.NEW, config));
             list.add(new InsnNode(Opcodes.DUP));
             list.add(new VarInsnNode(Opcodes.ALOAD, 0));
             list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(RemappingClassLoader.class), "needRemap", Type.getMethodDescriptor(Type.getType(boolean.class), Type.getType(ClassLoader.class))));
             list.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, config, "<init>", "(Z)V"));
-            list.add(new InsnNode(Opcodes.DUP));
             list.add(new VarInsnNode(Opcodes.ALOAD, 0));
             list.add(new InsnNode(Opcodes.SWAP));
             list.add(new FieldInsnNode(Opcodes.PUTFIELD, node.name, remapConfig.name, remapConfig.desc));
@@ -132,7 +125,9 @@ public class ClassLoaderAdapter implements PluginTransformer {
             if ((node.version & 0xFFFF) >= Opcodes.V1_6) {
                 list.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
             }
-            list.add(new InsnNode(Opcodes.RETURN));
+            list.add(new VarInsnNode(Opcodes.ALOAD, 0));
+            list.add(new FieldInsnNode(Opcodes.GETFIELD, node.name, remapConfig.name, remapConfig.desc));
+            list.add(new InsnNode(Opcodes.ARETURN));
             getConfig.instructions = list;
             getConfig.visitMaxs(3, 0);
         }
