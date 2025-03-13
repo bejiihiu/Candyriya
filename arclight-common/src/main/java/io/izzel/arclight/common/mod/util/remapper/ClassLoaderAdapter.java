@@ -114,7 +114,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
             list.add(new TypeInsnNode(Opcodes.NEW, config));
             list.add(new InsnNode(Opcodes.DUP));
             list.add(new VarInsnNode(Opcodes.ALOAD, 0));
-            list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(RemappingClassLoader.class), "needRemap", Type.getMethodDescriptor(Type.getType(boolean.class), Type.getType(ClassLoader.class))));
+            list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, node.name, "needRemap", Type.getMethodDescriptor(Type.getType(boolean.class), Type.getType(ClassLoader.class))));
             list.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, config, "<init>", "(Z)V"));
             list.add(new VarInsnNode(Opcodes.ALOAD, 0));
             list.add(new InsnNode(Opcodes.SWAP));
@@ -134,6 +134,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
         node.fields.add(remapper);
         node.fields.add(remapConfig);
         node.methods.add(getRemapper);
+        RemappingClassLoader.implementNeedRemap(node);
         node.methods.add(getConfig);
         node.interfaces.add(Type.getInternalName(RemappingClassLoader.class));
     }
