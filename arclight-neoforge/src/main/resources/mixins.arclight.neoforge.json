@@ -71,6 +71,7 @@
     "core.world.level.levelgen.structure.templatesystem.StructureTemplateMixin_NeoForge",
     "core.world.level.storage.loot.LootContextMixin_NeoForge",
     "neoforge.CommonHooksMixin",
+    "neoforge.EventHooksMixin",
     "neoforge.PacketDistributorMixin",
     "neoforge.PermissionAPIMixin",
     "optimization.general.activationrange.entity.ItemEntityMixin_ActivationRange_NeoForge"
