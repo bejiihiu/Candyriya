@@ -6,7 +6,7 @@ import io.izzel.arclight.common.bridge.core.command.CommandSourceStackBridge;
 import io.izzel.arclight.common.bridge.core.command.CommandSourceBridge;
 import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBridge;
 import io.izzel.arclight.common.mod.compat.CommandNodeHooks;
-import io.izzel.arclight.common.mod.command.ArclightDummyCommandSender;
+import io.izzel.arclight.common.mod.server.command.ArclightDummyCommandSender;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerLevel;

@@ -1,4 +1,4 @@
-package io.izzel.arclight.common.mod.permission;
+package io.izzel.arclight.common.mod.server.permission;
 
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.ServerOperator;

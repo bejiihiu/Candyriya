@@ -1,6 +1,6 @@
-package io.izzel.arclight.common.mod.command;
+package io.izzel.arclight.common.mod.server.command;
 
-import io.izzel.arclight.common.mod.permission.ArclightDummyPermissible;
+import io.izzel.arclight.common.mod.server.permission.ArclightDummyPermissible;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.commands.CommandSourceStack;
