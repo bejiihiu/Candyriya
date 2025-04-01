@@ -1,12 +1,12 @@
-package io.izzel.arclight.neoforge.mixin.core.network;
+package io.izzel.arclight.forge.mixin.core.network;
 
-import io.izzel.arclight.common.bridge.core.network.login.ServerLoginNetHandlerBridge;
+import io.izzel.arclight.common.bridge.core.network.login.ServerLoginPacketListenerBridge;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
-import net.neoforged.fml.util.thread.SidedThreadGroups;
+import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ServerLoginPacketListenerImpl.class)
-public abstract class ServerLoginNetHandlerMixin_NeoForge implements ServerLoginNetHandlerBridge {
+public abstract class ServerLoginPacketListenerImplMixin_Forge implements ServerLoginPacketListenerBridge {
 
     @Override
     public Thread bridge$newHandleThread(String name, Runnable runnable) {

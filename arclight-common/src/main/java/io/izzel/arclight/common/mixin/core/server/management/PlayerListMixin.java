@@ -6,7 +6,7 @@ import io.izzel.arclight.common.bridge.core.entity.EntityBridge;
 import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBridge;
 import io.izzel.arclight.common.bridge.core.network.NetworkManagerBridge;
 import io.izzel.arclight.common.bridge.core.network.datasync.SynchedEntityDataBridge;
-import io.izzel.arclight.common.bridge.core.network.play.ServerPlayNetHandlerBridge;
+import io.izzel.arclight.common.bridge.core.network.play.ServerGamePacketListenerBridge;
 import io.izzel.arclight.common.bridge.core.server.management.PlayerListBridge;
 import io.izzel.arclight.common.bridge.core.world.WorldBridge;
 import io.izzel.arclight.common.mod.server.ArclightServer;
@@ -314,14 +314,14 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         playerIn.connection.send(new ClientboundRespawnPacket(playerIn.createCommonSpawnInfo(serverWorld), (byte) (flag ? 1 : 0)));
         playerIn.connection.send(new ClientboundSetChunkCacheRadiusPacket(((WorldBridge) serverWorld).bridge$spigotConfig().viewDistance));
         playerIn.connection.send(new ClientboundSetSimulationDistancePacket(((WorldBridge) serverWorld).bridge$spigotConfig().simulationDistance));
-        ((ServerPlayNetHandlerBridge) playerIn.connection).bridge$teleport(new Location(((WorldBridge) serverWorld).bridge$getWorld(), playerIn.getX(), playerIn.getY(), playerIn.getZ(), playerIn.getYRot(), playerIn.getXRot()));
+        ((ServerGamePacketListenerBridge) playerIn.connection).bridge$teleport(new Location(((WorldBridge) serverWorld).bridge$getWorld(), playerIn.getX(), playerIn.getY(), playerIn.getZ(), playerIn.getYRot(), playerIn.getXRot()));
         playerIn.connection.send(new ClientboundSetDefaultSpawnPositionPacket(serverWorld.getSharedSpawnPos(), serverWorld.getSharedSpawnAngle()));
         playerIn.connection.send(new ClientboundChangeDifficultyPacket(worlddata.getDifficulty(), worlddata.isDifficultyLocked()));
         playerIn.connection.send(new ClientboundSetExperiencePacket(playerIn.experienceProgress, playerIn.totalExperience, playerIn.experienceLevel));
         this.sendActivePlayerEffects(playerIn);
         this.sendLevelInfo(playerIn, serverWorld);
         this.sendPlayerPermissionLevel(playerIn);
-        if (!((ServerPlayNetHandlerBridge) playerIn.connection).bridge$isDisconnected()) {
+        if (!((ServerGamePacketListenerBridge) playerIn.connection).bridge$isDisconnected()) {
             serverWorld.addRespawnedPlayer(playerIn);
             this.players.add(playerIn);
             this.playersByUUID.put(playerIn.getUUID(), playerIn);
@@ -343,7 +343,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
             PlayerChangedWorldEvent event = new PlayerChangedWorldEvent(((ServerPlayerEntityBridge) playerIn).bridge$getBukkitEntity(), fromWorld);
             Bukkit.getPluginManager().callEvent(event);
         }
-        if (((ServerPlayNetHandlerBridge) playerIn.connection).bridge$isDisconnected()) {
+        if (((ServerGamePacketListenerBridge) playerIn.connection).bridge$isDisconnected()) {
             this.save(playerIn);
         }
         return playerIn;
@@ -397,7 +397,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
     private void arclight$respawnPackets(ServerGamePacketListenerImpl instance, double d, double e, double f, float g, float h, @Local(ordinal = -1) ServerPlayer player) throws Throwable {
         player.connection.send(new ClientboundSetChunkCacheRadiusPacket(((WorldBridge) player.serverLevel()).bridge$spigotConfig().viewDistance));
         player.connection.send(new ClientboundSetSimulationDistancePacket(((WorldBridge) player.serverLevel()).bridge$spigotConfig().simulationDistance));
-        ((ServerPlayNetHandlerBridge) player.connection).bridge$teleport(new Location(player.serverLevel().bridge$getWorld(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot()));
+        ((ServerGamePacketListenerBridge) player.connection).bridge$teleport(new Location(player.serverLevel().bridge$getWorld(), player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot()));
         if (Blackhole.actuallyFalse()) {
             DecorationOps.callsite().invoke(instance, d, e, f, g, h);
         }
@@ -416,7 +416,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
             PlayerChangedWorldEvent event = new PlayerChangedWorldEvent(((ServerPlayerEntityBridge) newPlayer).bridge$getBukkitEntity(), fromWorld.bridge$getWorld());
             Bukkit.getPluginManager().callEvent(event);
         }
-        if (((ServerPlayNetHandlerBridge) newPlayer.connection).bridge$isDisconnected()) {
+        if (((ServerGamePacketListenerBridge) newPlayer.connection).bridge$isDisconnected()) {
             this.save(newPlayer);
         }
     }

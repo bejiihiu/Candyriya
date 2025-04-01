@@ -19,7 +19,7 @@
     "bukkit.CraftServerMixin_Fabric",
     "core.network.ServerCommonPacketListenerImplMixin_Fabric",
     "core.network.ServerConfigurationPacketListenerImplMixin_Fabric",
-    "core.network.ServerLoginNetHandlerMixin_Fabric",
+    "core.network.ServerLoginPacketListenerImplMixin_Fabric",
     "core.world.entity.EntityMixin_Fabric",
     "core.world.entity.LivingEntityMixin_Fabric",
     "core.world.entity.animal.SheepMixin_Fabric",

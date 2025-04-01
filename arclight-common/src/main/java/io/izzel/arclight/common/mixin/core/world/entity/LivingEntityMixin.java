@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Either;
 import io.izzel.arclight.common.bridge.core.entity.LivingEntityBridge;
 import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBridge;
-import io.izzel.arclight.common.bridge.core.network.play.ServerPlayNetHandlerBridge;
+import io.izzel.arclight.common.bridge.core.network.play.ServerGamePacketListenerBridge;
 import io.izzel.arclight.common.mod.server.ArclightServer;
 import io.izzel.arclight.common.mod.util.EntityDamageResult;
 import io.izzel.arclight.common.util.IteratorUtil;
@@ -875,7 +875,7 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
     private void arclight$entityTeleport(LivingEntity entity, double x, double y, double z) throws Throwable {
         if ((Object) this instanceof ServerPlayer) {
             (((ServerPlayer) (Object) this).connection).teleport(x, y, z, this.getYRot(), this.getXRot(), java.util.Collections.emptySet());
-            if (!((ServerPlayNetHandlerBridge) ((ServerPlayer) (Object) this).connection).bridge$teleportCancelled()) {
+            if (!((ServerGamePacketListenerBridge) ((ServerPlayer) (Object) this).connection).bridge$teleportCancelled()) {
                 DecorationOps.cancel().invoke(false);
                 return;
             }

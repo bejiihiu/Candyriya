@@ -1,12 +1,11 @@
 package io.izzel.arclight.common.bridge.core.network.login;
 
 import com.mojang.authlib.GameProfile;
-import io.izzel.arclight.common.bridge.core.network.common.ServerCommonPacketListenerBridge;
 import io.izzel.arclight.common.mod.util.ArclightCustomQueryAnswerPayload;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;
 
-public interface ServerLoginNetHandlerBridge extends ServerCommonPacketListenerBridge {
+public interface ServerLoginPacketListenerBridge {
     default Thread bridge$newHandleThread(String name, Runnable runnable) {
         return new Thread(runnable, name);
     }
@@ -14,6 +13,8 @@ public interface ServerLoginNetHandlerBridge extends ServerCommonPacketListenerB
     int bridge$getVelocityLoginId();
 
     void bridge$preLogin(GameProfile authenticatedProfile) throws Exception;
+
+    void bridge$disconnect(String reason);
 
     default FriendlyByteBuf bridge$getDiscardedQueryAnswerData(ServerboundCustomQueryAnswerPacket packet) {
         return packet.payload() instanceof ArclightCustomQueryAnswerPayload payload

@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-public interface ServerPlayNetHandlerBridge extends ServerCommonPacketListenerBridge {
+public interface ServerGamePacketListenerBridge extends ServerCommonPacketListenerBridge {
 
     void bridge$pushTeleportCause(PlayerTeleportEvent.TeleportCause cause);
 

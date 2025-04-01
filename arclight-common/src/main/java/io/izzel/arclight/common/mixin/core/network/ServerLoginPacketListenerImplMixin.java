@@ -5,7 +5,7 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.properties.Property;
 import io.izzel.arclight.common.bridge.core.network.NetworkManagerBridge;
 import io.izzel.arclight.common.bridge.core.network.common.ServerCommonPacketListenerBridge;
-import io.izzel.arclight.common.bridge.core.network.login.ServerLoginNetHandlerBridge;
+import io.izzel.arclight.common.bridge.core.network.login.ServerLoginPacketListenerBridge;
 import io.izzel.arclight.common.bridge.core.server.MinecraftServerBridge;
 import io.izzel.arclight.common.bridge.core.server.management.PlayerListBridge;
 import io.izzel.arclight.common.mod.util.VelocitySupport;
@@ -67,7 +67,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(ServerLoginPacketListenerImpl.class)
-public abstract class ServerLoginPacketListenerImplMixin implements ServerLoginNetHandlerBridge, CraftPlayer.TransferCookieConnection {
+public abstract class ServerLoginPacketListenerImplMixin implements ServerLoginPacketListenerBridge, CraftPlayer.TransferCookieConnection {
 
     // @formatter:off
     @Shadow private ServerLoginPacketListenerImpl.State state;

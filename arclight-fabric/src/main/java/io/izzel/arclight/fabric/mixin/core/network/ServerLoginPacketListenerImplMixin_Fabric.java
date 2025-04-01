@@ -1,6 +1,6 @@
 package io.izzel.arclight.fabric.mixin.core.network;
 
-import io.izzel.arclight.common.bridge.core.network.login.ServerLoginNetHandlerBridge;
+import io.izzel.arclight.common.bridge.core.network.login.ServerLoginPacketListenerBridge;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.impl.networking.NetworkHandlerExtensions;
 import net.fabricmc.fabric.impl.networking.payload.PacketByteBufLoginQueryResponse;
@@ -11,7 +11,7 @@ import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ServerLoginPacketListenerImpl.class)
-public abstract class ServerLoginNetHandlerMixin_Fabric implements ServerLoginNetHandlerBridge, NetworkHandlerExtensions {
+public abstract class ServerLoginPacketListenerImplMixin_Fabric implements ServerLoginPacketListenerBridge, NetworkHandlerExtensions {
 
     @Override
     public FriendlyByteBuf bridge$getDiscardedQueryAnswerData(ServerboundCustomQueryAnswerPacket packet) {

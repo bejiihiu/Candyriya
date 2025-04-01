@@ -1,6 +1,6 @@
 package io.izzel.arclight.neoforge.mixin.core.network;
 
-import io.izzel.arclight.common.bridge.core.network.play.ServerPlayNetHandlerBridge;
+import io.izzel.arclight.common.bridge.core.network.play.ServerGamePacketListenerBridge;
 import io.izzel.tools.product.Product;
 import io.izzel.tools.product.Product3;
 import net.minecraft.network.chat.Component;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public abstract class ServerPlayNetHandlerMixin_NeoForge extends ServerCommonPacketListenerImplMixin_NeoForge implements ServerPlayNetHandlerBridge {
+public abstract class ServerGamePacketListenerImplMixin_NeoForge extends ServerCommonPacketListenerImplMixin_NeoForge implements ServerGamePacketListenerBridge {
 
     @Shadow public ServerPlayer player;
 
