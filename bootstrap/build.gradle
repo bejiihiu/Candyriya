@@ -148,7 +148,7 @@ tasks.register('forgeJar', Jar) {
         exclude "org/apache/commons/lang/enum/**"
     }
     into('/') {
-        it.from(project(':arclight-forge').tasks.reobfJar.outputs.files.collect())
+        it.from(project(':arclight-forge').tasks.remapJar.outputs.files.collect())
         it.rename { name -> 'common.jar' }
     }
     into('/') {
@@ -159,7 +159,7 @@ tasks.register('forgeJar', Jar) {
     from sourceSets.main.output
     from sourceSets.forge.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn(project(':arclight-forge').tasks.reobfJar)
+    dependsOn(project(':arclight-forge').tasks.build)
 }
 
 tasks.register('neoforgeJar', Jar) {
@@ -180,7 +180,7 @@ tasks.register('neoforgeJar', Jar) {
         exclude "org/apache/commons/lang/enum/**"
     }
     into('/') {
-        it.from(project(':arclight-neoforge').tasks.reobfJar.outputs.files.collect())
+        it.from(project(':arclight-neoforge').tasks.remapJar.outputs.files.collect())
         it.rename { name -> 'common.jar' }
     }
     into('/') {
@@ -191,7 +191,7 @@ tasks.register('neoforgeJar', Jar) {
     from sourceSets.main.output
     from sourceSets.neoforge.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn(project(':arclight-neoforge').tasks.reobfJar)
+    dependsOn(project(':arclight-neoforge').tasks.build)
 }
 
 tasks.register('fabricJar', Jar) {
@@ -204,7 +204,7 @@ tasks.register('fabricJar', Jar) {
     manifest.attributes 'Automatic-Module-Name': 'arclight.boot'
     from(configurations.embedFabric.collect { it.isDirectory() ? it : zipTree(it) })
     into('/') {
-        it.from(project(':arclight-fabric').tasks.reobfJar.outputs.files.collect())
+        it.from(project(':arclight-fabric').tasks.remapJar.outputs.files.collect())
         it.rename { name -> 'common.jar' }
     }
     into('/') {
@@ -214,7 +214,7 @@ tasks.register('fabricJar', Jar) {
     from sourceSets.applaunch.output
     from sourceSets.fabric.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn(project(':arclight-fabric').tasks.reobfJar)
+    dependsOn(project(':arclight-fabric').tasks.build)
 }
 
 tasks.register("generateInstallerInfo", GenerateInstallerInfo) {
