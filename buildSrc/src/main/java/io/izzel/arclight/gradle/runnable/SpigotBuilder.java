@@ -41,6 +41,14 @@ public class SpigotBuilder implements Runnable {
     private String minecraftVersion;
 
     /**
+     * Specific build number of SpigotMC jenkins.
+     */
+    @Getter
+    @Setter
+    @Nullable
+    private Integer reversion = null;
+
+    /**
      * The specific commit refs.
      * Todo: add a task to use it.
      */
@@ -103,19 +111,24 @@ public class SpigotBuilder implements Runnable {
             spec.setWorkingDir(workDir.toFile());
             spec.setStandardOutput(System.out);
 
+            var rev = minecraftVersion;
+            if (reversion != null) {
+                rev = reversion.toString();
+            }
+
             if (extension == null) {
-                spec.setCommandLine("java", "-jar", buildToolsJar.normalize().toString(), "--rev", minecraftVersion, "--compile-if-changed");
+                spec.setCommandLine("java", "-jar", buildToolsJar.normalize().toString(), "--rev", rev);
             } else {
-                spec.setCommandLine("java", "-jar", buildToolsJar.normalize().toString(), "--dont-update", "--compile-if-changed");
+                spec.setCommandLine("java", "-jar", buildToolsJar.normalize().toString(), "--dont-update");
             }
 
             spec.setIgnoreExitValue(true);
         }).getExitValue();
 
         if (exit == 0) {
-            if (Files.exists(outputJar)) {
-                Files.delete(outputJar);
-            }
+//            if (Files.exists(outputJar)) {
+//                Files.delete(outputJar);
+//            }
         } else if (exit == 2) {
             // No changes.
         } else {

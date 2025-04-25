@@ -15,6 +15,9 @@ public interface IArclightExtension {
     String getBukkitVersion();
     void setBukkitVersion(String bukkitVersion);
 
+    Integer getSpigotReversion();
+    void setSpigotReversion(Integer rev);
+
     File getAccessTransformer();
     void setAccessTransformer(File accessTransformer);
 

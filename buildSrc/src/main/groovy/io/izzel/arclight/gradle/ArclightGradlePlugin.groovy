@@ -8,10 +8,11 @@ import io.izzel.arclight.gradle.tasks.RemapSpigotTask
 import io.izzel.arclight.gradle.tasks.RenameJarTask
 import net.fabricmc.loom.LoomGradlePlugin
 import net.fabricmc.loom.configuration.mods.dependency.LocalMavenHelper
-import net.fabricmc.loom.task.RemapJarTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.apache.commons.io.IOUtils
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -58,8 +59,6 @@ class ArclightGradlePlugin implements Plugin<Project> {
     private static def setupSpigot(Project project, Path arclightRepo) {
         def arclight = project.extensions.getByName('arclight') as ArclightExtension
 
-        def buildTools = arclight.cacheDir.resolve('arclight_cache/buildtools')
-        def buildToolsJar = buildTools.resolve('BuildTools.jar')
 
         def mappingsDir = arclight.cacheDir.resolve('arclight_cache/mappings')
 
@@ -67,13 +66,27 @@ class ArclightGradlePlugin implements Plugin<Project> {
         def spigotMapped = spigotDeps.resolve("spigot-${arclight.mcVersion}-mapped.jar")
         def spigotDeobf = spigotDeps.resolve("spigot-${arclight.mcVersion}-deobf.jar")
 
-        if (arclight.mappingsConfiguration.areMappingsExist()
-                && Files.exists(spigotDeobf)) {
-            // Todo: always run spigot builder.
-            return
+        def buildMeta = arclight.cacheDir.resolve('spigot_version.json')
+        def rev = arclight.mcVersion
+        if (arclight.spigotReversion) {
+            rev = arclight.spigotReversion.toString()
+        }
+        def newBuildMeta = IOUtils.toString(new URI("https://hub.spigotmc.org/versions/${rev}.json").toURL(), StandardCharsets.UTF_8)
+        if (Files.exists(buildMeta)) {
+            var built = Files.readString(buildMeta)
+            if (built == newBuildMeta) {
+                if (arclight.mappingsConfiguration.areMappingsExist()
+                        && Files.exists(spigotDeobf)) {
+                    project.logger.lifecycle(":found valid spigot cache for ${rev}, using it")
+                    project.logger.debug(built)
+                    return
+                }
+            }
         }
 
         project.logger.lifecycle(":step1 download build tools")
+        def buildTools = arclight.cacheDir.resolve('arclight_cache/buildtools')
+        def buildToolsJar = buildTools.resolve('BuildTools.jar')
         def downloadBuildTools = new FileDownloader("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar", buildToolsJar)
         downloadBuildTools.run()
 
@@ -83,6 +96,7 @@ class ArclightGradlePlugin implements Plugin<Project> {
         spigotBuilder.workDir = buildTools
         spigotBuilder.outputDir = spigotDeps
         spigotBuilder.minecraftVersion = arclight.mcVersion
+        spigotBuilder.reversion = arclight.spigotReversion
         spigotBuilder.run()
 
         new LocalMavenHelper("io.izzel.arclight.generated", "spigot", arclight.mcVersion, null, arclightRepo).savePom()
@@ -109,5 +123,7 @@ class ArclightGradlePlugin implements Plugin<Project> {
         remapSpigot.bukkitVersion = arclight.bukkitVersion
         remapSpigot.inExtraSrg = arclight.extraMapping
         remapSpigot.run()
+
+        Files.writeString(buildMeta, newBuildMeta)
     }
 }

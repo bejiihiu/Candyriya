@@ -30,4 +30,7 @@ dependencies {
     implementation(libs.lorenz.tiny)
     implementation(libs.mercury)
     implementation(libs.specialsource) { transitive false }
+
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation("commons-io:commons-io:2.19.0")
 }

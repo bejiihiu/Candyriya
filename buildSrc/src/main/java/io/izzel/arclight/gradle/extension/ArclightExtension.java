@@ -12,6 +12,7 @@ public class ArclightExtension implements IArclightExtension {
     private Path cacheDir;
     private String mcVersion;
     private String bukkitVersion;
+    private Integer spigotRev;
     private File accessTransformer;
     private File extraMapping;
     private final IArclightMappingsExtension mappingsConfiguration = new ArclightMappingsExtension();
@@ -48,6 +49,16 @@ public class ArclightExtension implements IArclightExtension {
     @Override
     public void setBukkitVersion(String bukkitVersion) {
         this.bukkitVersion = bukkitVersion;
+    }
+
+    @Override
+    public Integer getSpigotReversion() {
+        return spigotRev;
+    }
+
+    @Override
+    public void setSpigotReversion(Integer rev) {
+        spigotRev = rev;
     }
 
     @Override
