@@ -126,10 +126,11 @@ public class SpigotBuilder implements Runnable {
         }).getExitValue();
 
         if (exit == 0) {
-//            if (Files.exists(outputJar)) {
-//                Files.delete(outputJar);
-//            }
+            if (Files.exists(outputJar)) {
+                Files.delete(outputJar);
+            }
         } else if (exit == 2) {
+            return;
             // No changes.
         } else {
             throw new GradleException("Failed to build spigot jar.");
@@ -137,21 +138,21 @@ public class SpigotBuilder implements Runnable {
 
         var spigot = workDir.resolve("spigot-" + minecraftVersion + ".jar");
         var bundler = outputDir.resolve("spigot-" + minecraftVersion + "-bundler.jar");
-        Files.move(spigot, bundler, StandardCopyOption.REPLACE_EXISTING);
-        try (var jar = new JarFile(bundler.toFile())) {
-            jar.stream().filter(e -> e.getName().startsWith("META-INF/versions/") && e.getName().endsWith(".jar"))
-                    .limit(1)
-                    .forEach(e -> {
-                        try (var out = Files.newOutputStream(outputJar)) {
-                            jar.getInputStream(e).transferTo(out);
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    });
+        if (Files.exists(spigot)) {
+            Files.copy(spigot, bundler, StandardCopyOption.REPLACE_EXISTING);
+            try (var jar = new JarFile(bundler.toFile())) {
+                jar.stream().filter(e -> e.getName().startsWith("META-INF/versions/") && e.getName().endsWith(".jar"))
+                        .limit(1)
+                        .forEach(e -> {
+                            try (var out = Files.newOutputStream(outputJar)) {
+                                jar.getInputStream(e).transferTo(out);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        });
+            }
         }
     }
-
-
 
     @SneakyThrows
     private void checkout(String dirName, String url, String refs) {

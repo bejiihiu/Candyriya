@@ -8,6 +8,7 @@ import io.izzel.arclight.gradle.tasks.RemapSpigotTask
 import io.izzel.arclight.gradle.tasks.RenameJarTask
 import net.fabricmc.loom.LoomGradlePlugin
 import net.fabricmc.loom.configuration.mods.dependency.LocalMavenHelper
+import org.apache.commons.io.FileUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.apache.commons.io.IOUtils
@@ -84,16 +85,20 @@ class ArclightGradlePlugin implements Plugin<Project> {
             }
         }
 
+        def buildSpigotWorkDir = arclight.cacheDir.resolve('arclight_cache/buildtools')
+
+        FileUtils.deleteDirectory(buildSpigotWorkDir.toFile())
+        Files.createDirectories(buildSpigotWorkDir)
+
         project.logger.lifecycle(":step1 download build tools")
-        def buildTools = arclight.cacheDir.resolve('arclight_cache/buildtools')
-        def buildToolsJar = buildTools.resolve('BuildTools.jar')
+        def buildToolsJar = buildSpigotWorkDir.resolve('BuildTools.jar')
         def downloadBuildTools = new FileDownloader("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar", buildToolsJar)
         downloadBuildTools.run()
 
         project.logger.lifecycle(":step2 build spigot")
         def spigotBuilder = project.getObjects().newInstance(SpigotBuilder)
         spigotBuilder.buildToolsJar = buildToolsJar
-        spigotBuilder.workDir = buildTools
+        spigotBuilder.workDir = buildSpigotWorkDir
         spigotBuilder.outputDir = spigotDeps
         spigotBuilder.minecraftVersion = arclight.mcVersion
         spigotBuilder.reversion = arclight.spigotReversion
@@ -103,7 +108,7 @@ class ArclightGradlePlugin implements Plugin<Project> {
 
         project.logger.lifecycle(":step3 process mappings")
         def processMapping = new ProcessMappingTask(project)
-        processMapping.buildData = new File(buildTools.toFile(), 'BuildData')
+        processMapping.buildData = new File(buildSpigotWorkDir.toFile(), 'BuildData')
         processMapping.mcVersion = arclight.mcVersion
         processMapping.bukkitVersion = arclight.bukkitVersion
         processMapping.outDir = mappingsDir.toFile()
@@ -112,7 +117,7 @@ class ArclightGradlePlugin implements Plugin<Project> {
 
         project.logger.lifecycle(":step4 remap spigot jar")
         def remapSpigot = new RemapSpigotTask(project)
-        remapSpigot.ssJar = new File(buildTools.toFile(), 'BuildData/bin/SpecialSource.jar')
+        remapSpigot.ssJar = new File(buildSpigotWorkDir.toFile(), 'BuildData/bin/SpecialSource.jar')
         remapSpigot.inJar = spigotBuilder.outputJar.toFile()
         remapSpigot.inSrg = new File(processMapping.outDir, 'bukkit_srg.srg')
         remapSpigot.inSrgToStable = new File(processMapping.outDir, "srg_to_named.srg")
