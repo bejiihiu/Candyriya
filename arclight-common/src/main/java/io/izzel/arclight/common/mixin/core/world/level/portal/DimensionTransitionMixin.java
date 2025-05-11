@@ -44,6 +44,6 @@ public class DimensionTransitionMixin implements DimensionTransitionBridge {
 
     @Override
     public PlayerTeleportEvent.TeleportCause bridge$getTeleportCause() {
-        return arclight$cause;
+        return arclight$cause == null ? PlayerTeleportEvent.TeleportCause.UNKNOWN : arclight$cause;
     }
 }
