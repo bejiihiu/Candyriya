@@ -3,6 +3,8 @@ package io.izzel.arclight.common.mixin.core.network;
 import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBridge;
 import io.izzel.arclight.common.bridge.core.network.common.ServerCommonPacketListenerBridge;
 import io.izzel.arclight.common.bridge.core.server.MinecraftServerBridge;
+import io.izzel.arclight.common.mod.mixins.annotation.CreateConstructor;
+import io.izzel.arclight.common.mod.mixins.annotation.ShadowConstructor;
 import io.izzel.arclight.common.mod.server.ArclightServer;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
 import io.izzel.arclight.mixin.Decorate;
@@ -69,6 +71,17 @@ public abstract class ServerCommonPacketListenerImplMixin implements ServerCommo
 
     public CraftPlayer getCraftPlayer() {
         return (this.player == null) ? null : ((ServerPlayerEntityBridge) this.player).bridge$getBukkitEntity();
+    }
+
+    @ShadowConstructor
+    public abstract void arclight$this(MinecraftServer server, Connection connection, CommonListenerCookie cookie);
+
+    @CreateConstructor
+    public void arclight$constructor(MinecraftServer server, Connection connection, CommonListenerCookie cookie, ServerPlayer player) {
+        arclight$this(server, connection, cookie);
+        this.player = player;
+        ((ServerPlayerEntityBridge) player).bridge$setTransferCookieConnection(this);
+        this.cserver = (CraftServer) Bukkit.getServer(); // TODO: Use MinecraftServerBridge.bridge$getServer()
     }
 
     @Override
