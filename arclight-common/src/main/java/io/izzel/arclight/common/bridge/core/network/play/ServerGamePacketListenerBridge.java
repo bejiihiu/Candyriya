@@ -42,4 +42,10 @@ public interface ServerGamePacketListenerBridge extends ServerCommonPacketListen
     }
 
     void bridge$storeLastPosition(double d, double e, double f, float yaw, float pitch, Set<RelativeMovement> set);
+
+    void arclight$platform$setLastPosX(double d);
+    void arclight$platform$setLastPosY(double d);
+    void arclight$platform$setLastPosZ(double d);
+    void arclight$platform$setLastPitch(float f);
+    void arclight$platform$setLastYaw(float f);
 }

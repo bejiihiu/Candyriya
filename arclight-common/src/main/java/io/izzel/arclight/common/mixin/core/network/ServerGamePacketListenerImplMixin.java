@@ -1745,4 +1745,29 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
     public SocketAddress getRawAddress() {
         return this.connection.channel.remoteAddress();
     }
+
+    @Override
+    public void arclight$platform$setLastPosX(double d) {
+        lastPosX = d;
+    }
+
+    @Override
+    public void arclight$platform$setLastPosY(double d) {
+        lastPosY = d;
+    }
+
+    @Override
+    public void arclight$platform$setLastPosZ(double d) {
+        lastPosZ = d;
+    }
+
+    @Override
+    public void arclight$platform$setLastPitch(float f) {
+        lastPitch = f;
+    }
+
+    @Override
+    public void arclight$platform$setLastYaw(float f) {
+        lastYaw = f;
+    }
 }
