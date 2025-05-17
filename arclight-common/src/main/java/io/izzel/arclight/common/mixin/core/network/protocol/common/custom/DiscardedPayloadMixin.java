@@ -24,23 +24,21 @@ public abstract class DiscardedPayloadMixin implements RawPayload {
     }
 
     @CreateConstructor
-    public void arclight$constructor(ResourceLocation rl, ByteBuf data) {
+    public void arclight$constructor(ResourceLocation rl, byte[] data) {
         this.arclight$constructor(rl);
-        this.data = data;
+        this.arclight$data = data;
     }
 
-    @Unique private ByteBuf data;
+    @Unique private byte[] arclight$data;
 
-    @Unique
     @Override
-    public ByteBuf data() {
-        return data.copy();
+    public byte[] arclight$getData() {
+        return arclight$data;
     }
 
-    @Unique
     @Override
-    public void setData(ByteBuf data) {
-        this.data = data;
+    public void arclight$setData(byte[] data) {
+        this.arclight$data = data;
     }
 
     @Inject(method = "codec", at = @At("HEAD"), cancellable = true)

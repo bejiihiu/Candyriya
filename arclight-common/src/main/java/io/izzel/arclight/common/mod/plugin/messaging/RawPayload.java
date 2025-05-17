@@ -9,19 +9,27 @@ import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public interface RawPayload extends CustomPacketPayload {
-    ByteBuf data();
-    void setData(ByteBuf data);
+    byte[] arclight$getData();
+    void arclight$setData(byte[] data);
+
+    default void arclight$setData(ByteBuf buf) {
+        arclight$setData(toBytes(buf));
+    }
+
+    static byte[] toBytes(ByteBuf buf) {
+        var bytes = new byte[buf.readableBytes()];
+        buf.readBytes(bytes, 0, buf.readableBytes());
+        return bytes;
+    }
 
     static <B extends FriendlyByteBuf> StreamCodec<B, ArclightRawPayload> channelCodec(CustomPacketPayload.Type<ArclightRawPayload> type, int max) {
         return StreamCodec.composite(
                 StreamCodec.of(FriendlyByteBuf::writeBytes, buf -> {
                     var size = buf.readableBytes();
                     Preconditions.checkArgument(size <= max, "Custom payload size may not be larger than " + max);
-                    var heap = buf.alloc().heapBuffer(size, size);
-                    buf.readBytes(heap);
-                    return heap;
+                    return RawPayload.toBytes(buf);
                 }),
-                RawPayload::data,
+                RawPayload::arclight$getData,
                 it -> new ArclightRawPayload(type, it)
         );
     }
@@ -32,10 +40,8 @@ public interface RawPayload extends CustomPacketPayload {
             public DiscardedPayload decode(B buf) {
                 int j = buf.readableBytes();
                 if (j >= 0 && j <= max) {
-                    var heap = buf.alloc().heapBuffer(j, j);
-                    buf.readBytes(heap);
                     var payload = new DiscardedPayload(location);
-                    ((RawPayload)(Object)payload).setData(heap);
+                    ((RawPayload)(Object)payload).arclight$setData(buf);
                     return payload;
                 } else {
                     throw new IllegalArgumentException("Payload may not be larger than " + max + " bytes");
@@ -45,7 +51,7 @@ public interface RawPayload extends CustomPacketPayload {
             @Override
             public void encode(B buf, CustomPacketPayload obj) {
                 if (obj instanceof RawPayload raw) {
-                    buf.writeBytes(raw.data());
+                    buf.writeBytes(raw.arclight$getData());
                 }
             }
         };
