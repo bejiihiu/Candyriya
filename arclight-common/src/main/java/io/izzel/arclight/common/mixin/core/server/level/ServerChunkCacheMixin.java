@@ -5,11 +5,10 @@ import io.izzel.arclight.common.bridge.core.world.server.ChunkHolderBridge;
 import io.izzel.arclight.common.bridge.core.world.server.ChunkMapBridge;
 import io.izzel.arclight.common.bridge.core.world.server.ServerChunkProviderBridge;
 import io.izzel.arclight.common.bridge.core.world.server.TicketManagerBridge;
-import io.izzel.arclight.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
 import net.minecraft.server.level.*;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.LevelData;
 import org.bukkit.entity.SpawnCategory;
@@ -19,7 +18,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -40,8 +38,9 @@ public abstract class ServerChunkCacheMixin implements ServerChunkProviderBridge
     // @formatter:on
 
     public boolean isChunkLoaded(final int chunkX, final int chunkZ) {
+        //bridge$chunkHolderAt is getUpdatingChunkIfPresent
         ChunkHolder chunk = ((ChunkMapBridge) this.chunkMap).bridge$chunkHolderAt(ChunkPos.asLong(chunkX, chunkZ));
-        return chunk != null && ((ChunkHolderBridge) chunk).bridge$getFullChunk() != null;
+        return chunk != null && ((ChunkHolderBridge) chunk).bridge$getFullChunkNow() != null;
     }
 
     public LevelChunk getChunkUnchecked(int chunkX, int chunkZ) {
@@ -58,17 +57,17 @@ public abstract class ServerChunkCacheMixin implements ServerChunkProviderBridge
     }
 
     @Override
-    public void bridge$setChunkGenerator(ChunkGenerator chunkGenerator) {
-        ((ChunkMapBridge) this.chunkMap).bridge$setChunkGenerator(chunkGenerator);
-    }
-
-    @Override
     public void bridge$setViewDistance(int viewDistance) {
         ((ChunkMapBridge) this.chunkMap).bridge$setViewDistance(viewDistance);
     }
 
+    @Override
+    public void bridge$setSimulationDistance(int simDistance) {
+        distanceManager.updateSimulationDistance(simDistance);
+    }
+
     @ModifyVariable(method = "getChunkFutureMainThread", index = 4, at = @At("HEAD"))
-    private boolean arclight$skipIfUnloading(boolean flag, int chunkX, int chunkZ) {
+    private boolean arclight$skipLoadIfUnloading(boolean flag, int chunkX, int chunkZ) {
         if (flag) {
             ChunkHolder chunkholder = this.getVisibleChunkIfPresent(ChunkPos.asLong(chunkX, chunkZ));
             if (chunkholder != null) {

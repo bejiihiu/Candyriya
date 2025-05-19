@@ -1,6 +1,6 @@
-package io.izzel.arclight.common.mixin.core.world.spawner;
+package io.izzel.arclight.common.mixin.core.world.level.levelgen;
 
-import io.izzel.arclight.common.bridge.core.world.WorldBridge;
+import io.izzel.arclight.common.bridge.core.world.server.ServerWorldBridge;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.levelgen.PhantomSpawner;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PhantomSpawnerMixin {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
-    public void arclight$spawnReason(ServerLevel worldIn, boolean spawnHostileMobs, boolean spawnPeacefulMobs, CallbackInfoReturnable<Integer> cir) {
-        ((WorldBridge) worldIn).bridge$pushAddEntityReason(CreatureSpawnEvent.SpawnReason.NATURAL);
+    private void arclight$addSpawnReason(ServerLevel level, boolean bl, boolean bl2, CallbackInfoReturnable<Integer> cir) {
+        ((ServerWorldBridge)level).bridge$pushAddEntityReason(CreatureSpawnEvent.SpawnReason.NATURAL);
     }
 }

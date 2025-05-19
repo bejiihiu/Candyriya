@@ -365,6 +365,16 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         }
         WorldBorder worldborder = serverWorld.getWorldBorder();
         worldborder.applySettings(worldInfo.getWorldBorder());
+
+        // Call WorldInitEvent for Bukkit created world
+        // Before any chunk is loaded/generated.
+        // This makes delayed configurate possible.
+        // Calling multiple times is OK since Spigot also do so.
+        // See [PlotSquared] BukkitSetupUtils#setupWorld(PlotAreaBuilder).
+        // See CraftServer.
+        // CraftBukkit - SPIGOT-5569: Call WorldInitEvent before any chunks are generated
+        this.server.getPluginManager().callEvent(new WorldInitEvent(serverWorld.bridge$getWorld()));
+
         if (!worldInfo.isInitialized()) {
             try {
                 setInitialSpawn(serverWorld, worldInfo, worldOptions.generateBonusChest(), flag);
@@ -483,6 +493,15 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
     @Override
     public void bridge$setServer(CraftServer server) {
         this.server = server;
+    }
+
+    // Used for one-shot cache access
+    @Override
+    public CraftServer bridge$getServer() {
+        if (this.server == null) {
+            throw new IllegalStateException("CraftServer has not been initialized yet");
+        }
+        return this.server;
     }
 
     @Override
