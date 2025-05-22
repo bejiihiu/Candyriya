@@ -468,6 +468,7 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
         } else {
             arclight$extendedReason = ArclightSpawnReason.TELEPORT;
             addFreshEntity(entity);
+            arclight$extendedReason = null;
         }
     }
 
