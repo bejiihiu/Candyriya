@@ -408,13 +408,14 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
     @Inject(method = "addEntity", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;addNewEntity(Lnet/minecraft/world/level/entity/EntityAccess;)Z"))
     private void arclight$addEntityEvent(Entity entityIn, CallbackInfoReturnable<Boolean> cir) {
         // SPIGOT-6415: Don't call spawn event when reason is null.
-        if (arclight$extendedReason == ArclightSpawnReason.TELEPORT) {
+        final var reason = arclight$reason;
+        arclight$reason = null;
+        if (arclight$extendedReason == ArclightSpawnReason.TELEPORT && reason == null) {
             cir.setReturnValue(false);
             return;
         }
-        CreatureSpawnEvent.SpawnReason reason = arclight$reason == null ? CreatureSpawnEvent.SpawnReason.DEFAULT : arclight$reason;
-        arclight$reason = null;
-        if (DistValidate.isValid(this) && !CraftEventFactory.doEntityAddEventCalling((ServerLevel) (Object) this, entityIn, reason)) {
+        CreatureSpawnEvent.SpawnReason spawnReason = reason == null ? CreatureSpawnEvent.SpawnReason.DEFAULT : reason;
+        if (DistValidate.isValid(this) && !CraftEventFactory.doEntityAddEventCalling((ServerLevel) (Object) this, entityIn, spawnReason)) {
             cir.setReturnValue(false);
         }
     }
@@ -422,7 +423,6 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
     @Inject(method = "addEntity", at = @At("RETURN"))
     public void arclight$resetReason(Entity entityIn, CallbackInfoReturnable<Boolean> cir) {
         arclight$reason = null;
-        arclight$extendedReason = null;
     }
 
     @Override
@@ -453,6 +453,11 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
     @Inject(method = "addDuringTeleport", at = @At("HEAD"))
     private void arclight$ignoreSpawnOnTeleport(Entity entity, CallbackInfo ci) {
         arclight$extendedReason = ArclightSpawnReason.TELEPORT;
+    }
+
+    @Inject(method = "addDuringTeleport", at = @At("RETURN"))
+    private void arclight$unsetIgnoreSpawnOnTeleport(Entity entity, CallbackInfo ci) {
+        arclight$extendedReason = null;
     }
 
     public void addDuringTeleport(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
