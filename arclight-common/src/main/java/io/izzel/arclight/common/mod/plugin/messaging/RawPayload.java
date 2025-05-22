@@ -9,17 +9,14 @@ import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public interface RawPayload extends CustomPacketPayload {
-    byte[] arclight$getData();
-    void arclight$setData(byte[] data);
+    ByteBuf arclight$getData();
+    void arclight$setData(ByteBuf data);
 
-    default void arclight$setData(ByteBuf buf) {
-        arclight$setData(toBytes(buf));
-    }
-
-    static byte[] toBytes(ByteBuf buf) {
-        var bytes = new byte[buf.readableBytes()];
-        buf.readBytes(bytes, 0, buf.readableBytes());
-        return bytes;
+    default byte[] arclight$readBytes() {
+        final var buf = arclight$getData();
+        byte[] allocate = new byte[buf.readableBytes()];
+        buf.readBytes(allocate);
+        return allocate;
     }
 
     static <B extends FriendlyByteBuf> StreamCodec<B, ArclightRawPayload> channelCodec(CustomPacketPayload.Type<ArclightRawPayload> type, int max) {
@@ -27,7 +24,7 @@ public interface RawPayload extends CustomPacketPayload {
                 StreamCodec.of(FriendlyByteBuf::writeBytes, buf -> {
                     var size = buf.readableBytes();
                     Preconditions.checkArgument(size <= max, "Custom payload size may not be larger than " + max);
-                    return RawPayload.toBytes(buf);
+                    return buf.readRetainedSlice(size);
                 }),
                 RawPayload::arclight$getData,
                 it -> new ArclightRawPayload(type, it)
@@ -40,8 +37,9 @@ public interface RawPayload extends CustomPacketPayload {
             public DiscardedPayload decode(B buf) {
                 int j = buf.readableBytes();
                 if (j >= 0 && j <= max) {
+                    var data = buf.readRetainedSlice(j);
                     var payload = new DiscardedPayload(location);
-                    ((RawPayload)(Object)payload).arclight$setData(buf);
+                    ((RawPayload)(Object)payload).arclight$setData(data);
                     return payload;
                 } else {
                     throw new IllegalArgumentException("Payload may not be larger than " + max + " bytes");

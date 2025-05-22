@@ -13,7 +13,7 @@ public record ArclightNfPayloadHandler(ArclightPluginChannel<ArclightNfPayloadHa
     public void handle(ArclightRawPayload pkt, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             var bukkit = ((ServerPlayerEntityBridge)ctx.player()).bridge$getBukkitEntity();
-            channel.dispatchMessage(bukkit, pkt.arclight$getData());
+            channel.dispatchMessage(bukkit, pkt.arclight$readBytes());
         });
     }
 

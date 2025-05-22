@@ -1,9 +1,9 @@
 package io.izzel.arclight.common.mod.plugin.messaging;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,30 +18,35 @@ public class ArclightRawPayload implements RawPayload {
     }
 
     private final Type<ArclightRawPayload> type;
-    private byte[] data;
+    private ByteBuf data;
 
-    public ArclightRawPayload(CustomPacketPayload.Type<ArclightRawPayload> type, ByteBuf buf) {
-        this(type, RawPayload.toBytes(buf));
-    }
-
-    public ArclightRawPayload(CustomPacketPayload.Type<ArclightRawPayload> type, byte[] raw) {
+    public ArclightRawPayload(CustomPacketPayload.Type<ArclightRawPayload> type, ByteBuf raw) {
         Objects.requireNonNull(type, "type cannot be null");
         this.type = type;
         this.data = raw;
     }
 
+    public ArclightRawPayload(CustomPacketPayload.Type<ArclightRawPayload> type, byte[] raw) {
+        this(type, Unpooled.copiedBuffer(raw));
+    }
+
+    public ArclightRawPayload(CustomPacketPayload.Type<ArclightRawPayload> type) {
+        Objects.requireNonNull(type, "type cannot be null");
+        this.type = type;
+    }
+
     @Override
-    public @NotNull Type<ArclightRawPayload> type() {
+    public Type<ArclightRawPayload> type() {
         return type;
     }
 
     @Override
-    public byte[] arclight$getData() {
+    public ByteBuf arclight$getData() {
         return data;
     }
 
     @Override
-    public void arclight$setData(byte[] data) {
+    public void arclight$setData(ByteBuf data) {
         this.data = data;
     }
 }

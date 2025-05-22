@@ -19,26 +19,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class DiscardedPayloadMixin implements RawPayload {
 
     @ShadowConstructor
-    public void arclight$constructor(ResourceLocation rl) {
-        throw new RuntimeException();
-    }
+    public abstract void arclight$constructor(ResourceLocation rl);
 
     @CreateConstructor
-    public void arclight$constructor(ResourceLocation rl, byte[] data) {
-        this.arclight$constructor(rl);
-        this.arclight$data = data;
+    public void arclight$constructor(ResourceLocation rl, ByteBuf data) {
+        arclight$constructor(rl);
+        this.data = data.copy();
     }
 
-    @Unique private byte[] arclight$data;
+    @Unique
+    private ByteBuf data;
 
-    @Override
-    public byte[] arclight$getData() {
-        return arclight$data;
+    @Unique
+    public ByteBuf data() {
+        return data;
     }
 
+    @Unique
     @Override
-    public void arclight$setData(byte[] data) {
-        this.arclight$data = data;
+    public ByteBuf arclight$getData() {
+        return data();
+    }
+
+    @Unique
+    @Override
+    public void arclight$setData(ByteBuf data) {
+        this.data = data;
     }
 
     @Inject(method = "codec", at = @At("HEAD"), cancellable = true)
