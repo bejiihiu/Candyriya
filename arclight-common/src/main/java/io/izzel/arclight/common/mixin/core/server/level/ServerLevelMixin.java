@@ -411,7 +411,6 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
         final var reason = arclight$reason;
         arclight$reason = null;
         if (arclight$extendedReason == ArclightSpawnReason.TELEPORT && reason == null) {
-            cir.setReturnValue(false);
             return;
         }
         CreatureSpawnEvent.SpawnReason spawnReason = reason == null ? CreatureSpawnEvent.SpawnReason.DEFAULT : reason;
