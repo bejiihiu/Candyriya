@@ -1,5 +1,7 @@
 accessWidener v2 named
 # Arclight 1.21.1
+accessible method net/minecraft/world/level/GameRules$BooleanValue deserialize (Ljava/lang/String;)V
+accessible method net/minecraft/world/level/GameRules$IntegerValue deserialize (Ljava/lang/String;)V
 accessible method net/minecraft/world/entity/decoration/ItemFrame setDirection (Lnet/minecraft/core/Direction;)V # For ItemsAdder
 accessible method net/minecraft/network/syncher/SynchedEntityData getItem (Lnet/minecraft/network/syncher/EntityDataAccessor;)Lnet/minecraft/network/syncher/SynchedEntityData$DataItem;
 mutable field net/minecraft/world/level/block/entity/trialspawner/TrialSpawner targetCooldownLength I
