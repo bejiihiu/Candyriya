@@ -52,7 +52,11 @@ public abstract class StructurePieceMixin implements StructurePieceBridge {
 
     @Inject(method = "createChest(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/level/levelgen/structure/BoundingBox;Lnet/minecraft/util/RandomSource;Lnet/minecraft/core/BlockPos;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/block/state/BlockState;)Z", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerLevelAccessor;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     protected void arclight$bukkitCreateChest(ServerLevelAccessor level, BoundingBox aabb, RandomSource random, BlockPos pos, ResourceKey<LootTable> resourceKey, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        CraftChest chest = (CraftChest) CraftBlockStates.getBlockState(level, pos, state, null);
+        CraftBlockState maybeChest = (CraftBlockState) CraftBlockStates.getBlockState(level, pos, state, null);
+        if (!(maybeChest instanceof CraftChest chest)) {
+            // Bukkit won't need to process this
+            return;
+        }
         chest.setLootTable(CraftLootTable.minecraftToBukkit(resourceKey));
         chest.setSeed(random.nextLong());
         placeCraftBlockEntity(level, pos, chest, 2);
