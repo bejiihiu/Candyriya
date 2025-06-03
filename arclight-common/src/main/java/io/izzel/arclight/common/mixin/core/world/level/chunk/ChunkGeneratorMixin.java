@@ -1,8 +1,8 @@
 package io.izzel.arclight.common.mixin.core.world.level.chunk;
 
 import io.izzel.arclight.common.bridge.core.world.IWorldBridge;
-import io.izzel.arclight.common.bridge.core.world.WorldBridge;
 import io.izzel.arclight.common.bridge.core.world.level.levelgen.ChunkGeneratorBridge;
+import io.izzel.arclight.common.mod.mixins.annotation.InvokeSpecial;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.arclight.mixin.Local;
@@ -54,18 +54,23 @@ public abstract class ChunkGeneratorMixin implements ChunkGeneratorBridge {
         DecorationOps.blackhole().invoke();
     }
 
+    @InvokeSpecial
+    private void arclight$this$applyBiomeDecoration(WorldGenLevel p_187712_, ChunkAccess p_187713_, StructureManager p_187714_) {
+        applyBiomeDecoration(p_187712_, p_187713_, p_187714_);
+    }
+
     // TODO SpigotWorldConfig support to provide different seed according to the structure kind
 
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunkAccess, StructureManager structureFeatureManager, boolean vanilla) {
         if (vanilla) {
-            this.applyBiomeDecoration(level, chunkAccess, structureFeatureManager);
+            arclight$this$applyBiomeDecoration(level, chunkAccess, structureFeatureManager);
         } else {
             this.addDecorations(level, chunkAccess, structureFeatureManager);
         }
     }
 
     private void addDecorations(WorldGenLevel region, ChunkAccess chunk, StructureManager structureManager) {
-        org.bukkit.World world = ((WorldBridge) ((IWorldBridge) region).bridge$getMinecraftWorld()).bridge$getWorld();
+        org.bukkit.World world = ((IWorldBridge) region).bridge$getMinecraftWorld().bridge$getWorld();
         // only call when a populator is present (prevents unnecessary entity conversion)
         if (!world.getPopulators().isEmpty()) {
             CraftLimitedRegion limitedRegion = new CraftLimitedRegion(region, chunk.getPos());

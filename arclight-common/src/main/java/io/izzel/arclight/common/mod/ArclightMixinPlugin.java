@@ -1,12 +1,6 @@
 package io.izzel.arclight.common.mod;
 
-import io.izzel.arclight.common.mod.mixins.CreateConstructorProcessor;
-import io.izzel.arclight.common.mod.mixins.InlineFieldProcessor;
-import io.izzel.arclight.common.mod.mixins.InlineMethodProcessor;
-import io.izzel.arclight.common.mod.mixins.MixinProcessor;
-import io.izzel.arclight.common.mod.mixins.RenameIntoProcessor;
-import io.izzel.arclight.common.mod.mixins.ShouldApplyProcessor;
-import io.izzel.arclight.common.mod.mixins.TransformAccessProcessor;
+import io.izzel.arclight.common.mod.mixins.*;
 import io.izzel.arclight.mixin.MixinTools;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -25,7 +19,8 @@ public class ArclightMixinPlugin implements IMixinConfigPlugin {
         new TransformAccessProcessor(),
         new CreateConstructorProcessor(),
         new InlineMethodProcessor(),
-        new InlineFieldProcessor()
+        new InlineFieldProcessor(),
+        new InvokeSpecialProcessor()
     );
 
     @Override
