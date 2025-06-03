@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(AnvilMenu.class)
-public class AnvilMenuMixin_Forge implements AnvilMenuBridge {
+public abstract class AnvilMenuMixin_Forge implements AnvilMenuBridge {
 
     @Override
     public boolean bridge$forge$onAnvilChange(AnvilMenu container, @NotNull ItemStack left, @NotNull ItemStack right, Container outputSlot, String name, int baseCost, Player player) {

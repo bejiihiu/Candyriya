@@ -15,4 +15,8 @@ public interface AnvilMenuBridge {
     default boolean bridge$forge$isBookEnchantable(ItemStack a, ItemStack b) {
         return true;
     }
+
+    void arclight$allowZeroCost();
+
+    boolean arclight$isZeroCostAllowed();
 }

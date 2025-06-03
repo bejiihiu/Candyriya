@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class CraftInventoryViewMixin implements InventoryView {
 
     @Shadow @Final @Mutable private Inventory viewing;
+    @Shadow @Final protected AbstractContainerMenu container;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void arclight$validate(HumanEntity player, Inventory viewing, AbstractContainerMenu container, CallbackInfo ci) {

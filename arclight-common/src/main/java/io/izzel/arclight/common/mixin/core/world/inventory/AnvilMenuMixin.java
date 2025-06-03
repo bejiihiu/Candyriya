@@ -5,28 +5,22 @@ import io.izzel.arclight.common.bridge.core.inventory.AnvilMenuBridge;
 import io.izzel.arclight.common.bridge.core.util.IWorldPosCallableBridge;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v.inventory.CraftInventoryAnvil;
-import org.bukkit.craftbukkit.v.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v.inventory.view.CraftAnvilView;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.view.AnvilView;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AnvilMenu.class)
 public abstract class AnvilMenuMixin extends ItemCombinerMixin implements AnvilMenuBridge {
@@ -45,11 +39,38 @@ public abstract class AnvilMenuMixin extends ItemCombinerMixin implements AnvilM
 
     private CraftAnvilView bukkitEntity;
 
+    private boolean arclight$zeroCostAllowed = false;
+
+    @Override
+    public void arclight$allowZeroCost() {
+        arclight$zeroCostAllowed = true;
+    }
+
+    @Override
+    public boolean arclight$isZeroCostAllowed() {
+        return arclight$zeroCostAllowed;
+    }
+
     @Decorate(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V"))
     private void arclight$prepareAnvilEvent(ResultContainer instance, int i, ItemStack itemStack) throws Throwable {
-        var event = new PrepareAnvilEvent((AnvilView) getBukkitView(), CraftItemStack.asCraftMirror(itemStack).clone());
+        arclight$zeroCostAllowed = false;
+        var event = new PrepareAnvilEvent(getBukkitView(), CraftItemStack.asCraftMirror(itemStack).clone());
         Bukkit.getServer().getPluginManager().callEvent(event);
         DecorationOps.callsite().invoke(instance, i, CraftItemStack.asNMSCopy(event.getResult()));
+    }
+
+    @Decorate(method = "mayPickup", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/DataSlot;get()I"))
+    private int arclight$tryAllowZeroCost(DataSlot instance) throws Throwable {
+        final int value = (int) DecorationOps.callsite().invoke(instance);
+        if (value == 0 && arclight$zeroCostAllowed) {
+            return 1;
+        }
+        return value;
+    }
+
+    @Inject(method = "mayPickup", at = @At("RETURN"), cancellable = true)
+    private void arclight$considerFlag(Player player, boolean hasItem, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(cir.getReturnValueZ() && hasItem);
     }
 
     @Inject(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AnvilMenu;broadcastChanges()V"))
