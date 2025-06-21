@@ -1254,6 +1254,7 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
             } else {
                 if (!this.player.containerMenu.isValidSlotIndex(packet.getSlotNum())) {
                     LOGGER.debug("Player {} clicked invalid slot index {}, available slots: {}", this.player.getName(), packet.getSlotNum(), this.player.containerMenu.slots.size());
+                    return;
                 }
                 boolean flag = packet.getStateId() != this.player.containerMenu.getStateId();
 
