@@ -81,7 +81,8 @@ public abstract class DamageSourceMixin implements DamageSourceBridge {
     }
 
     public Entity getDamager() {
-        return this.customEntityDamager == null ? this.causingEntity : this.customEntityDamager;
+        // Arclight: Blame: used causingEntity instead of directEntity and bump into problems :(
+        return this.customEntityDamager == null ? this.directEntity : this.customEntityDamager;
     }
 
     @Override
