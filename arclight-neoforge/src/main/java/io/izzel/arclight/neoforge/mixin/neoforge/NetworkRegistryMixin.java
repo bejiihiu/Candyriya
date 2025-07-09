@@ -51,11 +51,9 @@ public abstract class NetworkRegistryMixin {
 
     @Decorate(method = "getCodec", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V"))
     private static void arclight$discardIllegal(Logger instance, String s, Object o, ResourceLocation id, ConnectionProtocol protocol, PacketFlow flow) throws Throwable {
-        if (o instanceof ResourceLocation l) {
-            PacketRecorder recorder = ((MessengerBridge) Bukkit.getMessenger()).arclight$getPacketRecorder();
-            recorder.recordUnknown(l);
-            recorder.update();
-        }
+        PacketRecorder recorder = ((MessengerBridge) Bukkit.getMessenger()).arclight$getPacketRecorder();
+        recorder.recordUnknown(id);
+        recorder.update();
         if (flow == PacketFlow.CLIENTBOUND) {
             DecorationOps.cancel().invoke(RawPayload.discardedCodec(id, ArclightConstants.MAX_C2S_CUSTOM_PAYLOAD_SIZE));
             return;
