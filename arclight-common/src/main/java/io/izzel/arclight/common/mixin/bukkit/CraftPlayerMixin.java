@@ -1,29 +1,34 @@
 package io.izzel.arclight.common.mixin.bukkit;
 
 import io.izzel.arclight.common.bridge.bukkit.MessengerBridge;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.craftbukkit.v.CraftServer;
 import org.bukkit.craftbukkit.v.entity.CraftPlayer;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.messaging.StandardMessenger;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Set;
 
 @Mixin(value = CraftPlayer.class, remap = false)
 public abstract class CraftPlayerMixin extends CraftEntityMixin {
 
-    @Shadow @Final private Set<String> channels;
+    @Shadow @Final @Mutable private Set<String> channels;
 
     @Shadow public abstract ServerPlayer getHandle();
 
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void arclight$useFastSet(CraftServer server, ServerPlayer entity, CallbackInfo ci) {
+        channels = new ObjectOpenHashSet<>();
+    }
+
     @ModifyConstant(method = "addChannel", constant = @Constant(intValue = 128))
     private int arclight$modifyMaxChannel(int constant) {
-        return 1024;
+        return 2048;
     }
     
     /**
