@@ -1,6 +1,7 @@
 package io.izzel.arclight.common.mixin.core;
 
 import io.izzel.arclight.api.ArclightVersion;
+import io.izzel.arclight.common.mod.server.ArclightServer;
 import net.minecraft.CrashReport;
 import net.minecraft.SystemReport;
 import org.bukkit.craftbukkit.v.CraftCrashReport;
@@ -19,6 +20,10 @@ public class CrashReportMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void arclight$additional(String string, Throwable throwable, CallbackInfo ci) {
         this.systemReport.setDetail("Arclight Release", ArclightVersion.current()::getReleaseName);
-        this.systemReport.setDetail("Arclight", new CraftCrashReport());
+        if (ArclightServer.isInitialized()) {
+            this.systemReport.setDetail("Arclight", new CraftCrashReport());
+        } else {
+            this.systemReport.setDetail("Arclight", "The crash happens before the server initialization.");
+        }
     }
 }
