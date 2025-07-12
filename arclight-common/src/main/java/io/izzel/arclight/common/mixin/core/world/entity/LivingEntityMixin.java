@@ -410,7 +410,7 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
         removing = false;
     }
 
-    @Decorate(method = "triggerOnDeathMobEffects", at = @At(value = "INVOKE", remap = false, target = "Lnet/minecraft/world/effect/MobEffectInstance;onMobRemoved(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/Entity$RemovalReason;)V"))
+    @Decorate(method = "triggerOnDeathMobEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectInstance;onMobRemoved(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/Entity$RemovalReason;)V"))
     private void arclight$fireRemoveEvents(MobEffectInstance instance, LivingEntity arg, Entity.RemovalReason arg2) throws Throwable {
         DecorationOps.callsite().invoke(instance, arg, arg2);
         CraftEventFactory.callEntityPotionEffectChangeEvent((LivingEntity) (Object) this, instance, null, EntityPotionEffectEvent.Cause.DEATH);
