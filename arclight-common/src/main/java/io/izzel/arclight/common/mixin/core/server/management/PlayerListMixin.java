@@ -10,6 +10,7 @@ import io.izzel.arclight.common.bridge.core.network.play.ServerGamePacketListene
 import io.izzel.arclight.common.bridge.core.server.management.PlayerListBridge;
 import io.izzel.arclight.common.bridge.core.world.WorldBridge;
 import io.izzel.arclight.common.mod.server.ArclightServer;
+import io.izzel.arclight.common.mod.server.world.ArclightBorderChangeListener;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
 import io.izzel.arclight.common.mod.util.Blackhole;
 import io.izzel.arclight.mixin.Decorate;
@@ -52,6 +53,8 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.BorderChangeListener;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.LevelResource;
@@ -170,7 +173,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
             return;
         }
         String joinMessage = playerJoinEvent.getJoinMessage();
-        if (joinMessage != null && joinMessage.length() > 0) {
+        if (joinMessage != null && !joinMessage.isEmpty()) {
             for (Component line : CraftChatMessage.fromString(joinMessage)) {
                 this.server.getPlayerList().broadcastSystemMessage(line, flag);
             }
@@ -187,6 +190,11 @@ public abstract class PlayerListMixin implements PlayerListBridge {
     @ModifyVariable(method = "placeNewPlayer", ordinal = 1, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ServerLevel;addNewPlayer(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private ServerLevel arclight$handleWorldChanges(ServerLevel value, Connection connection, ServerPlayer player) {
         return player.serverLevel();
+    }
+
+    @Decorate(method = "addWorldborderListener", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/border/WorldBorder;addListener(Lnet/minecraft/world/level/border/BorderChangeListener;)V"))
+    private void arclight$useCustomListener(WorldBorder instance, BorderChangeListener arg) throws Throwable {
+        DecorationOps.callsite().invoke(instance, ArclightBorderChangeListener.typed());
     }
 
     @Inject(method = "save", cancellable = true, at = @At("HEAD"))

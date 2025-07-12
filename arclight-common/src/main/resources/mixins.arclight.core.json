@@ -70,6 +70,7 @@
     "server.commands.SummonCommandMixin",
     "server.commands.TeleportCommandMixin",
     "server.commands.TimeCommandMixin",
+    "server.commands.WorldBorderCommandMixin",
     "server.dedicated.DedicatedServerMixin",
     "server.level.ChunkHolderMixin",
     "server.level.ChunkMap_TrackedEntityMixin",
