@@ -91,6 +91,8 @@ public class ArclightServer {
         return server;
     }
 
+    public static boolean isInitialized() { return server != null; }
+
     public static CraftServer get() {
         return Objects.requireNonNull(server);
     }
