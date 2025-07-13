@@ -58,7 +58,8 @@ public class ArclightTerminalReader {
                 }
             }
         } catch (UserInterruptException e) {
-            server.close();
+            // DONT USE CLOSE, YOU AREN'T GOING TO SHUT IT DOWN IN ANOTHER THREAD!
+            server.halt(true);
         } finally {
             TerminalConsoleAppender.setReader(null);
         }
