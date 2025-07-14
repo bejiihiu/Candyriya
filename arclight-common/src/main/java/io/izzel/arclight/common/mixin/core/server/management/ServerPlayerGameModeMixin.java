@@ -60,7 +60,6 @@ public abstract class ServerPlayerGameModeMixin implements PlayerInteractionMana
     // @formatter:off
     @Shadow protected ServerLevel level;
     @Shadow @Final protected ServerPlayer player;
-    @Shadow public abstract boolean isCreative();
     @Shadow private GameType gameModeForPlayer;
     // @formatter:on
 
@@ -86,6 +85,7 @@ public abstract class ServerPlayerGameModeMixin implements PlayerInteractionMana
         DecorationOps.callsite().invoke(instance, packet);
         BlockEntity blockEntity = this.level.getBlockEntity(blockPos);
         if (blockEntity != null) {
+            // FIXME: Oops, this might be null!
             this.player.connection.send(blockEntity.getUpdatePacket());
         }
     }
@@ -98,6 +98,7 @@ public abstract class ServerPlayerGameModeMixin implements PlayerInteractionMana
             this.player.connection.send(new ClientboundBlockUpdatePacket(this.level, blockPos));
             BlockEntity blockEntity = this.level.getBlockEntity(blockPos);
             if (blockEntity != null) {
+                // FIXME: Oops, this might be null!
                 this.player.connection.send(blockEntity.getUpdatePacket());
             }
             DecorationOps.cancel().invoke();

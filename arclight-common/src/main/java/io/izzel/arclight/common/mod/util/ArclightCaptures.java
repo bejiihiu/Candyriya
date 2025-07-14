@@ -376,6 +376,18 @@ public class ArclightCaptures {
         spreadPos = null;
     }
 
+    private static boolean playerInteractCancelled;
+
+    public static void cancelPlayerInteract() { playerInteractCancelled = true; }
+
+    public static boolean shouldCancelPlayerInteract() {
+        try {
+            return playerInteractCancelled;
+        } finally {
+            playerInteractCancelled = false;
+        }
+    }
+
     private static void recapture(String type) {
         throw new IllegalStateException("Recapturing " + type);
     }
