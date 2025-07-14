@@ -17,6 +17,7 @@
     "CraftBlockEntityStateAccessor",
     "CraftBlockMixin",
     "CraftBlockStateMixin",
+    "CraftBlockTypeMixin",
     "CraftConsoleCommandSenderMixin",
     "CraftEnderDragonMixin",
     "CraftEntityMixin",
