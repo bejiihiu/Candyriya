@@ -9,14 +9,22 @@ import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public interface RawPayload extends CustomPacketPayload {
-    ByteBuf arclight$getData();
+    ByteBuf arclight$getRawData();
     void arclight$setData(ByteBuf data);
 
     default byte[] arclight$readBytes() {
-        final var buf = arclight$getData();
+        final var buf = arclight$getRawData();
         byte[] allocate = new byte[buf.readableBytes()];
         buf.readBytes(allocate);
         return allocate;
+    }
+
+    default ByteBuf arclight$getSlicedData() {
+        // NeoForge will attempt to split packets to avoid massive packets.
+        // They will determine the data size by encoding in advance.
+        // This leads to multiple encode(...) invocation.
+        // We need our packet to be stateless so it can be encoded whatsoever.
+        return arclight$getRawData().slice();
     }
 
     static <B extends FriendlyByteBuf> StreamCodec<B, ArclightRawPayload> channelCodec(CustomPacketPayload.Type<ArclightRawPayload> type, int max) {
@@ -26,7 +34,7 @@ public interface RawPayload extends CustomPacketPayload {
                     Preconditions.checkArgument(size <= max, "Custom payload size may not be larger than " + max);
                     return buf.readRetainedSlice(size);
                 }),
-                RawPayload::arclight$getData,
+                RawPayload::arclight$getSlicedData,
                 it -> new ArclightRawPayload(type, it)
         );
     }
@@ -49,7 +57,7 @@ public interface RawPayload extends CustomPacketPayload {
             @Override
             public void encode(B buf, CustomPacketPayload obj) {
                 if (obj instanceof RawPayload raw) {
-                    buf.writeBytes(raw.arclight$getData());
+                    buf.writeBytes(raw.arclight$getSlicedData());
                 }
             }
         };
