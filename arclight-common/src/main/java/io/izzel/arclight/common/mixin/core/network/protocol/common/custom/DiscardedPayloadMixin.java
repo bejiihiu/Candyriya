@@ -37,7 +37,7 @@ public abstract class DiscardedPayloadMixin implements RawPayload {
 
     @Unique
     @Override
-    public ByteBuf arclight$getData() {
+    public ByteBuf arclight$getRawData() {
         return data();
     }
 
