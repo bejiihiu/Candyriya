@@ -1,4 +1,4 @@
-package io.izzel.arclight.common.mod.server.world;
+package io.izzel.arclight.common.mod.server.world.border;
 
 import io.izzel.arclight.common.bridge.core.world.border.WorldBorderBridge;
 import net.minecraft.network.protocol.Packet;

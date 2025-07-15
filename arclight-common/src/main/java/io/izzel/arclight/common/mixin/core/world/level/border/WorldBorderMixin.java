@@ -30,8 +30,8 @@ public class WorldBorderMixin implements WorldBorderBridge {
     }
 
     @Inject(method = "addListener", cancellable = true, at = @At("HEAD"))
-    private void arclight$removeDuplicateListener(BorderChangeListener borderChangeListener, CallbackInfo ci) {
-        if (listeners.contains(borderChangeListener)) {
+    private void arclight$removeDuplicateListener(BorderChangeListener listener, CallbackInfo ci) {
+        if (listeners.contains(listener)) {
             ci.cancel();
         }
     }

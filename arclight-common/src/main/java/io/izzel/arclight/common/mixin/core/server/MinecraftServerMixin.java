@@ -10,6 +10,8 @@ import io.izzel.arclight.common.mod.ArclightConstants;
 import io.izzel.arclight.common.mod.mixins.annotation.TransformAccess;
 import io.izzel.arclight.common.mod.server.ArclightServer;
 import io.izzel.arclight.common.mod.server.BukkitRegistry;
+import io.izzel.arclight.common.mod.server.world.border.ArclightBorderChangeListener;
+import io.izzel.arclight.common.mod.server.world.border.ArclightDelegatedBorderListener;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
 import io.izzel.arclight.common.mod.util.BukkitOptionParser;
 import io.izzel.arclight.mixin.Decorate;
@@ -51,6 +53,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
@@ -77,6 +80,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -151,6 +155,8 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
     @Shadow private float smoothedTickTimeMillis;
     @Shadow public abstract Iterable<ServerLevel> getAllLevels();
     // @formatter:on
+
+    @Shadow private PlayerList playerList;
 
     public MinecraftServerMixin(String name) {
         super(name);
@@ -290,6 +296,19 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         BukkitRegistry.registerEnvironments(this.registryAccess().registryOrThrow(Registries.LEVEL_STEM));
     }
 
+    @Decorate(method = "createLevels", at = @At(value = "NEW", target = "(Lnet/minecraft/world/level/border/WorldBorder;)Lnet/minecraft/world/level/border/BorderChangeListener$DelegateBorderChangeListener;"))
+    private BorderChangeListener.DelegateBorderChangeListener arclight$configurableDelegatedListener(WorldBorder arg) throws Throwable {
+        // Arclight: move world border listener initialization to world registration
+        return new ArclightDelegatedBorderListener(arg, (BorderChangeListener.DelegateBorderChangeListener) DecorationOps.callsite().invoke(arg));
+    }
+
+    @Decorate(method = "createLevels", at = @At(value = "INVOKE", ordinal = 1, target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
+    private Object arclight$addRespectiveBorderListener(Map instance, Object k, Object v) throws Throwable {
+        // Arclight: move world border listener initialization to world registration
+        ((Level) v).getWorldBorder().addListener(ArclightBorderChangeListener.typed());
+        return DecorationOps.callsite().invoke(instance, k, v);
+    }
+
     @Decorate(method = "createLevels", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
     private Object arclight$worldInit(Map<Object, Object> instance, Object k, Object v, ChunkProgressListener chunkProgressListener) throws Throwable {
         var serverWorld = (ServerLevel) v;
@@ -365,6 +384,9 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         }
         WorldBorder worldborder = serverWorld.getWorldBorder();
         worldborder.applySettings(worldInfo.getWorldBorder());
+
+        // Arclight: move world border listener initialization to world registration
+        playerList.addWorldborderListener(serverWorld);
 
         // Call WorldInitEvent for Bukkit created world
         // Before any chunk is loaded/generated.

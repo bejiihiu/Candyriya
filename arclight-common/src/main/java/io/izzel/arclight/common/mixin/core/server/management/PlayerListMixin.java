@@ -10,7 +10,7 @@ import io.izzel.arclight.common.bridge.core.network.play.ServerGamePacketListene
 import io.izzel.arclight.common.bridge.core.server.management.PlayerListBridge;
 import io.izzel.arclight.common.bridge.core.world.WorldBridge;
 import io.izzel.arclight.common.mod.server.ArclightServer;
-import io.izzel.arclight.common.mod.server.world.ArclightBorderChangeListener;
+import io.izzel.arclight.common.mod.server.world.border.ArclightBorderChangeListener;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
 import io.izzel.arclight.common.mod.util.Blackhole;
 import io.izzel.arclight.mixin.Decorate;
@@ -216,6 +216,11 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         // playerIn.doTick();
         ArclightCaptures.captureQuitMessage(playerQuitEvent.getQuitMessage());
         cserver.getScoreboardManager().removePlayer(((ServerPlayerEntityBridge) playerIn).bridge$getBukkitEntity());
+    }
+
+    @Decorate(method = "sendLevelInfo", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
+    private WorldBorder arclight$useRespectiveWorldBorder(ServerLevel overworld, ServerPlayer player, ServerLevel destination) throws Throwable {
+        return (WorldBorder) DecorationOps.callsite().invoke(destination);
     }
 
     @Override
