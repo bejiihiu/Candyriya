@@ -78,6 +78,11 @@ public abstract class ServerPlayerGameModeMixin implements PlayerInteractionMana
         }
     }
 
+    /*
+     * This series of events are controlled by respective mod loaders.
+     * It is thus implemented differently when the original event gets cancelled.
+     * See PSI for firing when it's cancelled.
+     */
     @Decorate(method = "handleBlockBreakAction", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V"),
         slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;mayInteract(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;)Z")))
     private void arclight$mayNotInteractEvent(ServerGamePacketListenerImpl instance, Packet<?> packet, BlockPos blockPos, ServerboundPlayerActionPacket.Action action, Direction direction) throws Throwable {
