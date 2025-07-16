@@ -12,8 +12,13 @@ public class ArclightPermissionImpl {
         }
 
         PermissionCheckEvent.EVENT.register((provider, permission) -> {
-            var sender = ((CommandSourceStackBridge) provider).bridge$getBukkitSender();
-            return TriState.of(sender.hasPermission(permission));
+            if (provider instanceof CommandSourceStackBridge stack) {
+                var sender = stack.bridge$getBukkitSender();
+                if (sender != null) {
+                    return TriState.of(sender.hasPermission(permission));
+                }
+            }
+            return TriState.DEFAULT;
         });
 
         // Fixme: Bukkit didn't support offline player's permission.
