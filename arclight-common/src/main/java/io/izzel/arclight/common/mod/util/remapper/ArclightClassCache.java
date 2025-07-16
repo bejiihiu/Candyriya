@@ -19,11 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -56,10 +52,12 @@ public abstract class ArclightClassCache implements AutoCloseable {
 
     private static class Impl extends ArclightClassCache {
 
-        private static final int SPEC_VERSION = 2;
+        private static final int SPEC_VERSION = 3;
+        private static final boolean ENABLED = ArclightConfig.spec().getOptimization().isCachePluginClass();
 
-        private final boolean enabled = ArclightConfig.spec().getOptimization().isCachePluginClass();
-        private final ConcurrentHashMap<String, JarSegment> map = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, String> nameToHash = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, JarSegment> hashToSegment = new ConcurrentHashMap<>();
+
         private final Path basePath = Paths.get(".arclight/class_cache");
         private ScheduledExecutorService executor;
 
@@ -82,7 +80,7 @@ public abstract class ArclightClassCache implements AutoCloseable {
         }
 
         public Impl() {
-            if (!enabled) return;
+            if (!ENABLED) return;
             executor = Executors.newSingleThreadScheduledExecutor(r -> {
                 Thread thread = new Thread(r);
                 thread.setName("arclight class cache saving thread");
@@ -145,34 +143,68 @@ public abstract class ArclightClassCache implements AutoCloseable {
             Runtime.getRuntime().addShutdownHook(thread);
         }
 
+        private String calculateHash(String fileName) throws IOException {
+            Path jarFile = new File(fileName).toPath();
+            Hasher hasher = Hashing.sha256().newHasher();
+            hasher.putBytes(Files.readAllBytes(jarFile));
+            String hash = hasher.hash().toString();
+            return hash;
+        }
+
+        private String acquireHashC(String fileName) {
+            return nameToHash.computeIfAbsent(fileName, n -> {
+                try {
+                    return calculateHash(n);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        private JarSegment acquireSegmentC(String hash) {
+            return hashToSegment.computeIfAbsent(hash, k -> {
+                try {
+                    return new JarSegment(k);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
         @Override
         public CacheSegment makeSegment(URLConnection connection) throws IOException {
-            if (enabled && connection instanceof JarURLConnection) {
-                JarFile file = ((JarURLConnection) connection).getJarFile();
-                return this.map.computeIfAbsent(file.getName(), k -> {
-                    try {
-                        return new JarSegment(k);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+            if (ENABLED && connection instanceof JarURLConnection) {
+                final JarFile file = ((JarURLConnection) connection).getJarFile();
+                final String hash = acquireHashC(file.getName());
+                return acquireSegmentC(hash);
             } else {
-                return new EmptySegment();
+                return EmptySegment.INSTANCE;
             }
         }
 
         @Override
         public void save() throws IOException {
-            if (enabled) {
-                for (CacheSegment segment : map.values()) {
-                    segment.save();
+            if (ENABLED) {
+                try {
+                    hashToSegment.forEach((k, v) -> {
+                        try {
+                            v.save();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                } catch (RuntimeException e) {
+                    if (e.getCause() instanceof IOException io) {
+                        throw io;
+                    }
+                    throw e;
                 }
             }
         }
 
         @Override
         public void close() throws Exception {
-            if (enabled) {
+            if (ENABLED) {
                 save();
                 executor.shutdownNow();
             }
@@ -185,11 +217,7 @@ public abstract class ArclightClassCache implements AutoCloseable {
             private final AtomicLong sizeAllocator;
             private final Path indexPath, blobPath;
 
-            private JarSegment(String fileName) throws IOException {
-                Path jarFile = new File(fileName).toPath();
-                Hasher hasher = Hashing.sha256().newHasher();
-                hasher.putBytes(Files.readAllBytes(jarFile));
-                String hash = hasher.hash().toString();
+            private JarSegment(String hash) throws IOException {
                 this.indexPath = basePath.resolve("index").resolve(hash);
                 this.blobPath = basePath.resolve("blob").resolve(hash);
                 if (!Files.exists(indexPath)) {
@@ -231,7 +259,7 @@ public abstract class ArclightClassCache implements AutoCloseable {
             }
 
             @Override
-            public synchronized void save() throws IOException {
+            public void save() throws IOException {
                 if (savingQueue.isEmpty()) return;
                 List<Product5<String, byte[], Long, Integer, ArclightRemapConfig>> list = new ArrayList<>();
                 while (!savingQueue.isEmpty()) {
@@ -252,7 +280,7 @@ public abstract class ArclightClassCache implements AutoCloseable {
                 }
             }
 
-            private synchronized void read() throws IOException {
+            private void read() throws IOException {
                 try (InputStream inputStream = Files.newInputStream(indexPath);
                      DataInputStream dataIn = new DataInputStream(inputStream)) {
                     while (dataIn.available() > 0) {
@@ -267,6 +295,8 @@ public abstract class ArclightClassCache implements AutoCloseable {
         }
 
         private static class EmptySegment implements CacheSegment {
+
+            public static final EmptySegment INSTANCE = new EmptySegment();
 
             @Override
             public Optional<byte[]> findByName(String name, ArclightRemapConfig config) {
