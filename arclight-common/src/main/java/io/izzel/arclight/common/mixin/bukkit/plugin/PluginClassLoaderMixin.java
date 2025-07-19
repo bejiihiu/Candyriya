@@ -7,6 +7,8 @@ import io.izzel.arclight.common.mod.util.remapper.ArclightRemapConfig;
 import io.izzel.arclight.common.mod.util.remapper.ArclightRemapper;
 import io.izzel.arclight.common.mod.util.remapper.ClassLoaderRemapper;
 import io.izzel.arclight.common.mod.util.remapper.RemappingClassLoader;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.tools.product.Product2;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -158,5 +161,10 @@ public class PluginClassLoaderMixin extends URLClassLoader implements RemappingC
         }
 
         return result;
+    }
+
+    @Decorate(method = "loadClass0", at = @At(value = "NEW", target = "(Ljava/lang/String;)Ljava/lang/ClassNotFoundException;"))
+    private ClassNotFoundException arclight$addPluginInfo(String s) throws Throwable {
+        return (ClassNotFoundException) DecorationOps.callsite().invoke(String.format("Plugin %s cannot load class %s", description.getName(), s));
     }
 }

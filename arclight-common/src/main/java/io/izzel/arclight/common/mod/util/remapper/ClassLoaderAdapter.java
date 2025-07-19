@@ -47,7 +47,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
         ClassInfo info = classInfo(node);
         if (info == null) return;
         ArclightServer.LOGGER.debug(MARKER, "Transforming classloader class {}", node.name);
-        if (!info.remapping) {
+        if (config.remap() && !info.remapping) {
             implementIntf(node);
         }
         for (MethodNode methodNode : node.methods) {
@@ -89,6 +89,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
         MethodNode getConfig = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC, "getRemapConfig", Type.getMethodDescriptor(Type.getType(ArclightRemapConfig.class)), null, null);
         {
             final var config = Type.getInternalName(ArclightRemapConfig.class);
+            final var remapping = Type.getInternalName(ClassLoaderRemapping.class);
 
             /*
              * public ArclightRemapConfig getConfig() {
@@ -114,7 +115,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
             list.add(new TypeInsnNode(Opcodes.NEW, config));
             list.add(new InsnNode(Opcodes.DUP));
             list.add(new VarInsnNode(Opcodes.ALOAD, 0));
-            list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, node.name, "needRemap", Type.getMethodDescriptor(Type.getType(boolean.class), Type.getType(ClassLoader.class))));
+            list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, remapping, "canRemap", Type.getMethodDescriptor(Type.getType(boolean.class), Type.getType(ClassLoader.class)), false));
             list.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, config, "<init>", "(Z)V"));
             list.add(new VarInsnNode(Opcodes.ALOAD, 0));
             list.add(new InsnNode(Opcodes.SWAP));
@@ -134,7 +135,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
         node.fields.add(remapper);
         node.fields.add(remapConfig);
         node.methods.add(getRemapper);
-        RemappingClassLoader.implementNeedRemap(node);
+        //RemappingClassLoader.implementNeedRemap(node);
         node.methods.add(getConfig);
         node.interfaces.add(Type.getInternalName(RemappingClassLoader.class));
     }

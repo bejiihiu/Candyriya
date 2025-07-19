@@ -1,10 +1,7 @@
 package io.izzel.arclight.common.mod.util.remapper.generated;
 
 import com.google.common.io.ByteStreams;
-import io.izzel.arclight.common.mod.util.remapper.ArclightRemapConfig;
-import io.izzel.arclight.common.mod.util.remapper.ArclightRemapper;
-import io.izzel.arclight.common.mod.util.remapper.ClassLoaderRemapper;
-import io.izzel.arclight.common.mod.util.remapper.RemappingClassLoader;
+import io.izzel.arclight.common.mod.util.remapper.*;
 import io.izzel.tools.product.Product2;
 
 import java.io.IOException;
@@ -25,26 +22,26 @@ public class RemappingURLClassLoader extends URLClassLoader implements Remapping
     }
 
     // Sample using remap config
-    public ArclightRemapConfig config = new ArclightRemapConfig(RemappingClassLoader.needRemap(this));
+    public ArclightRemapConfig config = new ArclightRemapConfig(ClassLoaderRemapping.canRemap(this));
 
     public RemappingURLClassLoader(URL[] urls, ClassLoader parent) {
-        super(urls, RemappingClassLoader.tryRedirect(parent));
+        super(urls, ClassLoaderRemapping.tryRedirect(parent));
     }
 
     public RemappingURLClassLoader(URL[] urls) {
-        super(urls, RemappingClassLoader.tryRedirect(null));
+        super(urls, ClassLoaderRemapping.tryRedirect(null));
     }
 
     public RemappingURLClassLoader(URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory) {
-        super(urls, RemappingClassLoader.tryRedirect(parent), factory);
+        super(urls, ClassLoaderRemapping.tryRedirect(parent), factory);
     }
 
     public RemappingURLClassLoader(String name, URL[] urls, ClassLoader parent) {
-        super(name, urls, RemappingClassLoader.tryRedirect(parent));
+        super(name, urls, ClassLoaderRemapping.tryRedirect(parent));
     }
 
     public RemappingURLClassLoader(String name, URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory) {
-        super(name, urls, RemappingClassLoader.tryRedirect(parent), factory);
+        super(name, urls, ClassLoaderRemapping.tryRedirect(parent), factory);
     }
 
     @Override
