@@ -14,9 +14,7 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Mixin(DistanceManager.class)
@@ -33,6 +31,22 @@ public abstract class DistanceManagerMixin implements TicketManagerBridge {
     @Invoker("purgeStaleTickets") public abstract void bridge$tick();
     // @formatter:on
 
+    @Unique
+    private Queue<ChunkHolder> arclight$scheduleUpdatingQueue = new LinkedList<>();
+
+    @Override
+    public void arclight$offerUpdate(ChunkHolder holder) {
+        arclight$scheduleUpdatingQueue.add(holder);
+    }
+
+    @Decorate(method = "runAllUpdates", inject = true, at = @At(value = "INVOKE", target = "Ljava/util/Set;isEmpty()Z"))
+    private void arclight$runQueuedUpdates(ChunkMap map) {
+        final var queue = arclight$scheduleUpdatingQueue;
+        for (ChunkHolder now = queue.poll(); now != null; now = queue.poll()) {
+            ((ChunkHolderBridge) now).bridge$callEventIfUnloading(map);
+        }
+    }
+
     @Decorate(method = "removePlayer", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;get(J)Ljava/lang/Object;"))
     private Object arclight$nullsafeRemovePlayer(Long2ObjectMap<ServerPlayer> instance, long l) throws Throwable {
         Object set = DecorationOps.callsite().invoke(instance, l);
@@ -40,29 +54,6 @@ public abstract class DistanceManagerMixin implements TicketManagerBridge {
             return DecorationOps.cancel().invoke();
         }
         return set;
-    }
-
-    @Decorate(method = "runAllUpdates", at = @At(value = "FIELD", ordinal = 0, target = "Lnet/minecraft/server/level/DistanceManager;chunksToUpdateFutures:Ljava/util/Set;"))
-    private Set<ChunkHolder> arclight$copyChunksToUpdateFutures(DistanceManager receiver, @Local(allocate = "currentChunkFutures") Set<ChunkHolder> chunks) throws Throwable {
-        final var original = (Set<ChunkHolder>) DecorationOps.callsite().invoke(receiver);
-        chunks = new HashSet<>(original);
-        return chunks;
-    }
-
-    @Decorate(method = "runAllUpdates", inject = true, at = @At(value = "INVOKE", ordinal = 0, target = "Ljava/util/Set;forEach(Ljava/util/function/Consumer;)V"))
-    private void arclight$fireChunkUnloadEvent(ChunkMap chunkMap, @Local(allocate = "currentChunkFutures") Set<ChunkHolder> chunks) {
-        chunksToUpdateFutures.clear();
-        chunks.forEach(chunkHolder -> ((ChunkHolderBridge)chunkHolder).bridge$callEventIfUnloading(chunkMap));
-    }
-
-    @Decorate(method = "runAllUpdates", at = @At(value = "INVOKE", target = "Ljava/util/Set;forEach(Ljava/util/function/Consumer;)V"))
-    private void arclight$useLocalFuturesForForeach(Set<ChunkHolder> receiver, Consumer<ChunkHolder> consumer, @Local(allocate = "currentChunkFutures") Set<ChunkHolder> chunks) throws Throwable {
-        DecorationOps.callsite().invoke(chunks, consumer);
-    }
-
-    @Decorate(method = "runAllUpdates", at = @At(value = "INVOKE", target = "Ljava/util/Set;clear()V"))
-    private void arclight$useLocalFuturesForClear(Set<ChunkHolder> receiver, @Local(allocate = "currentChunkFutures") Set<ChunkHolder> chunks) throws Throwable {
-        DecorationOps.callsite().invoke(chunks);
     }
 
     public <T> boolean addRegionTicketAtDistance(TicketType<T> type, ChunkPos pos, int level, T value) {

@@ -15,6 +15,7 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,6 +34,9 @@ public abstract class ChunkHolderMixin extends GenerationChunkHolder implements 
     @Shadow private int ticketLevel;
     @Shadow public abstract CompletableFuture<ChunkResult<LevelChunk>> getFullChunkFuture();@Override @Accessor("oldTicketLevel") public abstract int bridge$getOldTicketLevel();
     // @formatter:on
+
+    @Unique
+    private boolean arclight$pendingUnload;
 
     public ChunkHolderMixin(ChunkPos chunkPos) {
         super(chunkPos);
@@ -68,6 +72,10 @@ public abstract class ChunkHolderMixin extends GenerationChunkHolder implements 
         boolean oldIsFull = oldFullChunkStatus.isOrAfter(FullChunkStatus.FULL);
         boolean newIsFull = newFullChunkStatus.isOrAfter(FullChunkStatus.FULL);
         if (oldIsFull && !newIsFull) {
+            if (arclight$pendingUnload) {
+                return;
+            }
+            arclight$pendingUnload = true;
             this.getFullChunkFuture().thenAccept((either) -> {
                 LevelChunk chunk = either.orElse(null);
                 if (chunk != null) {
@@ -87,6 +95,8 @@ public abstract class ChunkHolderMixin extends GenerationChunkHolder implements 
 
             // Run callback right away if the future was already done
             ((ChunkMapBridge) manager).bridge$getCallbackExecutor().run();
+        } else if (arclight$pendingUnload) {
+            ArclightServer.LOGGER.warn("Chunk status changed multiple times during chunk ticket tracking / unload event for chunk {}", getPos());
         }
     }
 
@@ -102,6 +112,7 @@ public abstract class ChunkHolderMixin extends GenerationChunkHolder implements 
     // Note that this logic is slightly different from the one above
     @Inject(method = "updateFutures", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/level/ChunkHolder$LevelChangeListener;onLevelChange(Lnet/minecraft/world/level/ChunkPos;Ljava/util/function/IntSupplier;ILjava/util/function/IntConsumer;)V"))
     private void arclight$onChunkLoad(ChunkMap chunkManager, Executor executor, CallbackInfo ci) {
+        arclight$pendingUnload = false;
         FullChunkStatus fullChunkStatus = ChunkLevel.fullStatus(this.oldTicketLevel);
         FullChunkStatus fullChunkStatus2 = ChunkLevel.fullStatus(this.ticketLevel);
         this.oldTicketLevel = this.ticketLevel;

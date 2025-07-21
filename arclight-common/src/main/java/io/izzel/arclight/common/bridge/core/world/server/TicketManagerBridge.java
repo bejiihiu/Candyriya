@@ -1,5 +1,6 @@
 package io.izzel.arclight.common.bridge.core.world.server;
 
+import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.Ticket;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
@@ -17,6 +18,8 @@ public interface TicketManagerBridge {
     void bridge$tick();
 
     <T> void bridge$removeAllTicketsFor(TicketType<T> ticketType, int ticketLevel, T ticketIdentifier);
+
+    void arclight$offerUpdate(ChunkHolder holder);
 
     default boolean bridge$platform$isTicketForceTick(Ticket<?> ticket) {
         return false;
