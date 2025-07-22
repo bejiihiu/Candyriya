@@ -10,8 +10,10 @@ import java.util.function.Function;
 
 public class ArclightBorderChangeListener implements BorderChangeListener {
 
+    public static final ArclightBorderChangeListener INSTANCE = new ArclightBorderChangeListener();
+
     public static BorderChangeListener typed() {
-        return new ArclightBorderChangeListener();
+        return INSTANCE;
     }
 
     @Override
