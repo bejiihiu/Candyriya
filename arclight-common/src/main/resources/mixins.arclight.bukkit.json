@@ -38,6 +38,7 @@
     "CraftSpellcasterMixin",
     "CraftWorldMixin",
     "EntityTypeMixin",
+    "GameRuleMixin",
     "MaterialMixin",
     "PotionTypeMixin",
     "Registry_SimpleRegistryMixin",

@@ -123,11 +123,11 @@ public class BukkitRegistry {
             @Override
             public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
                 if (!gameRules.containsKey(key.getId())) {
-                    Class clazz;
-                    var argType = type.createArgument("arclight").getType();
-                    if (argType instanceof BoolArgumentType) {
+                    Class<?> clazz;
+                    var argType = type.createRule();
+                    if (argType instanceof GameRules.BooleanValue) {
                         clazz = Boolean.class;
-                    } else if (argType instanceof IntegerArgumentType) {
+                    } else if (argType instanceof GameRules.IntegerValue) {
                         clazz = Integer.class;
                     } else {
                         clazz = String.class;
