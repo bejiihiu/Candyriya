@@ -2,8 +2,10 @@ package io.izzel.arclight.common.mixin.core.fluid;
 
 import io.izzel.arclight.common.bridge.core.fluid.LavaFluidBridge;
 import io.izzel.arclight.common.bridge.core.world.IWorldBridge;
+import io.izzel.arclight.common.mod.server.event.ArclightEventFactory;
 import io.izzel.arclight.common.mod.util.DistValidate;
-import io.izzel.arclight.mixin.Eject;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -15,12 +17,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.LavaFluid;
+import org.bukkit.craftbukkit.v.block.CraftBlockState;
 import org.bukkit.craftbukkit.v.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LavaFluid.class)
 public abstract class LavaFluidMixin implements LavaFluidBridge {
@@ -84,15 +86,17 @@ public abstract class LavaFluidMixin implements LavaFluidBridge {
         }
     }
 
-    @Eject(method = "spreadTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelAccessor;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
-    private boolean arclight$blockFromTo(LevelAccessor world, BlockPos pos, BlockState newState, int flags, CallbackInfo ci) {
-        if (!DistValidate.isValid(world)) return world.setBlock(pos, newState, flags);
-        if (!CraftEventFactory.handleBlockFormEvent(((IWorldBridge) world).bridge$getMinecraftWorld(), pos, newState, flags)) {
-            ci.cancel();
-            return false;
-        } else {
-            return true;
+    @Decorate(method = "spreadTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LevelAccessor;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+    private boolean arclight$blockFromTo(LevelAccessor world, BlockPos pos, BlockState newState, int flags) throws Throwable {
+        // Already checked in callBlockFormEvent
+        final var event = ArclightEventFactory.callBlockFormEvent(((IWorldBridge) world).bridge$getMinecraftWorld(), pos, newState, flags, null);
+        if (event != null) {
+            if (event.isCancelled()) {
+                return (boolean) DecorationOps.cancel().invoke();
+            }
+            newState = ((CraftBlockState) event.getNewState()).getHandle();
         }
+        return (boolean) DecorationOps.callsite().invoke(world, pos, newState, flags);
     }
 
     @Override

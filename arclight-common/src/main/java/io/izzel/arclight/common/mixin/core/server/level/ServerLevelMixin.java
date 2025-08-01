@@ -8,6 +8,7 @@ import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBrid
 import io.izzel.arclight.common.bridge.core.inventory.IInventoryBridge;
 import io.izzel.arclight.common.bridge.core.server.MinecraftServerBridge;
 import io.izzel.arclight.common.bridge.core.world.ExplosionBridge;
+import io.izzel.arclight.common.bridge.core.world.IWorldBridge;
 import io.izzel.arclight.common.bridge.core.world.level.levelgen.flat.FlatLevelGeneratorSettingsBridge;
 import io.izzel.arclight.common.bridge.core.world.server.ServerChunkProviderBridge;
 import io.izzel.arclight.common.bridge.core.world.server.ServerWorldBridge;
@@ -20,6 +21,7 @@ import io.izzel.arclight.common.mod.mixins.annotation.CreateConstructor;
 import io.izzel.arclight.common.mod.mixins.annotation.ShadowConstructor;
 import io.izzel.arclight.common.mod.server.ArclightServer;
 import io.izzel.arclight.common.mod.server.entity.ArclightSpawnReason;
+import io.izzel.arclight.common.mod.server.event.ArclightEventFactory;
 import io.izzel.arclight.common.mod.server.world.LevelPersistentData;
 import io.izzel.arclight.common.mod.server.world.WorldSymlink;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
@@ -71,6 +73,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v.block.CraftBlockState;
 import org.bukkit.craftbukkit.v.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v.generator.CustomChunkGenerator;
@@ -341,9 +344,16 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
         return this.addFreshEntity(entity);
     }
 
-    @Redirect(method = "tickPrecipitation", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    public boolean arclight$snowForm(ServerLevel serverWorld, BlockPos pos, BlockState state) {
-        return CraftEventFactory.handleBlockFormEvent(serverWorld, pos, state, null);
+    @Decorate(method = "tickPrecipitation", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    public boolean arclight$snowForm(ServerLevel level, BlockPos pos, BlockState newState) throws Throwable {
+        final var event = ArclightEventFactory.callBlockFormEvent(level, pos, newState, 3, null);
+        if (event != null) {
+            if (event.isCancelled()) {
+                return false;
+            }
+            newState = ((CraftBlockState) event.getNewState()).getHandle();
+        }
+        return (boolean) DecorationOps.callsite().invoke(level, pos, newState);
     }
 
     //TODO: weather cycle for every player

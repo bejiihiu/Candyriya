@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBridge;
 import io.izzel.arclight.common.bridge.core.util.DamageSourceBridge;
 import io.izzel.arclight.common.bridge.core.world.WorldBridge;
+import io.izzel.arclight.common.mod.server.event.ArclightEventFactory;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
 import io.izzel.arclight.common.mod.util.DistValidate;
 import io.izzel.arclight.mixin.Decorate;
@@ -97,6 +98,7 @@ public abstract class CraftEventFactoryMixin {
         }
         DecorationOps.callsite().invoke(instance, event);
     }
+
     /**
      * @author IzzelAliz
      * @reason
@@ -147,24 +149,20 @@ public abstract class CraftEventFactoryMixin {
     }
 
     /**
-     * @author IzzelAliz
-     * @reason
+     * @author IzzelAliz, InitAuther97
+     * @reason IzzelAliz: suppress during world generation; InitAuther97: use extracted logic
      */
     @Overwrite
     public static boolean handleBlockFormEvent(Level world, BlockPos pos, net.minecraft.world.level.block.state.BlockState block, int flag, @Nullable Entity entity) {
-        // Suppress during worldgen
-        if (!DistValidate.isValid(world)) {
+        // Suppressed in callBlockFormEvent
+        final var event = ArclightEventFactory.callBlockFormEvent(world, pos, block, flag, entity);
+        if (event == null) {
             world.setBlock(pos, block, flag);
             return true;
         }
-        CraftBlockState blockState = CraftBlockStates.getBlockState(world, pos, flag);
-        blockState.setData(block);
-
-        BlockFormEvent event = (entity == null) ? new BlockFormEvent(blockState.getBlock(), blockState) : new EntityBlockFormEvent(entity.bridge$getBukkitEntity(), blockState.getBlock(), blockState);
-        Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
-            blockState.update(true);
+            event.getNewState().update(true);
         }
 
         return !event.isCancelled();

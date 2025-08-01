@@ -1,5 +1,9 @@
 package io.izzel.arclight.common.mixin.core.world.level.block;
 
+import io.izzel.arclight.common.bridge.core.world.IWorldBridge;
+import io.izzel.arclight.common.mod.server.event.ArclightEventFactory;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -11,7 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v.block.CraftBlockState;
 import org.bukkit.craftbukkit.v.block.CraftBlockStates;
-import org.bukkit.craftbukkit.v.event.CraftEventFactory;
 import org.bukkit.event.block.BlockFormEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,9 +29,16 @@ public abstract class ConcretePowderBlockMixin extends FallingBlockMixin {
     @Shadow @Final private Block concrete;
     // @formatter:on
 
-    @Redirect(method = "onLand", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
-    public boolean arclight$blockForm(Level world, BlockPos pos, BlockState newState, int flags) {
-        return CraftEventFactory.handleBlockFormEvent(world, pos, newState, flags);
+    @Decorate(method = "onLand", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+    public boolean arclight$blockForm(Level world, BlockPos pos, BlockState newState, int flags) throws Throwable {
+        final var event = ArclightEventFactory.callBlockFormEvent(((IWorldBridge) world).bridge$getMinecraftWorld(), pos, newState, flags, null);
+        if (event != null) {
+            if (event.isCancelled()) {
+                return false;
+            }
+            newState = ((CraftBlockState) event.getNewState()).getHandle();
+        }
+        return (boolean) DecorationOps.callsite().invoke(world, pos, newState, flags);
     }
 
     @Redirect(method = "getStateForPlacement", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;defaultBlockState()Lnet/minecraft/world/level/block/state/BlockState;"))

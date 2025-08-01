@@ -8,8 +8,11 @@ import io.izzel.arclight.common.bridge.bukkit.EntityDamageEventBridge;
 import io.izzel.arclight.common.bridge.core.entity.LivingEntityBridge;
 import io.izzel.arclight.common.bridge.core.entity.player.ServerPlayerEntityBridge;
 import io.izzel.arclight.common.bridge.core.network.play.ServerGamePacketListenerBridge;
+import io.izzel.arclight.common.bridge.core.world.IWorldBridge;
 import io.izzel.arclight.common.mod.server.ArclightServer;
+import io.izzel.arclight.common.mod.server.event.ArclightEventFactory;
 import io.izzel.arclight.common.mod.util.ArclightDamageContainer;
+import io.izzel.arclight.common.mod.util.DistValidate;
 import io.izzel.arclight.common.util.IteratorUtil;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
@@ -63,6 +66,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v.CraftEquipmentSlot;
 import org.bukkit.craftbukkit.v.attribute.CraftAttributeMap;
+import org.bukkit.craftbukkit.v.block.CraftBlockState;
 import org.bukkit.craftbukkit.v.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v.event.CraftEventFactory;
@@ -686,9 +690,16 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
         }
     }
 
-    @Redirect(method = "createWitherRose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
-    private boolean arclight$fireWitherRoseForm(Level instance, BlockPos pPos, BlockState pNewState, int pFlags) {
-        return CraftEventFactory.handleBlockFormEvent(instance, pPos, pNewState, pFlags, (Entity) (Object) this);
+    @Decorate(method = "createWitherRose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+    private boolean arclight$fireWitherRoseForm(Level level, BlockPos pos, BlockState newState, int flags) throws Throwable {
+        final var event = ArclightEventFactory.callBlockFormEvent(((IWorldBridge) level).bridge$getMinecraftWorld(), pos, newState, flags, null);
+        if (event != null) {
+            if (event.isCancelled()) {
+                return false;
+            }
+            newState = ((CraftBlockState) event.getNewState()).getHandle();
+        }
+        return (boolean) DecorationOps.callsite().invoke(level, pos, newState, flags);
     }
 
     @Decorate(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setSharedFlag(IZ)V"))
