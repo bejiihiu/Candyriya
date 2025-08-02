@@ -24,7 +24,6 @@ public class CraftBlockTypeMixin {
 
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.getDeclaredAnnotation(MixinMerged.class) != null) {
-                ArclightServer.LOGGER.debug("CraftBlockType hasMethod skipping method {} which is mixed from outside", method.getName());
                 continue;
             }
             if (Arrays.equals(method.getParameterTypes(), params)) {
