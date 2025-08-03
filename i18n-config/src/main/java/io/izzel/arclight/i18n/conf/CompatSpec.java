@@ -32,6 +32,9 @@ public class  CompatSpec {
     @Setting("isolate-plugin-class-loaders")
     private List<String> isolatePluginClassLoaders;
 
+    @Setting("isolate-adventure-from-modloader")
+    private boolean isolateAdventureFromModloader;
+
     public Map<String, MaterialPropertySpec> getMaterials() {
         return materials;
     }
@@ -75,5 +78,9 @@ public class  CompatSpec {
             }
         }
         return false;
+    }
+
+    public boolean isAdventureIsolatedFromML() {
+        return isolateAdventureFromModloader;
     }
 }

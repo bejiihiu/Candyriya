@@ -51,7 +51,8 @@ public abstract class JavaPluginLoaderMixin implements JavaPluginLoaderBridge {
     // @formatter:off
     @Shadow @Final Server server;
     @Invoker("setClass") public abstract void bridge$setClass(final String name, final Class<?> clazz);
-    @Accessor("loaders") public abstract<T extends URLClassLoader & PluginClassLoaderBridge> List<T> bridge$getLoaders();
+    @Invoker("getClassByName") public abstract Class<?> arclight$getClassByName(String name, boolean resolve, PluginDescriptionFile description);
+    @Accessor("loaders") public abstract<T extends URLClassLoader & PluginClassLoaderBridge> List<T> arclight$getLoaders();
     // @formatter:on
 
     @Unique
@@ -97,7 +98,7 @@ public abstract class JavaPluginLoaderMixin implements JavaPluginLoaderBridge {
         SimplePluginManager manager = (SimplePluginManager) this.server.getPluginManager();
         if (ArclightConfig.spec().getCompat().isIsolatedPluginClassLoaders(name)) {
             Set<String> loaders = ArclightServer.iterateDepends(description);
-            for (PluginClassLoaderBridge loader : bridge$getLoaders()) {
+            for (PluginClassLoaderBridge loader : arclight$getLoaders()) {
                 PluginDescriptionFile desc = loader.arclight$desc();
                 if (loaders.contains(desc.getName()) || !Collections.disjoint(loaders, desc.getProvides())) {
                     try {
@@ -108,7 +109,7 @@ public abstract class JavaPluginLoaderMixin implements JavaPluginLoaderBridge {
             }
         } else {
 
-            for (PluginClassLoaderBridge loader : bridge$getLoaders()) {
+            for (PluginClassLoaderBridge loader : arclight$getLoaders()) {
                 try {
                     return loader.arclight$loadFromExternal(name, resolve, manager.isTransitiveDepend(description, loader.arclight$desc()));
                 } catch (ClassNotFoundException ignored) {
