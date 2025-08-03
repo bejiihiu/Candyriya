@@ -52,6 +52,7 @@
     "plugin.JavaPluginMixin",
     "plugin.LibraryLoaderMixin",
     "plugin.PluginClassLoaderMixin",
+    "plugin.SimplePluginManagerAccessor",
     "util.BlockStateListPopulatorMixin",
     "util.DelegatedGeneratorAccessMixin",
     "util.DummyGeneratorAccessMixin"

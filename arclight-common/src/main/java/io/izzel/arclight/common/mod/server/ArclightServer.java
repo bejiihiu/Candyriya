@@ -1,8 +1,11 @@
 package io.izzel.arclight.common.mod.server;
 
+import com.google.common.graph.Graph;
+import com.google.common.graph.Graphs;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.izzel.arclight.common.bridge.bukkit.CraftServerBridge;
 import io.izzel.arclight.common.bridge.core.server.MinecraftServerBridge;
+import io.izzel.arclight.common.mixin.bukkit.plugin.SimplePluginManagerAccessor;
 import io.izzel.arclight.common.mod.util.VelocitySupport;
 import io.izzel.arclight.common.mod.util.log.ArclightI18nLogger;
 import net.minecraft.resources.ResourceKey;
@@ -11,14 +14,19 @@ import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.level.dimension.LevelStem;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v.CraftServer;
 import org.bukkit.craftbukkit.v.command.ColouredConsoleSender;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.spigotmc.SpigotConfig;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,6 +67,16 @@ public class ArclightServer {
     }
 
     private static CraftServer server;
+
+    public static Set<String> iterateDepends(PluginDescriptionFile desc) {
+        SimplePluginManager manager = (SimplePluginManager) Bukkit.getPluginManager();
+        Graph<String> dependencyGraph = ((SimplePluginManagerAccessor)(Object) manager).arclight$dependencyGraph();
+        if (dependencyGraph.nodes().contains(desc.getName())) {
+            return Graphs.reachableNodes(dependencyGraph, desc.getName());
+        } else {
+            return Collections.emptySet();
+        }
+    }
 
     @SuppressWarnings("ConstantConditions")
     public static CraftServer createOrLoad(DedicatedServer console, PlayerList playerList) {

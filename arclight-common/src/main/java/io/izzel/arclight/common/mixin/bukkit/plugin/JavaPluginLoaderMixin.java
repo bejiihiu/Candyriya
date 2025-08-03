@@ -4,16 +4,16 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.izzel.arclight.api.Unsafe;
 import io.izzel.arclight.common.bridge.bukkit.JavaPluginLoaderBridge;
+import io.izzel.arclight.common.bridge.bukkit.PluginClassLoaderBridge;
+import io.izzel.arclight.common.mod.server.ArclightServer;
+import io.izzel.arclight.i18n.ArclightConfig;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Server;
 import org.bukkit.Warning;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.AuthorNagException;
-import org.bukkit.plugin.EventExecutor;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredListener;
+import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassVisitor;
@@ -22,23 +22,24 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.File;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -50,17 +51,73 @@ public abstract class JavaPluginLoaderMixin implements JavaPluginLoaderBridge {
     // @formatter:off
     @Shadow @Final Server server;
     @Invoker("setClass") public abstract void bridge$setClass(final String name, final Class<?> clazz);
-    @Accessor("loaders") public abstract List<URLClassLoader> bridge$getLoaders();
+    @Accessor("loaders") public abstract<T extends URLClassLoader & PluginClassLoaderBridge> List<T> bridge$getLoaders();
     // @formatter:on
 
+    @Unique
+    private MethodHandle arclight$mh_ctorPcl;
+    @Unique
     private static final AtomicInteger COUNTER = new AtomicInteger();
+    @Unique
     private static final Cache<Method, Class<? extends EventExecutor>> EXECUTOR_CACHE = CacheBuilder.newBuilder()
         .expireAfterAccess(1, TimeUnit.HOURS)
         .build();
+    @Unique
     private static final String HIDDEN_FORM =
         Float.parseFloat(System.getProperty("java.class.version")) < 57
             ? "Ljava/lang/invoke/LambdaForm$Hidden;"
             : "Ljdk/internal/vm/annotation/Hidden;";
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void arclight$initMH(Server instance, CallbackInfo ci) {
+        try {
+            Class<?> clz = Class.forName("org.bukkit.plugin.java.PluginClassLoader", true, getClass().getClassLoader());
+            arclight$mh_ctorPcl = MethodHandles.lookup().findConstructor(clz, MethodType.methodType(void.class, String.class, JavaPluginLoader.class, ClassLoader.class, PluginDescriptionFile.class, File.class, File.class, ClassLoader.class));
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Redirect(method = "loadPlugin", at = @At(value = "NEW", target = "(Lorg/bukkit/plugin/java/JavaPluginLoader;Ljava/lang/ClassLoader;Lorg/bukkit/plugin/PluginDescriptionFile;Ljava/io/File;Ljava/io/File;Ljava/lang/ClassLoader;)Lorg/bukkit/plugin/java/PluginClassLoader;"))
+    @Coerce
+    private Object arclight$debug$redirectConstructor(JavaPluginLoader loader, ClassLoader parent, PluginDescriptionFile desc, File file, File file2, ClassLoader ex) {
+        try {
+            return arclight$mh_ctorPcl.invoke(desc.getName(), loader, parent, desc, file, file2, ex);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @author InitAuther97
+     * @reason Support plugin class loader isolation
+     */
+    @Overwrite
+    Class<?> getClassByName(String name, boolean resolve, PluginDescriptionFile description) {
+        SimplePluginManager manager = (SimplePluginManager) this.server.getPluginManager();
+        if (ArclightConfig.spec().getCompat().isIsolatedPluginClassLoaders(name)) {
+            Set<String> loaders = ArclightServer.iterateDepends(description);
+            for (PluginClassLoaderBridge loader : bridge$getLoaders()) {
+                PluginDescriptionFile desc = loader.arclight$desc();
+                if (loaders.contains(desc.getName()) || !Collections.disjoint(loaders, desc.getProvides())) {
+                    try {
+                        return loader.arclight$loadFromExternal(name, resolve, true);
+                    } catch (ClassNotFoundException ignored) {
+                    }
+                }
+            }
+        } else {
+
+            for (PluginClassLoaderBridge loader : bridge$getLoaders()) {
+                try {
+                    return loader.arclight$loadFromExternal(name, resolve, manager.isTransitiveDepend(description, loader.arclight$desc()));
+                } catch (ClassNotFoundException ignored) {
+                }
+            }
+        }
+
+        return null;
+    }
 
     /**
      * @author IzzelAliz

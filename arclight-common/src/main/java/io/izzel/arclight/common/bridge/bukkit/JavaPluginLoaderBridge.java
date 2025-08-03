@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface JavaPluginLoaderBridge {
 
-    List<URLClassLoader> bridge$getLoaders();
+    <T extends URLClassLoader & PluginClassLoaderBridge> List<T> bridge$getLoaders();
 
     void bridge$setClass(final String name, final Class<?> clazz);
 }

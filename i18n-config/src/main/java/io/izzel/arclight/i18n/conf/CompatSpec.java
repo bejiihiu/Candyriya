@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @ConfigSerializable
-public class CompatSpec {
+public class  CompatSpec {
 
     @Setting("material-property-overrides")
     private Map<String, MaterialPropertySpec> materials;
@@ -28,6 +28,9 @@ public class CompatSpec {
 
     @Setting("valid-username-regex")
     private String validUsernameRegex;
+
+    @Setting("isolate-plugin-class-loaders")
+    private List<String> isolatePluginClassLoaders;
 
     public Map<String, MaterialPropertySpec> getMaterials() {
         return materials;
@@ -63,5 +66,14 @@ public class CompatSpec {
 
     public String getValidUsernameRegex() {
         return validUsernameRegex;
+    }
+
+    public boolean isIsolatedPluginClassLoaders(String name) {
+        for (String prefix : isolatePluginClassLoaders) {
+            if (name.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
