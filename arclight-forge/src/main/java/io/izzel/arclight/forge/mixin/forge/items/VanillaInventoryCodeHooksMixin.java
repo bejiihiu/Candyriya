@@ -98,7 +98,7 @@ public abstract class VanillaInventoryCodeHooksMixin {
         return Optional.ofNullable(DelegatedContainer.makeItemHandlerPair(craftInventory));
     }
 
-    @Redirect(method = "insertHook", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/items/VanillaInventoryCodeHooks;getItemHandler(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;Lnet/minecraft/core/Direction;)Ljava/util/Optional;"))
+    @Decorate(method = "insertHook", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/items/VanillaInventoryCodeHooks;getItemHandler(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;Lnet/minecraft/core/Direction;)Ljava/util/Optional;"))
     private static Optional<Pair<IItemHandler, Object>> arclight$searchTo(Level level, Hopper hopper, Direction direction) throws Throwable {
         final var handler = (Optional<Pair<IItemHandler, Object>>) DecorationOps.callsite().invoke(level, hopper, direction);
         final var pos = BlockPos.containing(hopper.getLevelX(), hopper.getLevelY(), hopper.getLevelZ());
@@ -108,7 +108,7 @@ public abstract class VanillaInventoryCodeHooksMixin {
         return arclight$runHopperInventorySearchEvent(container, hopperBlock, searchBlock, HopperInventorySearchEvent.ContainerType.DESTINATION);
     }
 
-    @Redirect(method = "extractHook", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/items/VanillaInventoryCodeHooks;getItemHandler(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;Lnet/minecraft/core/Direction;)Ljava/util/Optional;"))
+    @Decorate(method = "extractHook", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/items/VanillaInventoryCodeHooks;getItemHandler(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;Lnet/minecraft/core/Direction;)Ljava/util/Optional;"))
     private static Optional<Pair<IItemHandler, Object>> arclight$searchFrom(Level level, Hopper hopper, Direction direction) throws Throwable {
         final var handler = (Optional<Pair<IItemHandler, Object>>) DecorationOps.callsite().invoke(level, hopper);
         final var pos = BlockPos.containing(hopper.getLevelX(), hopper.getLevelY(), hopper.getLevelZ());
