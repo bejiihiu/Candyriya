@@ -141,12 +141,12 @@ public abstract class PluginClassLoaderMixin extends URLClassLoader implements R
 
     @Override
     public SimplePluginManager arclight$getPluginManager() {
-        return (SimplePluginManager) plugin.getServer().getPluginManager();
+        return (SimplePluginManager) ((JavaPluginLoaderBridge) (Object) loader).arclight$server().getPluginManager();
     }
 
     @Override
     public Logger arclight$systemLogger() {
-        return plugin.getServer().getLogger();
+        return ((JavaPluginLoaderBridge)(Object) loader).arclight$server().getLogger();
     }
 
     public PluginClassLoaderMixin(URL[] urls) {

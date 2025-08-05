@@ -89,6 +89,11 @@ public abstract class JavaPluginLoaderMixin implements JavaPluginLoaderBridge {
         }
     }
 
+    @Override
+    public Server arclight$server() {
+        return server;
+    }
+
     /**
      * @author InitAuther97
      * @reason Support plugin class loader isolation
