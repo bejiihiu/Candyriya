@@ -19,7 +19,7 @@ public record ArclightFabricPayloadHandler(ArclightPluginChannel<ArclightFabricP
     public void receive(ArclightRawPayload pkt, ServerPlayNetworking.Context ctx) {
         ctx.server().executeIfPossible(() -> {
             var bukkit = ((ServerPlayerEntityBridge)ctx.player()).bridge$getBukkitEntity();
-            channel.dispatchMessage(bukkit, pkt.arclight$readBytes());
+            channel.dispatchMessage(bukkit, pkt.arclight$leak());
         });
     }
 
@@ -27,7 +27,7 @@ public record ArclightFabricPayloadHandler(ArclightPluginChannel<ArclightFabricP
     public void receive(ArclightRawPayload pkt, ServerConfigurationNetworking.Context ctx) {
         ctx.server().executeIfPossible(() -> {
             var bukkit = ((ServerCommonPacketListenerBridge)ctx.networkHandler()).bridge$getCraftPlayer();
-            channel.dispatchMessage(bukkit, pkt.arclight$readBytes());
+            channel.dispatchMessage(bukkit, pkt.arclight$leak());
         });
     }
 

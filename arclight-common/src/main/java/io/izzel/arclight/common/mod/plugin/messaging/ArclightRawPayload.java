@@ -27,7 +27,7 @@ public class ArclightRawPayload implements RawPayload {
     }
 
     public ArclightRawPayload(CustomPacketPayload.Type<ArclightRawPayload> type, byte[] raw) {
-        this(type, Unpooled.copiedBuffer(raw));
+        this(type, Unpooled.wrappedBuffer(raw));
     }
 
     @Override

@@ -27,7 +27,7 @@ public class ArclightForgePayloadHandler implements ForgePayloadHandler {
 
     @Override
     public void sendCustomPayload(Plugin src, CraftPlayer dst, byte[] data) {
-        forge.send(new FriendlyByteBuf(Unpooled.copiedBuffer(data)), PacketDistributor.PLAYER.with(dst.getHandle()));
+        forge.send(new FriendlyByteBuf(Unpooled.wrappedBuffer(data)), PacketDistributor.PLAYER.with(dst.getHandle()));
     }
 
     @Override
