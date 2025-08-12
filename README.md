@@ -2,15 +2,15 @@
 
 A Bukkit server implementation on common mod loaders.
 
-![Downloads count](https://img.shields.io/github/downloads/IzzelAliz/Arclight/total?style=flat-square)  ![License](https://img.shields.io/github/license/IzzelAliz/Arclight?style=flat-square)
+[![Downloads count](https://img.shields.io/github/downloads/IzzelAliz/Arclight/total?style=flat-square)](https://arclight.izzel.io/)  ![License](https://img.shields.io/github/license/IzzelAliz/Arclight?style=flat-square)
 
 ![Logo](.github/arclightlogo.jpg)
 
 ## Download
-Versions list and support status: [Discussions thread](https://github.com/IzzelAliz/Arclight/discussions/1575)
 
-- [Stable releases](https://github.com/IzzelAliz/Arclight/releases)
-- [Nightly builds](https://arclight.izzel.io/)
+Downloads are available at [https://arclight.izzel.io](https://arclight.izzel.io).
+
+Versions list and support status: [Discussions thread](https://github.com/IzzelAliz/Arclight/discussions/1575)
 
 ## Installing
 
@@ -45,5 +45,3 @@ YourKit supports open source projects with innovative and intelligent tools for 
 applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
 <a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>,
 and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
-
-[<img src="https://dartnode.com/branding/DN-Open-Source-sm.png" width=50% alt="Powered by DartNode" />](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
