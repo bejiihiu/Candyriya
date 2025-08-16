@@ -46,6 +46,6 @@ public class CommandBlockLogicMixin {
             args[0] = "minecraft:" + args[0];
         }
 
-        DecorationOps.callsite().invoke(sender, joiner.join(args));
+        DecorationOps.callsite().invoke(commands, sender, joiner.join(args));
     }
 }
