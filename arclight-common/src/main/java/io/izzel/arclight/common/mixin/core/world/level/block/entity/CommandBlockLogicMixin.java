@@ -2,6 +2,8 @@ package io.izzel.arclight.common.mixin.core.world.level.block.entity;
 
 import com.google.common.base.Joiner;
 import io.izzel.arclight.common.bridge.core.command.CommandSourceStackBridge;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.level.BaseCommandBlock;
@@ -10,13 +12,12 @@ import org.bukkit.craftbukkit.v.CraftServer;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(BaseCommandBlock.class)
 public class CommandBlockLogicMixin {
 
-    @Redirect(method = "performCommand", at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/Commands;performPrefixedCommand(Lnet/minecraft/commands/CommandSourceStack;Ljava/lang/String;)V"))
-    private void arclight$serverCommand(Commands commands, CommandSourceStack sender, String command) {
+    @Decorate(method = "performCommand", at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/Commands;performPrefixedCommand(Lnet/minecraft/commands/CommandSourceStack;Ljava/lang/String;)V"))
+    private void arclight$serverCommand(Commands commands, CommandSourceStack sender, String command) throws Throwable {
         Joiner joiner = Joiner.on(" ");
         if (command.startsWith("/")) {
             command = command.substring(1);
@@ -45,6 +46,6 @@ public class CommandBlockLogicMixin {
             args[0] = "minecraft:" + args[0];
         }
 
-        commands.performPrefixedCommand(sender, joiner.join(args));
+        DecorationOps.callsite().invoke(sender, joiner.join(args));
     }
 }
