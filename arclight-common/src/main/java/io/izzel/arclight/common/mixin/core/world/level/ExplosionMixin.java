@@ -62,6 +62,7 @@ public abstract class ExplosionMixin implements ExplosionBridge {
     // @formatter:on
 
     public float yield;
+    public boolean wasCanceled = false;
 
     @Override
     public float bridge$getYield() {
@@ -136,18 +137,15 @@ public abstract class ExplosionMixin implements ExplosionBridge {
         return vec3;
     }
 
-    @Unique
-    public boolean arclight$wasCanceled = false;
-
     @Override
     public boolean bridge$wasCancelled() {
-        return arclight$wasCanceled;
+        return wasCanceled;
     }
 
     @Inject(method = "finalizeExplosion", cancellable = true, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/Util;shuffle(Ljava/util/List;Lnet/minecraft/util/RandomSource;)V"))
     private void arclight$blockExplode(boolean bl, CallbackInfo ci) {
         if (this.arclight$callBlockExplodeEvent()) {
-            this.arclight$wasCanceled = true;
+            this.wasCanceled = true;
             ci.cancel();
         }
     }
