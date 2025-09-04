@@ -1,4 +1,4 @@
-package io.izzel.arclight.common.mod.server;
+package io.izzel.arclight.common.mod.util.thread;
 
 public interface RunnableInPlace extends Runnable {
 

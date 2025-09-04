@@ -11,7 +11,7 @@ import io.izzel.arclight.common.bridge.core.server.management.PlayerInteractionM
 import io.izzel.arclight.common.bridge.core.server.management.PlayerListBridge;
 import io.izzel.arclight.common.mod.ArclightConstants;
 import io.izzel.arclight.common.mod.server.ArclightServer;
-import io.izzel.arclight.common.mod.server.RunnableInPlace;
+import io.izzel.arclight.common.mod.util.thread.RunnableInPlace;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
@@ -915,38 +915,26 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
         this.bridge$disconnect("Invalid hotbar selection (Hacking?)");
     }
 
-    /**
-     * @author IzzelAliz
-     * @reason
-     */
-    @Overwrite
-    public void handleChat(ServerboundChatPacket packet) {
-        if (this.server.isStopped()) {
-            return;
+    // InitAuther97: use more compatible injections
+    @Inject(method = "handleChat", cancellable = true, at = @At("HEAD"))
+    private void arclight$skipChatOnShutdown(ServerboundChatPacket serverboundChatPacket, CallbackInfo ci) {
+        if (server.isStopped()) {
+            ci.cancel();
         }
-        Optional<LastSeenMessages> optional = this.unpackAndApplyLastSeen(packet.lastSeenMessages());
-        if (!optional.isEmpty()) {
-            this.tryHandleChat(packet.message(), RunnableInPlace.wrap(() -> {
-                PlayerChatMessage playerchatmessage;
+    }
 
-                try {
-                    playerchatmessage = this.getSignedMessage(packet, optional.get());
-                } catch (SignedMessageChain.DecodeException e) {
-                    this.handleMessageDecodeFailure(e);
-                    return;
-                }
+    @Decorate(method = "handleChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;tryHandleChat(Ljava/lang/String;Ljava/lang/Runnable;)V"))
+    private void arclight$wrapChatInPlace(ServerGamePacketListenerImpl instance, String string, Runnable runnable) throws Throwable {
+        DecorationOps.callsite().invoke(instance, string, (Runnable) RunnableInPlace.wrap(runnable));
+    }
 
-                CompletableFuture<FilteredText> completablefuture = this.filterTextPacket(playerchatmessage.signedContent()).thenApplyAsync(Function.identity(), ArclightServer.getChatExecutor());
-                var component = bridge$platform$onServerChatSubmitted(this.player, playerchatmessage.decoratedContent());
-
-                this.chatMessageChain.append(completablefuture, (text) -> {
-                        if (component == null) return;
-                        PlayerChatMessage playerchatmessage1 = playerchatmessage.withUnsignedContent(component).filter(completablefuture.join().mask());
-
-                        this.broadcastChatMessage(playerchatmessage1);
-                    }
-                );
-            }));
+    // InitAuther97: don't want to pollute BlockableEventLoop with instanceof check for very rare usages.
+    @Decorate(method = "tryHandleChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;execute(Ljava/lang/Runnable;)V"))
+    private void arclight$runInPlaceIfPossible(MinecraftServer instance, Runnable runnable) throws Throwable {
+        if (runnable instanceof RunnableInPlace) {
+            runnable.run();
+        } else {
+            DecorationOps.callsite().invoke(instance, runnable);
         }
     }
 

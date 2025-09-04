@@ -93,7 +93,6 @@
     "server.management.UserListMixin",
     "stats.StatisticsCounterMixin",
     "util.StringUtilMixin",
-    "util.thread.BlockableEventLoopMixin",
     "world.BlockGetterMixin",
     "world.CompoundContainerMixin",
     "world.ContainerMixin",

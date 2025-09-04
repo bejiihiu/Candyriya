@@ -3,7 +3,6 @@ package io.izzel.arclight.forge.mixin.core.network;
 import io.izzel.arclight.common.bridge.core.network.play.ServerGamePacketListenerBridge;
 import io.izzel.tools.product.Product;
 import io.izzel.tools.product.Product3;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
@@ -26,11 +25,6 @@ public abstract class ServerGamePacketListenerImplMixin_Forge extends ServerComm
     public Product3<Boolean, ItemStack, ItemStack> bridge$platform$canSwapHandItems(LivingEntity entity) {
         var event = ForgeEventFactory.onLivingSwapHandItems(this.player);
         return Product.of(event.isCanceled(), event.getItemSwappedToMainHand(), event.getItemSwappedToOffHand());
-    }
-
-    @Override
-    public Component bridge$platform$onServerChatSubmitted(ServerPlayer player, Component message) {
-        return ForgeHooks.onServerChatSubmittedEvent(player, message);
     }
 
     @Override
