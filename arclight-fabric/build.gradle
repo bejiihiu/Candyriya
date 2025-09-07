@@ -8,10 +8,6 @@ architectury {
     fabric()
 }
 
-loom {
-    accessWidenerPath = getRootProject().ext.commonProject.loom.accessWidenerPath
-}
-
 dependencies {
     modImplementation libs.fabric.loader
     modImplementation libs.fabric.api

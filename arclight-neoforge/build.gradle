@@ -9,8 +9,6 @@ architectury {
 }
 
 loom {
-    accessWidenerPath = getRootProject().ext.commonProject.loom.accessWidenerPath
-
     neoForge {
     }
 }
