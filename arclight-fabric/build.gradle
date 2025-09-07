@@ -17,10 +17,8 @@ dependencies {
     implementation libs.mixin.tools
     annotationProcessor(libs.mixin.tools) { transitive = false }
 
-    implementation(libs.spigot.api) { transitive = false }
-    shadowBundle(libs.spigot.api) { transitive = false }
-    implementation(libs.bungeecord.chat) { transitive = false }
-    shadowBundle(libs.bungeecord.chat) { transitive = false }
+    implementation(libs.bundles.spigot.shade) { transitive = false }
+    shadowBundle(libs.bundles.spigot.shade) { transitive = false }
     implementation rootProject.ext.generatedSpigot
     shadowBundle rootProject.ext.generatedSpigot
 
