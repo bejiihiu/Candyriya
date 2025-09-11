@@ -4,6 +4,8 @@ import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.izzel.arclight.common.mod.mixins.annotation.LoadIfMod;
+import io.izzel.arclight.common.mod.mixins.annotation.TransformAccess;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 
 import java.util.Map;
@@ -24,6 +26,12 @@ public class CommandNodeMixin<S> {
     @Shadow @Final private Map<String, ArgumentCommandNode<S, ?>> arguments;
     @Shadow @Final private Predicate<S> requirement;
     // @formatter:on
+
+    /*
+     * This is used when the current command is not present in CommandSourceStack.
+     */
+    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
+    private static CommandNode<?> CURRENT_COMMAND;
 
     @Unique
     public void removeCommand(String name) {
