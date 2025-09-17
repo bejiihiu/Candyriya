@@ -12,13 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WorldEdit {
+
     // Don't use SpigotWatchdog since we're not using it
     // Use correct implementation for MojangWatchdog
     public static void handleWatchdog(ClassNode node, PluginPatcher.ClassRepo repo) {
         if (!node.name.startsWith("com/sk89q/worldedit")) {
             return;
         }
-        if (node.interfaces.size() == 1 && node.interfaces.get(0).equals("com/sk89q/worldedit/extension/platform/Watchdog")){
+        if (node.interfaces.size() == 1 && node.interfaces.get(0).equals("com/sk89q/worldedit/extension/platform/Watchdog")) {
             if (node.name.contains("SpigotWatchdog")) {
                 for (MethodNode method : node.methods) {
                     if (method.name.equals("<init>")) {
@@ -64,13 +65,39 @@ public class WorldEdit {
         }
     }
 
+    // Correct usage of Paper's CraftBukkit methods in BukkitAdapter
+    public static void handleBukkitAdapter(ClassNode node, PluginPatcher.ClassRepo repo) {
+        MethodNode adaptBlockState = null;
+        for (MethodNode method : node.methods) {
+            if ("adapt".equals(method.name) &&
+                    Type.getReturnType(method.desc).getInternalName().equals("com/sk89q/worldedit/world/block/BlockState")) {
+                adaptBlockState = method;
+                break;
+            }
+        }
+        if (adaptBlockState == null) {
+            throw new UnsupportedOperationException("Cannot find adapt(...):BlockState in PaperweightAdapter");
+        }
+        boolean success = false;
+        for (AbstractInsnNode insn : adaptBlockState.instructions) {
+            if (insn instanceof MethodInsnNode invocation && "createData".equals(invocation.name)) {
+                invocation.name = "fromData";
+                success = true;
+                break;
+            }
+        }
+        if (!success) {
+            throw new UnsupportedOperationException("Cannot find CraftBlockData#createData invocation in PaperweightAdapter");
+        }
+    }
+
     // Correctly handle reflection name picking
     // Their naming mapping for NMS is somehow behind the version
     public static void handleStaticRefraction(ClassNode node, PluginPatcher.ClassRepo repo) {
         var remapper = ArclightRemapper.getMojMapper();
         var addEntity = remapper.mapMethodName(
                 "net/minecraft/server/level/ServerLevel",
-                "addFreshEntity",
+                "addFreshEntityWithPassengers",
                 "(Lnet/minecraft/world/entity/Entity;)Z",
                 Opcodes.ACC_PUBLIC
         );
