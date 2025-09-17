@@ -33,7 +33,7 @@ public class IntegratedPatcher implements PluginPatcher {
             sb.append("version=").append(implVersion);
         }
         sb.append(" patchers=[");
-        sb.append("WorldEdit 1.21.1 2");
+        sb.append("WorldEdit 1.21.1 3");
         sb.append("]");
         return sb.toString();
     }
