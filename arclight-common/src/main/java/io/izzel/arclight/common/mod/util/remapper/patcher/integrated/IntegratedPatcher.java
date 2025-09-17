@@ -22,7 +22,6 @@ public class IntegratedPatcher implements PluginPatcher {
         // Their naming mapping is behind the version, syncing manually
         SPECIFIC.put("com/sk89q/worldedit/bukkit/adapter/impl/v1_21/StaticRefraction", WorldEdit::handleStaticRefraction);
         SPECIFIC.put("com/sk89q/worldedit/bukkit/adapter/impl/v1_21/PaperweightAdapter", WorldEdit::handleBukkitAdapter);
-        GENERAL.add(WorldEdit::handleWatchdog);
     }
 
     @Override
@@ -33,7 +32,7 @@ public class IntegratedPatcher implements PluginPatcher {
             sb.append("version=").append(implVersion);
         }
         sb.append(" patchers=[");
-        sb.append("WorldEdit 1.21.1 3");
+        sb.append("WorldEdit 1.21.1 4");
         sb.append("]");
         return sb.toString();
     }

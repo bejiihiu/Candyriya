@@ -13,58 +13,6 @@ import java.util.Map;
 
 public class WorldEdit {
 
-    // Don't use SpigotWatchdog since we're not using it
-    // Use correct implementation for MojangWatchdog
-    public static void handleWatchdog(ClassNode node, PluginPatcher.ClassRepo repo) {
-        if (!node.name.startsWith("com/sk89q/worldedit")) {
-            return;
-        }
-        if (node.interfaces.size() == 1 && node.interfaces.get(0).equals("com/sk89q/worldedit/extension/platform/Watchdog")) {
-            if (node.name.contains("SpigotWatchdog")) {
-                for (MethodNode method : node.methods) {
-                    if (method.name.equals("<init>")) {
-                        method.instructions.clear();
-                        method.instructions.add(new TypeInsnNode(Opcodes.NEW, "java/lang/ClassNotFoundException"));
-                        method.instructions.add(new InsnNode(Opcodes.DUP));
-                        method.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/ClassNotFoundException", "<init>", "()V", false));
-                        method.instructions.add(new InsnNode(Opcodes.ATHROW));
-                        method.tryCatchBlocks.clear();
-                        method.localVariables.clear();
-                        return;
-                    }
-                }
-            } else if (node.name.contains("MojangWatchdog")) {
-                var toBukkit = ArclightRemapper.getMojMapper();
-                var toNms = ArclightRemapper.getNmsMapper();
-                var util = toBukkit.mapType("net/minecraft/Util");
-                var bukkit = toBukkit.mapMethodName(
-                        "net/minecraft/Util",
-                        "getNanos",
-                        "()J"
-                );
-                var utilNms = toNms.mapType(util);
-                var getNanos = toNms.mapMethodName(
-                        util,
-                        bukkit,
-                        "()J"
-                );
-                for (MethodNode method : node.methods) {
-                    if (method.name.equals("tick")) {
-                        for (AbstractInsnNode current : method.instructions) {
-                            if (current instanceof MethodInsnNode invoke && invoke.getOpcode() == Opcodes.INVOKESTATIC) {
-                                invoke.owner = utilNms;
-                                invoke.name = getNanos;
-                                invoke.desc = "()J";
-                                break;
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
     // Correct usage of Paper's CraftBukkit methods in BukkitAdapter
     public static void handleBukkitAdapter(ClassNode node, PluginPatcher.ClassRepo repo) {
         MethodNode adaptBlockState = null;
