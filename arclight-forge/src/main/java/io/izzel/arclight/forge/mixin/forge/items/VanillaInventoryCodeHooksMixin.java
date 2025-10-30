@@ -44,7 +44,7 @@ public abstract class VanillaInventoryCodeHooksMixin {
         }
     }
 
-    @Decorate(method = {"lambda$dropperInsertHook$1", "lambda$insertHook$2", "lambda$insertCrafterOutput$3"}, at = @At(value = "INVOKE", target = "Lnet/minecraftforge/items/VanillaInventoryCodeHooks;putStackInInventoryAllSlots(Lnet/minecraft/world/level/block/entity/BlockEntity;Ljava/lang/Object;Lnet/minecraftforge/items/IItemHandler;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"))
+    @Decorate(method = {"dropperInsertHook", "insertHook"}, at = @At(value = "INVOKE", target = "Lnet/minecraftforge/items/VanillaInventoryCodeHooks;putStackInInventoryAllSlots(Lnet/minecraft/world/level/block/entity/BlockEntity;Ljava/lang/Object;Lnet/minecraftforge/items/IItemHandler;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack arclight$sourceInitiatedMoveItem(BlockEntity source, Object destination, IItemHandler instance, ItemStack stack) throws Throwable {
         if (!stack.isEmpty()) {
             CraftItemStack original = CraftItemStack.asCraftMirror(stack);
@@ -66,7 +66,7 @@ public abstract class VanillaInventoryCodeHooksMixin {
         return (ItemStack) DecorationOps.callsite().invoke(source, destination, instance, stack);
     }
 
-    @Decorate(method = "lambda$extractHook$0", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraftforge/items/IItemHandler;extractItem(IIZ)Lnet/minecraft/world/item/ItemStack;"))
+    @Decorate(method = "extractHook", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraftforge/items/IItemHandler;extractItem(IIZ)Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack arclight$nonSourceInitiatedMoveItem(IItemHandler instance, int slot, int expected, boolean simulate, Hopper hopper, Pair<IItemHandler, Object> sourcePair) throws Throwable {
         Preconditions.checkArgument(simulate, "Should be injected at simulate=true");
         ItemStack stack = (ItemStack) DecorationOps.callsite().invoke(instance, slot, expected, simulate);
