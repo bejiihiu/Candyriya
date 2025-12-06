@@ -601,9 +601,12 @@ public abstract class ServerPlayerMixin extends PlayerMixin implements ServerPla
         if (container != null) {
             ((ContainerBridge) container).bridge$setTitle(iTileInventory.getDisplayName());
             boolean cancelled = false;
-            ArclightCaptures.captureContainerOwner((ServerPlayer) (Object) this);
-            container = CraftEventFactory.callInventoryOpenEvent((ServerPlayer) (Object) this, container, cancelled);
-            ArclightCaptures.popContainerOwner((ServerPlayer) (Object) this);
+            try {
+                ArclightCaptures.captureContainerOwner((ServerPlayer) (Object) this);
+                container = CraftEventFactory.callInventoryOpenEvent((ServerPlayer) (Object) this, container, cancelled);
+            } finally {
+                ArclightCaptures.popContainerOwner((ServerPlayer) (Object) this);
+            }
             if (container == null && !cancelled) {
                 if (iTileInventory instanceof Container) {
                     ((Container) iTileInventory).stopOpen((ServerPlayer) (Object) this);
@@ -637,9 +640,12 @@ public abstract class ServerPlayerMixin extends PlayerMixin implements ServerPla
     @Inject(method = "doCloseContainer", at = @At("HEAD"))
     private void arclight$invClose(CallbackInfo ci) {
         if (this.containerMenu != this.inventoryMenu) {
-            ArclightCaptures.captureContainerOwner((ServerPlayer) (Object) this);
-            CraftEventFactory.handleInventoryCloseEvent((ServerPlayer) (Object) this);
-            ArclightCaptures.popContainerOwner((ServerPlayer) (Object) this);
+            try {
+                ArclightCaptures.captureContainerOwner((ServerPlayer) (Object) this);
+                CraftEventFactory.handleInventoryCloseEvent((ServerPlayer) (Object) this);
+            } finally {
+                ArclightCaptures.popContainerOwner((ServerPlayer) (Object) this);
+            }
         }
     }
 
