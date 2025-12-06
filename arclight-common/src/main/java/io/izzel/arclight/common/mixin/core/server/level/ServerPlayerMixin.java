@@ -614,7 +614,7 @@ public abstract class ServerPlayerMixin extends PlayerMixin implements ServerPla
             boolean cancelled = false;
             ArclightCaptures.captureContainerOwner((ServerPlayer) (Object) this);
             container = CraftEventFactory.callInventoryOpenEvent((ServerPlayer) (Object) this, container, cancelled);
-            ArclightCaptures.resetContainerOwner();
+            ArclightCaptures.popContainerOwner((ServerPlayer) (Object) this);
             if (container == null && !cancelled) {
                 if (iTileInventory instanceof Container) {
                     ((Container) iTileInventory).stopOpen((ServerPlayer) (Object) this);
@@ -648,10 +648,9 @@ public abstract class ServerPlayerMixin extends PlayerMixin implements ServerPla
     @Inject(method = "doCloseContainer", at = @At("HEAD"))
     private void arclight$invClose(CallbackInfo ci) {
         if (this.containerMenu != this.inventoryMenu) {
-            var old = ArclightCaptures.getContainerOwner();
             ArclightCaptures.captureContainerOwner((ServerPlayer) (Object) this);
             CraftEventFactory.handleInventoryCloseEvent((ServerPlayer) (Object) this);
-            ArclightCaptures.captureContainerOwner(old);
+            ArclightCaptures.popContainerOwner((ServerPlayer) (Object) this);
         }
     }
 
