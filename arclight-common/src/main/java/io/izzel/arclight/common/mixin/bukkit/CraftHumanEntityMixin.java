@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(value = CraftHumanEntity.class, remap = false)
+@Mixin(value = CraftHumanEntity.class)
 public abstract class CraftHumanEntityMixin extends CraftEntity {
 
     // @formatter:off
-    @Shadow public abstract Player getHandle();
-    @Shadow public abstract void setHandle(Player entity);
+    @Shadow(remap = false) public abstract Player getHandle();
+    @Shadow(remap = false) public abstract void setHandle(Player entity);
     // @formatter:on
 
     public CraftHumanEntityMixin(CraftServer server, Entity entity) {
