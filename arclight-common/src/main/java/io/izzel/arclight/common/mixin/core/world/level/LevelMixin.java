@@ -122,7 +122,8 @@ public abstract class LevelMixin implements WorldBridge, LevelAccessor, LevelWri
         bridge$getWorld();
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+    // InitAuther97: inject later than ironsspellbooks, see their LevelMixin
+    @Inject(method = "<init>", at = @At("RETURN"), order = 1001)
     private void arclight$init(WritableLevelData info, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimType, Supplier<ProfilerFiller> profiler, boolean isRemote, boolean isDebug, long seed, int maxNeighborUpdates, CallbackInfo ci) {
         ((WorldBorderBridge) this.worldBorder).bridge$setWorld((Level) (Object) this);
         for (SpawnCategory spawnCategory : SpawnCategory.values()) {
