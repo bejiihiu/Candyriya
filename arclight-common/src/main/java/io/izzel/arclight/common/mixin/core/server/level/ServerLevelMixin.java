@@ -121,7 +121,6 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
     @Shadow public abstract ServerChunkCache getChunkSource();
     @Shadow protected abstract void wakeUpAllPlayers();
     @Shadow @Final private ServerChunkCache chunkSource;
-    @Shadow @Final public static BlockPos END_SPAWN_POINT;
     @Shadow @Final public ServerLevelData serverLevelData;
     @Shadow @Final private PersistentEntitySectionManager<Entity> entityManager;
     @Shadow public abstract DimensionDataStorage getDataStorage();
@@ -199,6 +198,9 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
                     this.environment = World.Environment.NORMAL;
                 }
             }
+
+            // Now we create the CraftWorld
+            this.world = new CraftWorld((ServerLevel) (Object) this, generator, biomeProvider, environment);
         }
 
         ChunkGenerator raw = (ChunkGenerator) DecorationOps.callsite().invoke(instance);
@@ -219,9 +221,6 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
                 raw = new CustomChunkGenerator((ServerLevel) (Object) this, raw, generator);
             }
             // CraftBukkit end
-
-            // Now we create the CraftWorld
-            this.world = new CraftWorld((ServerLevel) (Object) this, generator, biomeProvider, environment);
         }
         return raw;
     }
@@ -264,7 +263,8 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
         if (arclight$isActual()) {
             ((WorldInfoBridge) this.K).bridge$setWorld((ServerLevel) (Object) this);
             var data = this.getDataStorage().computeIfAbsent(LevelPersistentData.factory(), "bukkit_pdc");
-            this.bridge$getWorld().readBukkitValues(data.getTag());
+            this.getWorld().readBukkitValues(data.getTag());
+            this.getCraftServer().addWorld(this.getWorld());
         }
     }
 
@@ -373,7 +373,7 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
     @Inject(method = "save", at = @At(value = "JUMP", ordinal = 0, opcode = Opcodes.IFNULL))
     private void arclight$worldSaveEvent(ProgressListener progress, boolean flush, boolean skipSave, CallbackInfo ci) {
         if (DistValidate.isValid(this)) {
-            Bukkit.getPluginManager().callEvent(new WorldSaveEvent(bridge$getWorld()));
+            Bukkit.getPluginManager().callEvent(new WorldSaveEvent(getWorld()));
         }
     }
 
@@ -587,7 +587,7 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"))
     private void arclight$timeSkip(ServerLevel world, long time) {
-        TimeSkipEvent event = new TimeSkipEvent(this.bridge$getWorld(), TimeSkipEvent.SkipReason.NIGHT_SKIP, (time - time % 24000L) - this.getDayTime());
+        TimeSkipEvent event = new TimeSkipEvent(this.getWorld(), TimeSkipEvent.SkipReason.NIGHT_SKIP, (time - time % 24000L) - this.getDayTime());
         Bukkit.getPluginManager().callEvent(event);
         arclight$timeSkipCancelled = event.isCancelled();
         if (!event.isCancelled()) {
