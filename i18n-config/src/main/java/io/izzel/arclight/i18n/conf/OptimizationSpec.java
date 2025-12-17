@@ -12,7 +12,7 @@ public class OptimizationSpec {
     @Setting("goal-selector-update-interval")
     private int goalSelectorInterval;
 
-    @Setting("activation-and-tracking-range")
+    @Setting("use-activation-and-tracking-range")
     private boolean useActivationAndTrackingRange;
 
     public boolean useActivationAndTrackingRange() {
