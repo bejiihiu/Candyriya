@@ -11,8 +11,6 @@ import org.bukkit.craftbukkit.v.CraftServer;
 
 public interface MinecraftServerBridge {
 
-    void bridge$setAutosavePeriod(int autosavePeriod);
-
     void bridge$setConsole(ConsoleCommandSender console);
 
     void bridge$setServer(CraftServer server);
@@ -20,8 +18,6 @@ public interface MinecraftServerBridge {
     CraftServer bridge$getServer();
 
     RemoteConsoleCommandSender bridge$getRemoteConsole();
-
-    void bridge$setRemoteConsole(RemoteConsoleCommandSender sender);
 
     void bridge$queuedProcess(Runnable runnable);
 
@@ -36,14 +32,6 @@ public interface MinecraftServerBridge {
     default void bridge$platform$unloadLevel(Level level) {}
 
     default void bridge$forge$markLevelsDirty() {}
-
-    default void bridge$platform$serverStarted() {}
-
-    default void bridge$platform$serverStopping() {}
-
-    default void bridge$forge$expectServerStopped() {}
-
-    default void bridge$platform$serverStopped() {}
 
     default void bridge$forge$reinstatePersistentChunks(ServerLevel level, ForcedChunksSavedData savedData) {}
 

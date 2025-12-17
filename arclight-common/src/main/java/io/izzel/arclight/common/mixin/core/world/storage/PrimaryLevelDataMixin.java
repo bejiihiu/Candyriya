@@ -114,6 +114,16 @@ public abstract class PrimaryLevelDataMixin implements WorldInfoBridge {
     }
 
     @Override
+    public void arclight$checkName(String name) {
+        checkName(name);
+    }
+
+    @Override
+    public void arclight$offerCustomDimensions(Registry<LevelStem> registry) {
+        this.customDimensions = registry;
+    }
+
+    @Override
     public LevelSettings bridge$getWorldSettings() {
         return this.settings;
     }

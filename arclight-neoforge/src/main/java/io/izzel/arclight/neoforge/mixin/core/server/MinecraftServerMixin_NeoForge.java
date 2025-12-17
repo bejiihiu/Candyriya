@@ -8,7 +8,6 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.world.chunk.ForcedChunkManager;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -32,26 +31,6 @@ public abstract class MinecraftServerMixin_NeoForge implements MinecraftServerBr
     @Override
     public void bridge$forge$markLevelsDirty() {
         this.markWorldsDirty();
-    }
-
-    @Override
-    public void bridge$platform$serverStarted() {
-        ServerLifecycleHooks.handleServerStarted((MinecraftServer) (Object) this);
-    }
-
-    @Override
-    public void bridge$platform$serverStopping() {
-        ServerLifecycleHooks.handleServerStopping((MinecraftServer) (Object) this);
-    }
-
-    @Override
-    public void bridge$forge$expectServerStopped() {
-        ServerLifecycleHooks.expectServerStopped();
-    }
-
-    @Override
-    public void bridge$platform$serverStopped() {
-        ServerLifecycleHooks.handleServerStopped((MinecraftServer) (Object) this);
     }
 
     @Override
