@@ -41,26 +41,6 @@ public abstract class MinecraftServerMixin_Forge implements MinecraftServerBridg
     }
 
     @Override
-    public void bridge$platform$serverStarted() {
-        ServerLifecycleHooks.handleServerStarted((MinecraftServer) (Object) this);
-    }
-
-    @Override
-    public void bridge$platform$serverStopping() {
-        ServerLifecycleHooks.handleServerStopping((MinecraftServer) (Object) this);
-    }
-
-    @Override
-    public void bridge$forge$expectServerStopped() {
-        ServerLifecycleHooks.expectServerStopped();
-    }
-
-    @Override
-    public void bridge$platform$serverStopped() {
-        ServerLifecycleHooks.handleServerStopped((MinecraftServer) (Object) this);
-    }
-
-    @Override
     public void bridge$forge$reinstatePersistentChunks(ServerLevel level, ForcedChunksSavedData savedData) {
         ForgeChunkManager.reinstatePersistentChunks(level, savedData);
     }
