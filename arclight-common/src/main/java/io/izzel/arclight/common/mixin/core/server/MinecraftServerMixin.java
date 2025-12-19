@@ -394,7 +394,6 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
     // bukkit methods
     public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
         this.bridge$forge$markLevelsDirty();
-        this.bridge$platform$loadLevel(serverWorld);
         if (!serverWorld.bridge$getWorld().getKeepSpawnInMemory()) {
             return;
         }
@@ -437,12 +436,13 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
     // bukkit callbacks
     public void addLevel(ServerLevel level) {
         this.levels.put(level.dimension(), level);
+        this.arclight$onServerLoad(level);
         this.bridge$forge$markLevelsDirty();
     }
 
     public void removeLevel(ServerLevel level) {
-        this.bridge$platform$unloadLevel(level);
         this.levels.remove(level.dimension());
+        this.arclight$onServerUnload(level);
         this.bridge$forge$markLevelsDirty();
         ((CraftServerBridge) Bukkit.getServer()).bridge$removeWorld(level);
     }

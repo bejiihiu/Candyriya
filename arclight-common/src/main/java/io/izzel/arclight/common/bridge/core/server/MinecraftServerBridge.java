@@ -4,7 +4,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.TimeSource;
 import net.minecraft.world.level.ForcedChunksSavedData;
-import net.minecraft.world.level.Level;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.craftbukkit.v.CraftServer;
@@ -27,9 +26,9 @@ public interface MinecraftServerBridge {
 
     Commands bridge$getVanillaCommands();
 
-    default void bridge$platform$loadLevel(Level level) {}
+    void arclight$onServerLoad(ServerLevel level);
 
-    default void bridge$platform$unloadLevel(Level level) {}
+    void arclight$onServerUnload(ServerLevel level);
 
     default void bridge$forge$markLevelsDirty() {}
 

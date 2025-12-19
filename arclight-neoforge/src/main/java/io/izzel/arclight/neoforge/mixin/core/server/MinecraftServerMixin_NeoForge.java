@@ -1,10 +1,10 @@
 package io.izzel.arclight.neoforge.mixin.core.server;
 
 import io.izzel.arclight.common.bridge.core.server.MinecraftServerBridge;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ForcedChunksSavedData;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.world.chunk.ForcedChunkManager;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -19,12 +19,12 @@ public abstract class MinecraftServerMixin_NeoForge implements MinecraftServerBr
     // @formatter:on
 
     @Override
-    public void bridge$platform$loadLevel(Level level) {
+    public void arclight$onServerLoad(ServerLevel level) {
         NeoForge.EVENT_BUS.post(new LevelEvent.Load(level));
     }
 
     @Override
-    public void bridge$platform$unloadLevel(Level level) {
+    public void arclight$onServerUnload(ServerLevel level) {
         NeoForge.EVENT_BUS.post(new LevelEvent.Unload(level));
     }
 
