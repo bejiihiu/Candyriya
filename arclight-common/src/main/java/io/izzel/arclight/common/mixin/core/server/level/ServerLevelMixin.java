@@ -166,15 +166,11 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerWorld
     @Decorate(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/dimension/LevelStem;generator()Lnet/minecraft/world/level/chunk/ChunkGenerator;"))
     private ChunkGenerator arclight$initChunkGenerator(LevelStem instance, @Local(ordinal = -1) MinecraftServer server, @Local(ordinal = -1) ServerLevelData worldInfo) throws Throwable {
         // Pulling up world info init since level info is used when selecting ChunkGenerator.
-        if (arclight$isActual()) {
-            if (worldInfo instanceof PrimaryLevelData primary) {
-                this.K = primary;
-            } else {
-                // damn spigot again
-                this.K = DelegateWorldInfo.wrap(worldInfo);
-            }
+        if (arclight$isActual() && worldInfo instanceof PrimaryLevelData primary) {
+            this.K = primary;
         } else {
-            this.K = null;
+            // damn spigot again
+            this.K = DelegateWorldInfo.wrap(worldInfo);
         }
 
         if (arclight$isActual()) {
