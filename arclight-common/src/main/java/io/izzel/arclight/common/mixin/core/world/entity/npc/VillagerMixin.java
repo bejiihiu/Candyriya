@@ -2,6 +2,8 @@ package io.izzel.arclight.common.mixin.core.world.entity.npc;
 
 import io.izzel.arclight.common.bridge.core.world.item.MerchantOfferBridge;
 import io.izzel.arclight.common.bridge.core.world.WorldBridge;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.monster.Witch;
@@ -14,6 +16,8 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.VillagerReplenishTradeEvent;
+import org.slf4j.Logger;
+import org.spigotmc.SpigotConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,6 +27,14 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(net.minecraft.world.entity.npc.Villager.class)
 public abstract class VillagerMixin extends AbstractVillagerMixin {
+
+    @Decorate(method = "die", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
+    private void arclight$logVillagerDeaths(Logger instance, String s, Object o1, Object o2) throws Throwable {
+        if (!SpigotConfig.logVillagerDeaths) {
+            return;
+        }
+        DecorationOps.callsite().invoke(instance, s, o1, o2);
+    }
 
     @Inject(method = "customServerAiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
     private void arclight$reason(CallbackInfo ci) {

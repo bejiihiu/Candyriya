@@ -70,6 +70,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.objectweb.asm.Opcodes;
+import org.slf4j.Logger;
+import org.spigotmc.SpigotConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -245,6 +247,14 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
             }
         }
         effectsToProcess.clear();
+    }
+
+    @Decorate(method = "die", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V"))
+    private void arclight$logNamedEntityDeath(Logger instance, String s, Object o1, Object o2) throws Throwable {
+        if (!SpigotConfig.logNamedDeaths) {
+            return;
+        }
+        DecorationOps.callsite().invoke(instance, s, o1, o2);
     }
 
     private transient EntityPotionEffectEvent.Cause arclight$cause;
