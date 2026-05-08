@@ -1,7 +1,6 @@
 package io.izzel.arclight.common.mixin.core.world.level.block.entity;
 
 import io.izzel.arclight.common.bridge.core.world.IInventoryBridge;
-import io.izzel.arclight.common.bridge.core.world.level.block.entity.BlockEntityBridge;
 import io.izzel.arclight.common.bridge.core.world.level.WorldBridge;
 import io.izzel.arclight.common.mod.server.ArclightServer;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
@@ -83,7 +82,7 @@ public abstract class HopperBlockEntityMixin extends BaseContainerBlockEntityMix
                 destinationInventory = ((IInventoryBridge) destination).getOwnerInventory();
             }
 
-            InventoryMoveItemEvent event = new InventoryMoveItemEvent(((BlockEntityBridge) entity).bridge$getOwner().getInventory(), original.clone(), destinationInventory, true);
+            InventoryMoveItemEvent event = new InventoryMoveItemEvent(((IInventoryBridge) source).getOwnerInventory(), original.clone(), destinationInventory, true);
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 entity.setCooldown(((WorldBridge) entity.getLevel()).bridge$spigotConfig().hopperTransfer); // Delay hopper checks
