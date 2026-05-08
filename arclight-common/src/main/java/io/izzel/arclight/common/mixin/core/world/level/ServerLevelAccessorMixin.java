@@ -1,6 +1,7 @@
 package io.izzel.arclight.common.mixin.core.world.level;
 
 import io.izzel.arclight.common.bridge.core.server.level.ServerLevelBridge;
+import io.izzel.arclight.common.mod.util.DistValidate;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
@@ -30,6 +31,14 @@ public interface ServerLevelAccessorMixin extends LevelAccessor, ServerLevelBrid
      */
     @Overwrite
     default void addFreshEntityWithPassengers(Entity entity) {
+        if (!DistValidate.isValid((LevelAccessor) this)) {
+            Iterator<Entity> iterator = entity.getSelfAndPassengers().iterator();
+            while (iterator.hasNext()) {
+                Entity next = iterator.next();
+                this.addFreshEntity(next);
+            }
+            return;
+        }
         CreatureSpawnEvent.SpawnReason spawnReason = bridge$getAddEntityReason();
         Iterator<Entity> iterator = entity.getSelfAndPassengers().iterator();
         while (iterator.hasNext()) {
@@ -43,7 +52,9 @@ public interface ServerLevelAccessorMixin extends LevelAccessor, ServerLevelBrid
         Iterator<Entity> iterator = entity.getSelfAndPassengers().iterator();
         while (iterator.hasNext()) {
             Entity next = iterator.next();
-            bridge$pushAddEntityReason(reason);
+            if (DistValidate.isValid((LevelAccessor) this)) {
+                bridge$pushAddEntityReason(reason);
+            }
             this.addFreshEntity(next);
         }
         return !entity.isRemoved();
