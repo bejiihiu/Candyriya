@@ -4,6 +4,8 @@ import io.izzel.arclight.common.bridge.core.world.level.LevelAccessorBridge;
 import io.izzel.arclight.common.bridge.core.world.level.WorldBridge;
 import io.izzel.arclight.common.bridge.core.world.chunk.ChunkAccessBridge;
 import io.izzel.arclight.common.bridge.core.world.level.chunk.LevelChunkBridge;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -27,7 +29,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
@@ -163,9 +164,9 @@ public abstract class LevelChunkMixin extends ChunkAccessMixin implements LevelC
         this.mustNotSave = !unloadEvent.isSaveChunk();
     }
 
-    @Redirect(method = "setBlockState", at = @At(value = "FIELD", ordinal = 1, target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
-    public boolean arclight$redirectIsRemote(Level world) {
-        return world.isClientSide && this.arclight$doPlace;
+    @Decorate(method = "setBlockState", at = @At(value = "FIELD", ordinal = 1, target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
+    public boolean arclight$redirectIsRemote(Level world) throws Throwable {
+        return (boolean) DecorationOps.callsite().invoke(world) && this.arclight$doPlace;
     }
 
     @Override
