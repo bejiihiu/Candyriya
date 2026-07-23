@@ -8,7 +8,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.entity.LivingEntityBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerPlayerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.network.ServerGamePacketListenerImplBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.LevelAccessorBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.server.event.CandyriyaEventFactory;
 import kz.bejiihiu.candyriya.common.util.IteratorUtil;
 import io.izzel.arclight.mixin.Decorate;
@@ -360,7 +360,7 @@ public abstract class LivingEntityMixin extends EntityMixin implements LivingEnt
     private void Candyriya$beginOnDeathMobEffects(Entity.RemovalReason removalReason, CallbackInfo ci) {
         if (removing) {
             ci.cancel();
-            ArclightServer.LOGGER.warn("remove() is called recursively, skipping");
+            CandyriyaServer.LOGGER.warn("remove() is called recursively, skipping");
             return;
         }
         removing = true;

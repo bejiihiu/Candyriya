@@ -4,7 +4,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.entity.EntityBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.IInventoryBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.block.entity.BlockEntityBridge;
 import kz.bejiihiu.candyriya.common.mixin.bukkit.CraftBlockEntityStateAccessor;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.forge.mixin.forge.items.CombinedInvWrapperAccessor;
 import kz.bejiihiu.candyriya.forge.mixin.forge.items.RangedWrapperAccessor;
 import kz.bejiihiu.candyriya.forge.mixin.forge.items.SidedInvWrapperAccessor;
@@ -150,7 +150,7 @@ public class DelegatedContainer implements Container, IInventoryBridge {
 
     @Override
     public ItemStack removeItemNoUpdate(int i) {
-        ArclightServer.LOGGER.warn("Attempted to removeItemNoUpdate on IItemHandler, using removeItem instead");
+        CandyriyaServer.LOGGER.warn("Attempted to removeItemNoUpdate on IItemHandler, using removeItem instead");
         return delegate.extractItem(i, Integer.MAX_VALUE, false);
     }
 

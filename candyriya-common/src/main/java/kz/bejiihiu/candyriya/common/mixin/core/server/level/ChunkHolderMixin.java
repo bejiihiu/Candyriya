@@ -3,7 +3,7 @@ package kz.bejiihiu.candyriya.common.mixin.core.server.level;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.chunk.LevelChunkBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.server.ChunkHolderBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ChunkMapBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -96,7 +96,7 @@ public abstract class ChunkHolderMixin extends GenerationChunkHolder implements 
             // Run callback right away if the future was already done
             ((ChunkMapBridge) manager).bridge$getCallbackExecutor().run();
         } else if (Candyriya$pendingUnload) {
-            ArclightServer.LOGGER.warn("Chunk status changed multiple times during chunk ticket tracking / unload event for chunk {}", getPos());
+            CandyriyaServer.LOGGER.warn("Chunk status changed multiple times during chunk ticket tracking / unload event for chunk {}", getPos());
         }
     }
 
@@ -126,7 +126,7 @@ public abstract class ChunkHolderMixin extends GenerationChunkHolder implements 
                 }
             }).exceptionally((throwable) -> {
                 // ensure exceptions are printed, by default this is not the case
-                ArclightServer.LOGGER.fatal("Failed to schedule load callback for chunk " + this.pos, throwable);
+                CandyriyaServer.LOGGER.fatal("Failed to schedule load callback for chunk " + this.pos, throwable);
                 return null;
             });
 

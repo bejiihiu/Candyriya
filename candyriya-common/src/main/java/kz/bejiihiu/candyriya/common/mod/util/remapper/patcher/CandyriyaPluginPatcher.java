@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper.patcher;
 
 import io.izzel.arclight.api.PluginPatcher;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.CandyriyaRemapConfig;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.ClassLoaderRemapper;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.GlobalClassRepo;
@@ -41,7 +41,7 @@ public class CandyriyaPluginPatcher implements PluginTransformer {
         var list = new ArrayList<PluginPatcher>();
         File pluginFolder = new File("plugins");
         if (pluginFolder.exists()) {
-            ArclightServer.LOGGER.info("patcher.loading");
+            CandyriyaServer.LOGGER.info("patcher.loading");
             File[] files = pluginFolder.listFiles();
             if (files != null) {
                 for (File file : files) {
@@ -50,7 +50,7 @@ public class CandyriyaPluginPatcher implements PluginTransformer {
                     }
                 }
                 if (!list.isEmpty()) {
-                    ArclightServer.LOGGER.info("patcher.loaded", list.size());
+                    CandyriyaServer.LOGGER.info("patcher.loaded", list.size());
                 }
             }
         }
@@ -76,7 +76,7 @@ public class CandyriyaPluginPatcher implements PluginTransformer {
                 }
             }
         } catch (Throwable e) {
-            ArclightServer.LOGGER.debug("patcher.load-error", e);
+            CandyriyaServer.LOGGER.debug("patcher.load-error", e);
         }
         return Optional.empty();
     }

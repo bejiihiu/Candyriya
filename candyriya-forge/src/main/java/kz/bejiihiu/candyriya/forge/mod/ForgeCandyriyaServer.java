@@ -9,7 +9,7 @@ import net.minecraftforge.eventbus.EventBus;
 import net.minecraftforge.eventbus.api.IEventBus;
 import org.bukkit.plugin.Plugin;
 
-public class ForgeArclightServer implements ArclightServer {
+public class ForgeCandyriyaServer implements ArclightServer {
 
     private final TickingTracker tickingTracker = new DefaultTickingTracker();
 

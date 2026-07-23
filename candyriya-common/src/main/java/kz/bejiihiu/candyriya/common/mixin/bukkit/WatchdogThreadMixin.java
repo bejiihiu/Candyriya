@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.bukkit;
 
 import kz.bejiihiu.candyriya.common.bridge.core.server.MinecraftServerBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import net.minecraft.Util;
 import org.spigotmc.WatchdogThread;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +20,7 @@ public class WatchdogThreadMixin extends Thread {
 
     @Inject(method = "tick", at = @At("RETURN"))
     private static void Candyriya$tick(CallbackInfo ci) {
-        ((MinecraftServerBridge) ArclightServer.getMinecraftServer()).Candyriya$extendNextTickTimeTo(Util.timeSource);
+        ((MinecraftServerBridge) CandyriyaServer.getMinecraftServer()).Candyriya$extendNextTickTimeTo(Util.timeSource);
     }
 
     @Inject(method = "doStop", at = @At("HEAD"))
@@ -39,8 +39,8 @@ public class WatchdogThreadMixin extends Thread {
      */
     @Overwrite
     public void run() {
-        ArclightServer.LOGGER.info("Started pseudo Spigot watchdog thread.");
-        ArclightServer.LOGGER.debug("Spigot watchdog thread run() stack trace", new UnsupportedOperationException("started spigot watchdog"));
+        CandyriyaServer.LOGGER.info("Started pseudo Spigot watchdog thread.");
+        CandyriyaServer.LOGGER.debug("Spigot watchdog thread run() stack trace", new UnsupportedOperationException("started spigot watchdog"));
         while (!Thread.interrupted()) {
             LockSupport.parkNanos(Long.MAX_VALUE);
         }

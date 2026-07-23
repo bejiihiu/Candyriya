@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.forge.mod.event;
 
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import net.minecraftforge.common.MinecraftForge;
 
 public abstract class CandyriyaEventDispatcherRegistry {
@@ -12,6 +12,6 @@ public abstract class CandyriyaEventDispatcherRegistry {
         MinecraftForge.EVENT_BUS.register(new EntityTeleportEventDispatcher());
         MinecraftForge.EVENT_BUS.register(new ItemEntityEventDispatcher());
         MinecraftForge.EVENT_BUS.register(new ChannelRegisterHandler());
-        ArclightServer.LOGGER.info("registry.forge-event");
+        CandyriyaServer.LOGGER.info("registry.forge-event");
     }
 }

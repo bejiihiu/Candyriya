@@ -7,7 +7,7 @@ import kz.bejiihiu.candyriya.common.mod.server.api.DefaultTickingTracker;
 import net.neoforged.bus.api.IEventBus;
 import org.bukkit.plugin.Plugin;
 
-public class NeoForgeArclightServer implements ArclightServer {
+public class NeoForgeCandyriyaServer implements ArclightServer {
 
     private final TickingTracker tickingTracker = new DefaultTickingTracker();
 

@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core.network.protocol.game;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.util.VelocitySupport;
 import io.netty.buffer.Unpooled;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -32,7 +32,7 @@ public class ClientboundCommandsPacket_ArgumentNodeStubMixin {
         buf.writeVarInt(Candyriya_WRAP_INDEX);
         var id = BuiltInRegistries.COMMAND_ARGUMENT_TYPE.getId(type);
         if (id == -1) {
-            ArclightServer.LOGGER.debug("Command argument type {} is not registered", type);
+            CandyriyaServer.LOGGER.debug("Command argument type {} is not registered", type);
         }
         buf.writeVarInt(id);
         var payload = new FriendlyByteBuf(Unpooled.buffer());

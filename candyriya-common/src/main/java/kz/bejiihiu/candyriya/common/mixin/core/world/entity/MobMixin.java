@@ -3,7 +3,7 @@ package kz.bejiihiu.candyriya.common.mixin.core.world.entity;
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.LivingEntityBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.MobBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.nbt.CompoundTag;
@@ -112,7 +112,7 @@ public abstract class MobMixin extends LivingEntityMixin implements MobBridge {
                 reason = (this.getTarget().isAlive() ? EntityTargetEvent.TargetReason.FORGOT_TARGET : EntityTargetEvent.TargetReason.TARGET_DIED);
             }
             if (reason == EntityTargetEvent.TargetReason.UNKNOWN) {
-                ArclightServer.LOGGER.debug("Unknown target reason setting {} target to {}", this, livingEntity);
+                CandyriyaServer.LOGGER.debug("Unknown target reason setting {} target to {}", this, livingEntity);
             }
             CraftLivingEntity ctarget = null;
             if (livingEntity != null) {

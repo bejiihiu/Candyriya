@@ -4,7 +4,7 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.MessengerBridge;
 import kz.bejiihiu.candyriya.common.mod.plugin.messaging.PacketRecorder;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.plugin.messaging.CandyriyaPluginChannel;
 import net.minecraft.resources.ResourceLocation;
 import org.bukkit.craftbukkit.v.entity.CraftPlayer;
@@ -50,16 +50,16 @@ public abstract class StandardMessengerMixin implements Messenger, MessengerBrid
     public CandyriyaPluginChannel<?> Candyriya$getAndCheckCrossSend(Plugin src, ResourceLocation channel) {
         var Candyriya = this.Candyriya$registry.get(channel);
         if (src == null) {
-            ArclightServer.LOGGER.warn("Sending anonymous packet on channel {}", channel);
+            CandyriyaServer.LOGGER.warn("Sending anonymous packet on channel {}", channel);
         } else if (!Candyriya.getOutgoing().contains(src)) {
             boolean first;
             synchronized (this.Candyriya$crossSend) {
                 first = this.Candyriya$crossSend.put(src, channel);
             }
             if (first) {
-                ArclightServer.LOGGER.warn("A plugin is sending message on a channel that's registered as outgoing by other plugins but itself!");
-                ArclightServer.LOGGER.warn("Plugin: [{}], on channel: {}", src.getDescription().getFullName(), channel);
-                ArclightServer.LOGGER.warn("This warning will only be displayed once for every plugin and channel.");
+                CandyriyaServer.LOGGER.warn("A plugin is sending message on a channel that's registered as outgoing by other plugins but itself!");
+                CandyriyaServer.LOGGER.warn("Plugin: [{}], on channel: {}", src.getDescription().getFullName(), channel);
+                CandyriyaServer.LOGGER.warn("This warning will only be displayed once for every plugin and channel.");
             }
         }
         return Candyriya;
@@ -77,7 +77,7 @@ public abstract class StandardMessengerMixin implements Messenger, MessengerBrid
         } else {
             registerOutgoingPluginChannel(src, channel.toString());
         }
-        ArclightServer.LOGGER.warn("Plugin [{}] is sending message on an unregistered outgoing channel {}, registering.", fullName, channel);
+        CandyriyaServer.LOGGER.warn("Plugin [{}] is sending message on an unregistered outgoing channel {}, registering.", fullName, channel);
     }
 
     @Override
@@ -159,9 +159,9 @@ public abstract class StandardMessengerMixin implements Messenger, MessengerBrid
             var namespace = corrected.substring(0, corrected.indexOf(':'));
             var path = corrected.substring(corrected.indexOf(':') + 1);
             if (!ResourceLocation.isValidNamespace(namespace) || !ResourceLocation.isValidPath(path)) {
-                ArclightServer.LOGGER.warn("Channel name is malformed and impossible to use: {}", corrected);
-                ArclightServer.LOGGER.warn("Related functionality cannot be guaranteed!");
-                ArclightServer.LOGGER.warn("This message will only be displayed once for this channel!");
+                CandyriyaServer.LOGGER.warn("Channel name is malformed and impossible to use: {}", corrected);
+                CandyriyaServer.LOGGER.warn("Related functionality cannot be guaranteed!");
+                CandyriyaServer.LOGGER.warn("This message will only be displayed once for this channel!");
                 valid.put(channel, false);
             } else {
                 valid.put(channel, true);

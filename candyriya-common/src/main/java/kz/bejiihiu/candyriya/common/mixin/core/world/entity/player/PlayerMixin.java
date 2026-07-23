@@ -11,7 +11,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.food.FoodDataBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerLevelBridge;
 import kz.bejiihiu.candyriya.common.mixin.core.world.entity.LivingEntityMixin;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.arclight.mixin.Local;

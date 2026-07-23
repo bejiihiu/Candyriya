@@ -8,7 +8,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.server.MinecraftServerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
 import kz.bejiihiu.candyriya.common.mod.CandyriyaConstants;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.TransformAccess;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.server.BukkitRegistry;
 import kz.bejiihiu.candyriya.common.mod.server.world.border.CandyriyaBorderChangeListener;
 import kz.bejiihiu.candyriya.common.mod.server.world.border.CandyriyaDelegatedBorderListener;
@@ -231,7 +231,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
             return IteratorUtil.filter(iterator, it -> {
                 final var location = it.getKey().location();
                 if (location.getNamespace().equals("bukkit")) {
-                    ArclightServer.LOGGER.info("Deferred {} custom dimension creation", location);
+                    CandyriyaServer.LOGGER.info("Deferred {} custom dimension creation", location);
                     return false;
                 } else {
                     return true;

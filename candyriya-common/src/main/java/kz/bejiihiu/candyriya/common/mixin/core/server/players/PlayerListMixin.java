@@ -9,7 +9,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.network.syncher.SynchedEntityDat
 import kz.bejiihiu.candyriya.common.bridge.core.server.network.ServerGamePacketListenerImplBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.players.PlayerListBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.server.world.border.CandyriyaBorderChangeListener;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import kz.bejiihiu.candyriya.common.mod.util.Blackhole;

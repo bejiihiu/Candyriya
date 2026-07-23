@@ -3,7 +3,7 @@ package kz.bejiihiu.candyriya.common.mixin.bukkit;
 import com.google.common.collect.ImmutableMap;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.MaterialBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.block.FireBlockBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.i18n.LocalizedException;
 import kz.bejiihiu.candyriya.i18n.conf.MaterialPropertySpec;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -360,8 +360,8 @@ public abstract class MaterialMixin implements MaterialBridge {
                     this.ctor = (Constructor<? extends MaterialData>) data.getConstructor(Material.class, byte.class);
                 }
             } catch (Exception e) {
-                ArclightServer.LOGGER.warn("Bad material data class {} for {}", Candyriya$spec.materialDataClass, this);
-                ArclightServer.LOGGER.warn(e);
+                CandyriyaServer.LOGGER.warn("Bad material data class {} for {}", Candyriya$spec.materialDataClass, this);
+                CandyriyaServer.LOGGER.warn(e);
             }
         }
         Candyriya$location = key;
@@ -462,13 +462,13 @@ public abstract class MaterialMixin implements MaterialBridge {
                 }
             } catch (Exception e) {
                 if (e instanceof LocalizedException) {
-                    ArclightServer.LOGGER.warn(((LocalizedException) e).node(), ((LocalizedException) e).args());
+                    CandyriyaServer.LOGGER.warn(((LocalizedException) e).node(), ((LocalizedException) e).args());
                 } else {
-                    ArclightServer.LOGGER.warn("registry.block-state.error", this, Candyriya$spec.blockStateClass, e);
+                    CandyriyaServer.LOGGER.warn("registry.block-state.error", this, Candyriya$spec.blockStateClass, e);
                 }
             }
             if (this.Candyriya$stateFunc == null) {
-                ArclightServer.LOGGER.warn("registry.block-state.no-candidate", this, Candyriya$spec.blockStateClass);
+                CandyriyaServer.LOGGER.warn("registry.block-state.no-candidate", this, Candyriya$spec.blockStateClass);
             }
         }
         if (this.Candyriya$stateFunc == null) {
@@ -533,13 +533,13 @@ public abstract class MaterialMixin implements MaterialBridge {
             }
         } catch (Exception e) {
             if (e instanceof LocalizedException) {
-                ArclightServer.LOGGER.warn(((LocalizedException) e).node(), ((LocalizedException) e).args());
+                CandyriyaServer.LOGGER.warn(((LocalizedException) e).node(), ((LocalizedException) e).args());
             } else {
-                ArclightServer.LOGGER.warn("registry.meta-type.error", this, type, e);
+                CandyriyaServer.LOGGER.warn("registry.meta-type.error", this, type, e);
             }
         }
         if (candidate == null) {
-            ArclightServer.LOGGER.warn("registry.meta-type.no-candidate", this, type);
+            CandyriyaServer.LOGGER.warn("registry.meta-type.no-candidate", this, type);
             candidate = CraftMetaItem::new;
         }
         return candidate;

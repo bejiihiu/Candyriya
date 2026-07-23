@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper;
 
 import com.google.common.collect.Maps;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import net.md_5.specialsource.provider.InheritanceProvider;
 import net.md_5.specialsource.repo.ClassRepo;
 import org.objectweb.asm.Opcodes;
@@ -48,7 +48,7 @@ public class CandyriyaInterfaceInvokerGen implements PluginTransformer {
                     if (!extend) {
                         MethodNode methodNode = generateSynthetic(name, desc, node, remapper);
                         classNode.methods.add(methodNode);
-                        ArclightServer.LOGGER.debug("Generated {} redirecting to {}", classNode.name + "/" + name + " " + desc, node.owner + "/" + node.name + " " + node.desc);
+                        CandyriyaServer.LOGGER.debug("Generated {} redirecting to {}", classNode.name + "/" + name + " " + desc, node.owner + "/" + node.name + " " + node.desc);
                     }
                 }
             }

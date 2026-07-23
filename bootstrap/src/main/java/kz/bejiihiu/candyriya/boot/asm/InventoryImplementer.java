@@ -22,7 +22,7 @@ import java.lang.reflect.Modifier;
 public class InventoryImplementer implements Implementer {
 
     private static final Marker MARKER = MarkerManager.getMarker("INVENTORY");
-    private static final String BRIDGE_TYPE = "io/izzel/Candyriya/common/bridge/core/world/IInventoryBridge";
+    private static final String BRIDGE_TYPE = "kz/bejiihiu/candyriya/common/bridge/core/world/IInventoryBridge";
 
     private final String maxStackSizeMethodName;
 

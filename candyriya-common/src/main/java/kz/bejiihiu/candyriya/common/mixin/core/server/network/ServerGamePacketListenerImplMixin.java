@@ -10,7 +10,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.server.MinecraftServerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerPlayerGameModeBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.players.PlayerListBridge;
 import kz.bejiihiu.candyriya.common.mod.CandyriyaConstants;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.util.thread.RunnableInPlace;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import io.izzel.arclight.mixin.Decorate;

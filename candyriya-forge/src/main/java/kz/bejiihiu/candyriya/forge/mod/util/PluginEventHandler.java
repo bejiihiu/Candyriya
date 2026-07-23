@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.forge.mod.util;
 
 import io.izzel.arclight.api.Unsafe;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import net.minecraftforge.eventbus.EventBus;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -149,7 +149,7 @@ public class PluginEventHandler implements IEventListener {
             var asm = new PluginEventHandler(plugin, target, method, IGenericEvent.class.isAssignableFrom(eventType));
             MH_ADD_LISTENERS.invokeExact(bus, target, eventType, (IEventListener) asm, asm.getPriority());
         } catch (Throwable e) {
-            ArclightServer.LOGGER.error("Error registering event handler: {} {}", eventType, method, e);
+            CandyriyaServer.LOGGER.error("Error registering event handler: {} {}", eventType, method, e);
         }
     }
 

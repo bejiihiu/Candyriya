@@ -2,7 +2,7 @@ package kz.bejiihiu.candyriya.fabric.mixin.bukkit;
 
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import net.minecraft.commands.CommandResultCallback;
 import net.minecraft.commands.CommandSourceStack;
 import org.bukkit.Bukkit;
@@ -22,7 +22,7 @@ public abstract class CraftServerMixin_Fabric {
         if (sender instanceof CraftEntity) {
             commandSource = ((CraftEntity) sender).getHandle().createCommandSourceStack();
         } else if (sender == Bukkit.getConsoleSender()) {
-            commandSource = ArclightServer.getMinecraftServer().createCommandSourceStack();
+            commandSource = CandyriyaServer.getMinecraftServer().createCommandSourceStack();
         } else if (sender instanceof CraftBlockCommandSender) {
             commandSource = ((CraftBlockCommandSender) sender).getWrapper();
         } else {
@@ -32,7 +32,7 @@ public abstract class CraftServerMixin_Fabric {
         if (stringreader.canRead() && stringreader.peek() == '/') {
             stringreader.skip();
         }
-        ParseResults<CommandSourceStack> parse = ArclightServer.getMinecraftServer().getCommands()
+        ParseResults<CommandSourceStack> parse = CandyriyaServer.getMinecraftServer().getCommands()
                 .getDispatcher().parse(stringreader, commandSource);
         // Todo: Command event.
 //        CommandEvent event = new CommandEvent(parse);

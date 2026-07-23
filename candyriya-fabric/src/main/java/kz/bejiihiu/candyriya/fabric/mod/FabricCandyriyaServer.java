@@ -5,7 +5,7 @@ import io.izzel.arclight.api.TickingTracker;
 import kz.bejiihiu.candyriya.common.mod.server.api.DefaultTickingTracker;
 import org.bukkit.plugin.Plugin;
 
-public class FabricArclightServer implements ArclightServer {
+public class FabricCandyriyaServer implements ArclightServer {
 
     private final TickingTracker tickingTracker = new DefaultTickingTracker();
 

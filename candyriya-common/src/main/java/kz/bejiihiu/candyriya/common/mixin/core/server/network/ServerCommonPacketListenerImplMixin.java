@@ -5,7 +5,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.server.network.ServerCommonPacke
 import kz.bejiihiu.candyriya.common.bridge.core.server.MinecraftServerBridge;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.CreateConstructor;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.ShadowConstructor;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;

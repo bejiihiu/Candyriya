@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.neoforge.mixin.core.server.network;
 
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.server.MinecraftServer;
@@ -33,6 +33,6 @@ public abstract class ServerConfigurationPacketListenerImplMixin_NeoForge extend
 
     @Redirect(method = "handlePong", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerConfigurationPacketListenerImpl;runConfiguration()V"))
     private void Candyriya$runConfigurationMainThread(ServerConfigurationPacketListenerImpl instance) {
-        ArclightServer.executeOnMainThread(() -> this.runConfiguration());
+        CandyriyaServer.executeOnMainThread(() -> this.runConfiguration());
     }
 }

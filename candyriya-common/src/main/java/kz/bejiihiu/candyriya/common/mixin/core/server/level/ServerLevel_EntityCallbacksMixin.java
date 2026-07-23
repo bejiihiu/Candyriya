@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import kz.bejiihiu.candyriya.common.bridge.core.entity.EntityBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerPlayerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.saveddata.maps.MapItemSavedDataBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -32,7 +32,7 @@ public class ServerLevel_EntityCallbacksMixin {
     @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
     private void Candyriya$entityCleanup(Entity entity, CallbackInfo ci) {
         if (entity instanceof Player player) {
-            for (ServerLevel serverLevel : ArclightServer.getMinecraftServer().getAllLevels()) {
+            for (ServerLevel serverLevel : CandyriyaServer.getMinecraftServer().getAllLevels()) {
                 DimensionDataStorage worldData = serverLevel.getDataStorage();
                 for (Object o : worldData.cache.values()) {
                     if (o instanceof MapItemSavedData map) {

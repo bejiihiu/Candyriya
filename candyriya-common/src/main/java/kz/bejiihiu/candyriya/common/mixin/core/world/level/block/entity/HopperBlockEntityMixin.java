@@ -2,7 +2,7 @@ package kz.bejiihiu.candyriya.common.mixin.core.world.level.block.entity;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.IInventoryBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import kz.bejiihiu.candyriya.common.mod.util.DistValidate;
 import io.izzel.arclight.mixin.Decorate;

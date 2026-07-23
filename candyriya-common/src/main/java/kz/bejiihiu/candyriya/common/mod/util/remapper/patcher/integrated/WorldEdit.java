@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper.patcher.integrated;
 
 import io.izzel.arclight.api.PluginPatcher;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.CandyriyaRemapper;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Opcodes;

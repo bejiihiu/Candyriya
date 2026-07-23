@@ -5,7 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.JavaPluginLoaderBridge;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.PluginClassLoaderBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Server;

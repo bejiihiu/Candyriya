@@ -40,7 +40,7 @@ public class ApplicationBootstrap implements Consumer<String[]>, AbstractBootstr
             this.dirtyHacks();
             int targetIndex = Arrays.asList(args).indexOf("--launchTarget");
             if (targetIndex >= 0 && targetIndex < args.length - 1) {
-                args[targetIndex + 1] = "ArclightServer";
+                args[targetIndex + 1] = "CandyriyaServer";
             }
             ServiceLoader.load(getClass().getModule().getLayer(), Consumer.class).stream()
                     .filter(it -> !it.type().getName().contains("Candyriya"))

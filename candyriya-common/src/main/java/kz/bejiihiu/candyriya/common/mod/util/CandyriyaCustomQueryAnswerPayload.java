@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.util;
 
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
@@ -37,7 +37,7 @@ public record CandyriyaCustomQueryAnswerPayload(ByteBuf buf) implements CustomQu
             // Fast path: there is no data at all!
             return null;
         }
-        ArclightServer.LOGGER.warn("Recreating the CustomQAPayload from an unknown payload, this usually means unexpected changes.");
+        CandyriyaServer.LOGGER.warn("Recreating the CustomQAPayload from an unknown payload, this usually means unexpected changes.");
         // Slow path: recreate data from the payload
         final var buf = new FriendlyByteBuf(Unpooled.buffer());
         payload.write(buf);

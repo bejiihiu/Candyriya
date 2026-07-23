@@ -97,13 +97,13 @@ public class AsyncCatcher implements Implementer {
         InsnList insnList = new InsnList();
         LabelNode labelNode = new LabelNode(new Label());
         LabelNode labelNode1 = new LabelNode(new Label());
-        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "io/izzel/Candyriya/common/mod/server/ArclightServer", "isPrimaryThread", "()Z"));
+        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "kz/bejiihiu/candyriya/common/mod/server/CandyriyaServer", "isPrimaryThread", "()Z"));
         insnList.add(new JumpInsnNode(Opcodes.IFNE, labelNode));
         instantiateCallback(node, methodNode, insnList);
         insnList.add(new FieldInsnNode(Opcodes.GETSTATIC, Type.getType(AsyncCatcherSpec.Operation.class).getInternalName(), operation.name(), Type.getType(AsyncCatcherSpec.Operation.class).getDescriptor()));
         insnList.add(new LdcInsnNode(reason));
-        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "io/izzel/Candyriya/common/mod/server/ArclightServer", "getMainThreadExecutor", "()Ljava/util/concurrent/Executor;", false));
-        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getType(AsyncCatcher.class).getInternalName(), "checkOp", "(Ljava/util/function/Supplier;Lio/izzel/Candyriya/i18n/conf/AsyncCatcherSpec$Operation;Ljava/lang/String;Ljava/util/concurrent/Executor;)Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;"));
+        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "kz/bejiihiu/candyriya/common/mod/server/CandyriyaServer", "getMainThreadExecutor", "()Ljava/util/concurrent/Executor;", false));
+        insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getType(AsyncCatcher.class).getInternalName(), "checkOp", "(Ljava/util/function/Supplier;Lkz/bejiihiu/candyriya/i18n/conf/AsyncCatcherSpec$Operation;Ljava/lang/String;Ljava/util/concurrent/Executor;)Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;"));
         Type returnType = Type.getMethodType(methodNode.desc).getReturnType();
         boolean hasReturn = !returnType.equals(Type.VOID_TYPE);
         if (hasReturn) {

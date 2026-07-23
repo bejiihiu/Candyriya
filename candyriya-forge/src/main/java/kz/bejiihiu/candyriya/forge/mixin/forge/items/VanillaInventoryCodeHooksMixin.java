@@ -3,7 +3,7 @@ package kz.bejiihiu.candyriya.forge.mixin.forge.items;
 import com.google.common.base.Preconditions;
 import kz.bejiihiu.candyriya.common.bridge.core.world.IInventoryBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.forge.mod.util.DelegatedContainer;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;

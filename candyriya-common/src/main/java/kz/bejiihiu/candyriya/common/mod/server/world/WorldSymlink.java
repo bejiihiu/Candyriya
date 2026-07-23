@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.server.world;
 
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -18,15 +18,15 @@ public class WorldSymlink {
         try {
             if (!Files.isSymbolicLink(source)) {
                 if (Files.exists(source)) {
-                    ArclightServer.LOGGER.warn("symlink-file-exist", source);
+                    CandyriyaServer.LOGGER.warn("symlink-file-exist", source);
                     return;
                 }
                 Files.createSymbolicLink(source, dest);
             }
         } catch (UnsupportedOperationException e) {
-            ArclightServer.LOGGER.warn("error-symlink", e);
+            CandyriyaServer.LOGGER.warn("error-symlink", e);
         } catch (IOException e) {
-            ArclightServer.LOGGER.error("Error creating symlink", e);
+            CandyriyaServer.LOGGER.error("Error creating symlink", e);
         }
     }
 }

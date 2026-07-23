@@ -18,7 +18,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.level.storage.PrimaryLevel
 import kz.bejiihiu.candyriya.common.mixin.core.world.level.LevelMixin;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.CreateConstructor;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.ShadowConstructor;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.server.entity.CandyriyaSpawnReason;
 import kz.bejiihiu.candyriya.common.mod.server.event.CandyriyaEventFactory;
 import kz.bejiihiu.candyriya.common.mod.server.world.LevelPersistentData;
@@ -210,7 +210,7 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerLevel
                 } else if (raw instanceof FlatLevelSource flat) {
                     raw = new FlatLevelSource(((FlatLevelGeneratorSettingsBridge) flat.settings()).bridge$withBiomeSource(biomeSource));
                 } else {
-                    ArclightServer.LOGGER.warn("Level {} has unknown customized generator -- requested biome provider won't be satisfied.", this.serverLevelData.getLevelName());
+                    CandyriyaServer.LOGGER.warn("Level {} has unknown customized generator -- requested biome provider won't be satisfied.", this.serverLevelData.getLevelName());
                 }
             }
             if (generator != null) {
@@ -242,7 +242,7 @@ public abstract class ServerLevelMixin extends LevelMixin implements ServerLevel
             if (key.isPresent()) {
                 this.typeKey = key.get();
             } else {
-                ArclightServer.LOGGER.warn("Assign {} to unknown level stem {}", dimension.location(), levelStem);
+                CandyriyaServer.LOGGER.warn("Assign {} to unknown level stem {}", dimension.location(), levelStem);
                 this.typeKey = ResourceKey.create(Registries.LEVEL_STEM, dimension.location());
             }
             if (worldInfo instanceof DerivedLevelData data) {

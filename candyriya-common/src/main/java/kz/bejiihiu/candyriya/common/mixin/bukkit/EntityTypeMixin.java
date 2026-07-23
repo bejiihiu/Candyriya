@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.bukkit;
 
 import kz.bejiihiu.candyriya.common.bridge.bukkit.world.entity.EntityTypeBridge;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.i18n.LocalizedException;
 import kz.bejiihiu.candyriya.i18n.conf.EntityPropertySpec;
 import net.minecraft.resources.ResourceLocation;
@@ -53,9 +53,9 @@ public class EntityTypeMixin implements EntityTypeBridge {
                 this.clazz = (Class<? extends Entity>) cl;
             } catch (Exception e) {
                 if (e instanceof LocalizedException) {
-                    ArclightServer.LOGGER.warn(((LocalizedException) e).node(), ((LocalizedException) e).args());
+                    CandyriyaServer.LOGGER.warn(((LocalizedException) e).node(), ((LocalizedException) e).args());
                 } else {
-                    ArclightServer.LOGGER.warn("registry.entity.error", this, this.spec.entityClass, e);
+                    CandyriyaServer.LOGGER.warn("registry.entity.error", this, this.spec.entityClass, e);
                 }
             }
         }

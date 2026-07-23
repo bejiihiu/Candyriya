@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper;
 
 import com.google.common.collect.ImmutableMap;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.generated.RemappingURLClassLoader;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -37,7 +37,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
                             next = next.getNext();
                         }
                         if (next == null) continue;
-                        ArclightServer.LOGGER.debug(MARKER, "Found new {}/{} call in {} {}", typeInsnNode.desc, ((MethodInsnNode) next).name + ((MethodInsnNode) next).desc, node.name, methodNode.name + methodNode.desc);
+                        CandyriyaServer.LOGGER.debug(MARKER, "Found new {}/{} call in {} {}", typeInsnNode.desc, ((MethodInsnNode) next).name + ((MethodInsnNode) next).desc, node.name, methodNode.name + methodNode.desc);
                         ((MethodInsnNode) next).owner = replace;
                         typeInsnNode.desc = replace;
                     }
@@ -46,7 +46,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
         }
         ClassInfo info = classInfo(node);
         if (info == null) return;
-        ArclightServer.LOGGER.debug(MARKER, "Transforming classloader class {}", node.name);
+        CandyriyaServer.LOGGER.debug(MARKER, "Transforming classloader class {}", node.name);
         if (config.remap() && !info.remapping) {
             implementIntf(node);
         }
@@ -63,7 +63,7 @@ public class ClassLoaderAdapter implements PluginTransformer {
     }
 
     private void implementIntf(ClassNode node) {
-        ArclightServer.LOGGER.debug(MARKER, "Implementing RemappingClassLoader for class {}", node.name);
+        CandyriyaServer.LOGGER.debug(MARKER, "Implementing RemappingClassLoader for class {}", node.name);
         FieldNode remapper = new FieldNode(Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC, "remapper", Type.getDescriptor(ClassLoaderRemapper.class), null, null);
         MethodNode getRemapper = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC, "getRemapper", Type.getMethodDescriptor(Type.getType(ClassLoaderRemapper.class)), null, null);
         {

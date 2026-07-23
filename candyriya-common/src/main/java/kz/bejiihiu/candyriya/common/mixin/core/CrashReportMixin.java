@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core;
 
 import io.izzel.arclight.api.ArclightVersion;
-import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
 import net.minecraft.CrashReport;
 import net.minecraft.SystemReport;
 import org.bukkit.craftbukkit.v.CraftCrashReport;
