@@ -52,6 +52,12 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     
+    - name: Clean Gradle caches
+      run: |
+        rm -rf .gradle
+        rm -rf */build
+        rm -rf build
+    
     - name: Build
       env:
         Candyriya_FILES_TOKEN: ${{ secrets.Candyriya_FILES_TOKEN }}
