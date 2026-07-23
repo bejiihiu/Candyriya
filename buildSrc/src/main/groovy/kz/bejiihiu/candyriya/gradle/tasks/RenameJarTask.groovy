@@ -1,4 +1,4 @@
-package io.izzel.arclight.gradle.tasks
+package kz.bejiihiu.candyriya.gradle.tasks
 
 import net.md_5.specialsource.SpecialSource
 import org.gradle.api.file.RegularFileProperty

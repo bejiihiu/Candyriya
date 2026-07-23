@@ -1,6 +1,6 @@
-package io.izzel.arclight.gradle.tasks
+package kz.bejiihiu.candyriya.gradle.tasks
 
-import io.izzel.arclight.gradle.Utils
+import kz.bejiihiu.candyriya.gradle.Utils
 import net.md_5.specialsource.SpecialSource
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
@@ -49,14 +49,14 @@ class RemapSpigotTask implements Runnable {
 
     @Override
     void run() {
-        def tmp = Files.createTempFile("arclight", "jar")
+        def tmp = Files.createTempFile("candyriya", "jar")
         SpecialSource.main(new String[]{
                 '-i', inJar.canonicalPath,
                 '-o', tmp.toFile().canonicalPath,
                 '-m', inSrg.canonicalPath,
                 '-h', inheritanceMap.canonicalPath})
         if (inExtraSrg) {
-            def tmp2 = Files.createTempFile("arclight", "jar")
+            def tmp2 = Files.createTempFile("candyriya", "jar")
             copy(tmp, tmp2, ['*'], [
                     'net/minecraft/world/level/block/entity/LecternBlockEntity$1.class',
                     'net/minecraft/world/level/block/ChestBlock$2$1.class'
@@ -66,7 +66,7 @@ class RemapSpigotTask implements Runnable {
                     '-o', tmp.toFile().canonicalPath,
                     '-m', inExtraSrg.canonicalPath})
         }
-        def tmpDeobf = Files.createTempFile("arclight", "jar")
+        def tmpDeobf = Files.createTempFile("candyriya", "jar")
         def args = [
                 '-i', tmp.toFile().canonicalPath,
                 '-o', tmpDeobf.toFile().canonicalPath,
@@ -75,7 +75,7 @@ class RemapSpigotTask implements Runnable {
         ]
         Path tmpSrg
         if (bukkitVersion) {
-            tmpSrg = Files.createTempFile("arclight", "srg")
+            tmpSrg = Files.createTempFile("candyriya", "srg")
             tmpSrg.text = "PK: org/bukkit/craftbukkit/$bukkitVersion org/bukkit/craftbukkit/v"
             args.add('-m')
             args.add(tmpSrg.toFile().canonicalPath)

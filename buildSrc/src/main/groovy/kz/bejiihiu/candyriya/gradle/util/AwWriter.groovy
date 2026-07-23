@@ -1,4 +1,4 @@
-package io.izzel.arclight.gradle.util
+package kz.bejiihiu.candyriya.gradle.util
 
 import net.fabricmc.loom.configuration.providers.minecraft.mapped.NamedMinecraftProvider
 import net.md_5.specialsource.Jar

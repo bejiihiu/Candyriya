@@ -1,6 +1,6 @@
-package io.izzel.arclight.gradle.tasks
+package kz.bejiihiu.candyriya.gradle.tasks
 
-import io.izzel.arclight.gradle.util.AwWriter
+import kz.bejiihiu.candyriya.gradle.util.AwWriter
 import net.fabricmc.loom.LoomGradleExtension
 import net.fabricmc.loom.configuration.providers.mappings.MappingConfiguration
 import net.fabricmc.lorenztiny.TinyMappingsReader

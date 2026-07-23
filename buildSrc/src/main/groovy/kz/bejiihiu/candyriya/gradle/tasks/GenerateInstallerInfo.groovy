@@ -1,7 +1,7 @@
-package io.izzel.arclight.gradle.tasks
+package kz.bejiihiu.candyriya.gradle.tasks
 
 import groovy.json.JsonOutput
-import io.izzel.arclight.gradle.Utils
+import kz.bejiihiu.candyriya.gradle.Utils
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencyArtifact
