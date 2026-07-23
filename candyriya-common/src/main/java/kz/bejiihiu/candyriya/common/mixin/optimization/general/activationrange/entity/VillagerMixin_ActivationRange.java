@@ -1,0 +1,24 @@
+package kz.bejiihiu.candyriya.common.mixin.optimization.general.activationrange.entity;
+
+import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
+import kz.bejiihiu.candyriya.common.mixin.optimization.general.activationrange.EntityMixin_ActivationRange;
+import net.minecraft.world.entity.npc.Villager;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+
+@Mixin(Villager.class)
+public abstract class VillagerMixin_ActivationRange extends EntityMixin_ActivationRange {
+
+    // @formatter:off
+    @Shadow protected abstract void customServerAiStep();
+    // @formatter:on
+
+    @Override
+    public void inactiveTick() {
+        if (((WorldBridge) this.level()).bridge$spigotConfig().tickInactiveVillagers
+            && ((Villager) (Object) this).isEffectiveAi()) {
+            this.customServerAiStep();
+        }
+        super.inactiveTick();
+    }
+}

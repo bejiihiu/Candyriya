@@ -34,7 +34,7 @@ jobs:
       run: chmod +x gradlew
     - name: Build
       env:
-        ARCLIGHT_FILES_TOKEN: ${{ secrets.ARCLIGHT_FILES_TOKEN }}
+        Candyriya_FILES_TOKEN: ${{ secrets.Candyriya_FILES_TOKEN }}
       run: |
         ./gradlew cleanBuild build collect uploadFiles --no-daemon --stacktrace
 

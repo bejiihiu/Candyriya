@@ -1,0 +1,61 @@
+name: Bug Report
+description: Report a bug in Candyriya
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the information below.
+
+  - type: checkboxes
+    attributes:
+      label: Prerequisites
+      options:
+        - label: I am using the latest Candyriya build
+          required: true
+        - label: I have searched for existing issues
+          required: true
+
+  - type: input
+    id: candyriya-version
+    attributes:
+      label: Candyriya Version
+      description: The version printed when the server starts
+      placeholder: e.g. candyriya-1.21.1-1.0.0-SNAPSHOT-abc123
+    validations:
+      required: true
+
+  - type: input
+    id: minecraft-version
+    attributes:
+      label: Minecraft Version
+      placeholder: e.g. 1.21.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mod-loader
+    attributes:
+      label: Mod Loader
+      options:
+        - Forge
+        - NeoForge
+        - Fabric
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug and how to reproduce it
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output
+      render: shell

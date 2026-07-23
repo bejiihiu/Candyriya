@@ -1,0 +1,8 @@
+package kz.bejiihiu.candyriya.common.mixin.bukkit.inventory;
+
+import org.bukkit.craftbukkit.v.inventory.CraftItemStack;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(value = CraftItemStack.class, remap = false)
+public abstract class CraftItemStackMixin {
+}

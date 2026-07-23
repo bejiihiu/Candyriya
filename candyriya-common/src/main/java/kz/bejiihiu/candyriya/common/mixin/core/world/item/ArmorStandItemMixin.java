@@ -1,0 +1,35 @@
+package kz.bejiihiu.candyriya.common.mixin.core.world.item;
+
+import kz.bejiihiu.candyriya.common.mod.util.DistValidate;
+import kz.bejiihiu.candyriya.mixin.Decorate;
+import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import kz.bejiihiu.candyriya.mixin.Local;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ArmorStandItem;
+import net.minecraft.world.item.context.UseOnContext;
+import org.bukkit.craftbukkit.v.event.CraftEventFactory;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+@Mixin(ArmorStandItem.class)
+public class ArmorStandItemMixin {
+
+    private transient ArmorStand Candyriya$entity;
+
+    @Redirect(method = "useOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ArmorStand;moveTo(DDDFF)V"))
+    public void Candyriya$captureEntity(ArmorStand armorStandEntity, double x, double y, double z, float yaw, float pitch) {
+        armorStandEntity.moveTo(x, y, z, yaw, pitch);
+        Candyriya$entity = armorStandEntity;
+    }
+
+    @Decorate(method = "useOn", inject = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
+    public void Candyriya$entityPlace(UseOnContext context, @Local(ordinal = -1) ArmorStand armorStand) throws Throwable {
+        if (DistValidate.isValid(context) && CraftEventFactory.callEntityPlaceEvent(context, armorStand).isCancelled()) {
+            DecorationOps.cancel().invoke(InteractionResult.FAIL);
+            return;
+        }
+        DecorationOps.blackhole().invoke();
+    }
+}

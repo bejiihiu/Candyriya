@@ -1,47 +1,44 @@
-# Arclight
+# Candyriya
 
 A Bukkit server implementation on common mod loaders.
 
-[![Downloads count](https://img.shields.io/github/downloads/IzzelAliz/Arclight/total?style=flat-square)](https://arclight.izzel.io/)  ![License](https://img.shields.io/github/license/IzzelAliz/Arclight?style=flat-square)
+Fork of [Arclight](https://github.com/IzzelAliz/Arclight) with continued development and community-driven improvements.
 
-![Logo](.github/arclightlogo.jpg)
+[![Downloads count](https://img.shields.io/github/downloads/bejiihiu/Candyriya/total?style=flat-square)](https://github.com/bejiihiu/Candyriya/releases) ![License](https://img.shields.io/github/license/bejiihiu/Candyriya?style=flat-square)
+
+## About
+
+Candyriya is a continuation of the Arclight project, bringing Bukkit/Spigot/Paper plugin support to modded Minecraft servers running on Forge, NeoForge, and Fabric.
 
 ## Download
 
-Downloads are available at [https://arclight.izzel.io](https://arclight.izzel.io).
+Downloads are available at [GitHub Releases](https://github.com/bejiihiu/Candyriya/releases).
 
-Versions list and support status: [Discussions thread](https://github.com/IzzelAliz/Arclight/discussions/1575)
+## Supported Versions
+
+- **Minecraft 1.21.1** (primary target)
+- Forge, NeoForge, and Fabric support
 
 ## Installing
 
-* Download the jar.  
-* Launch with command `java -jar arclight.jar nogui`. 
+* Download the jar from [Releases](https://github.com/bejiihiu/Candyriya/releases).
+* Launch with command `java -jar candyriya.jar nogui`.
   * The `nogui` argument will disable the server control panel.
-
-Read our document for more information.
 
 ## Support
 
-Read the [document](https://wiki.izzel.io/s/arclight-docs).  
-Something is not working? Report any problems [here](https://github.com/IzzelAliz/Arclight/issues/new/choose)!.  
-Questions and discussions [here](https://github.com/IzzelAliz/Arclight/discussions).  
+- Report issues: [GitHub Issues](https://github.com/bejiihiu/Candyriya/issues)
+- Discussions: [GitHub Discussions](https://github.com/bejiihiu/Candyriya/discussions)
 
-Discord Server: https://discord.gg/ZvTY5SC  
-QQ Group Chat: 3556966
+## Contributing
+
+We welcome contributions! Feel free to submit PRs - we merge community contributions and credit original authors.
+
+## Acknowledgments
+
+- Original [Arclight](https://github.com/IzzelAliz/Arclight) project by IzzelAliz and contributors
+- All [Arclight contributors](https://github.com/IzzelAliz/Arclight/graphs/contributors)
 
 ## License
 
-This project is licensed under [GPL v3](LICENSE).
-
-## Sponsor
-
-[![](.github/bisecthosting.webp)](https://bisecthosting.com/arclight)
-
-Get 25% off hosting server with promocode **arclight** at [BisectHosting](https://bisecthosting.com/arclight).
-
-[![](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com)
-
-YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET
-applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
-<a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>,
-and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
+This project is licensed under [GPL v3](LICENSE) - see the original [Arclight license](https://github.com/IzzelAliz/Arclight/blob/master/LICENSE).

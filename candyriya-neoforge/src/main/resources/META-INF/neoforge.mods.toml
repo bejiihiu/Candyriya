@@ -1,0 +1,17 @@
+modLoader="javafml"
+loaderVersion="[2,)"
+license="GNU GENERAL PUBLIC LICENSE Version 3"
+
+[[mods]]
+modId="candyriya"
+version="${version}"
+displayName="Candyriya Mod"
+displayTest="IGNORE_SERVER_VERSION"
+credits="Original Arclight contributors"
+authors="bejiihiu"
+description='''
+    Candyriya bukkit layer for NeoForge
+    '''
+
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"

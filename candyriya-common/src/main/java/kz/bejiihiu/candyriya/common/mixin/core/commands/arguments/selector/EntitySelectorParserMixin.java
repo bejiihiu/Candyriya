@@ -1,0 +1,54 @@
+package kz.bejiihiu.candyriya.common.mixin.core.commands.arguments.selector;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import kz.bejiihiu.candyriya.common.bridge.core.commands.arguments.selector.EntitySelectorParserBridge;
+import net.minecraft.commands.arguments.selector.EntitySelector;
+import net.minecraft.commands.arguments.selector.EntitySelectorParser;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(EntitySelectorParser.class)
+public abstract class EntitySelectorParserMixin implements EntitySelectorParserBridge {
+
+    // @formatter:off
+    @Shadow private boolean usesSelectors;
+    @Shadow protected abstract void parseSelector() throws CommandSyntaxException;
+    @Shadow public abstract EntitySelector parse() throws CommandSyntaxException;
+    // @formatter:on
+
+    private Boolean Candyriya$overridePermissions;
+
+    @Override
+    public EntitySelector bridge$parse(boolean overridePermissions) throws CommandSyntaxException {
+        return this.parse(overridePermissions);
+    }
+
+    public EntitySelector parse(boolean overridePermissions) throws CommandSyntaxException {
+        try {
+            this.Candyriya$overridePermissions = overridePermissions;
+            return this.parse();
+        } finally {
+            this.Candyriya$overridePermissions = null;
+        }
+    }
+
+    @Override
+    public void bridge$parseSelector(boolean overridePermissions) throws CommandSyntaxException {
+        this.parseSelector(overridePermissions);
+    }
+
+    public void parseSelector(boolean overridePermissions) throws CommandSyntaxException {
+        this.usesSelectors = !overridePermissions;
+        this.parseSelector();
+    }
+
+    @Inject(method = "parseSelector", at = @At("HEAD"))
+    public void Candyriya$onParserSelector(CallbackInfo ci) {
+        if (this.Candyriya$overridePermissions != null) {
+            this.usesSelectors = !this.Candyriya$overridePermissions;
+        }
+    }
+}

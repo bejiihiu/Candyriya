@@ -1,0 +1,7 @@
+{
+  "accessWidener": "candyriya.accesswidener",
+  "injected_interfaces": {
+    "net/minecraft/class_1297": ["io/izzel/candyriya/common/bridge/inject/InjectEntityBridge"],
+    "net/minecraft/class_1937": ["io/izzel/candyriya/common/bridge/inject/InjectLevelBridge"]
+  }
+}

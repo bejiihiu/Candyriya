@@ -1,0 +1,25 @@
+{
+    "id": "candyriya",
+    "version": "${version}",
+    "schemaVersion": 1,
+    "name": "Candyriya",
+    "authors": ["bejiihiu"],
+    "description": "Candyriya bukkit layer for Fabric",
+    "license": "GNU GENERAL PUBLIC LICENSE Version 3",
+    "environment": "server",
+    "mixins": [
+        "mixins.candyriya.fabric.json",
+        "mixins.candyriya.core.json",
+        "mixins.candyriya.bukkit.json",
+        "mixins.candyriya.vanilla.json",
+        "mixins.candyriya.impl.optimization.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.16",
+        "fabric-permissions-api-v0": ">=0.3"
+    },
+    "entrypoints": {
+        "main": ["kz.bejiihiu.candyriya.fabric.CandyriyaModEntrypoint"],
+        "candyriya_boot": ["kz.bejiihiu.candyriya.fabric.boot.FabricBootstrap"]
+    }
+}

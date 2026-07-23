@@ -1,5 +1,5 @@
-import io.izzel.arclight.gradle.tasks.GenerateInstallerInfo
-import io.izzel.arclight.gradle.tasks.RenameAsyncCatcherTask
+import kz.bejiihiu.candyriya.gradle.tasks.GenerateInstallerInfo
+import kz.bejiihiu.candyriya.gradle.tasks.RenameAsyncCatcherTask
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -98,7 +98,7 @@ dependencies {
     gson libs.gson
 
     embedCommon libs.izzel.tools
-    embedCommon libs.arclight.api
+    embedCommon libs.candyriya.api
 
     embedCommon 'commons-lang:commons-lang:2.6@jar'
     embedCommon(project(':i18n-config')) { transitive = false }
@@ -119,13 +119,13 @@ jar {
 }
 
 tasks.register('forgeJar', Jar) {
-    archiveBaseName.set "arclight-forge-${libs.versions.minecraft.get()}"
-    manifest.attributes 'Main-Class': 'io.izzel.arclight.server.Launcher'
-    manifest.attributes 'Implementation-Title': 'Arclight'
-    manifest.attributes 'Implementation-Version': "arclight-${libs.versions.minecraft.get()}-${project.version}-$gitHash"
-    manifest.attributes 'Implementation-Vendor': 'Arclight Team'
+    archiveBaseName.set "candyriya-forge-${libs.versions.minecraft.get()}"
+    manifest.attributes 'Main-Class': 'kz.bejiihiu.candyriya.server.Launcher'
+    manifest.attributes 'Implementation-Title': 'Candyriya'
+    manifest.attributes 'Implementation-Version': "Candyriya-${libs.versions.minecraft.get()}-${project.version}-$gitHash"
+    manifest.attributes 'Implementation-Vendor': 'bejiihiu'
     manifest.attributes 'Implementation-Timestamp': new Date().format("yyyy-MM-dd HH:mm:ss")
-    manifest.attributes 'Automatic-Module-Name': 'arclight.boot'
+    manifest.attributes 'Automatic-Module-Name': 'candyriya.boot'
     from(configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
@@ -136,7 +136,7 @@ tasks.register('forgeJar', Jar) {
         exclude 'org/apache/commons/lang/enum/**'
     }
     into('/') {
-        it.from(project(':arclight-forge').tasks.relocateCraftBukkit.outputs.files.collect())
+        it.from(project(':candyriya-forge').tasks.relocateCraftBukkit.outputs.files.collect())
         it.rename { name -> 'common.jar' }
     }
     into('/') {
@@ -147,17 +147,17 @@ tasks.register('forgeJar', Jar) {
     from sourceSets.main.output
     from sourceSets.forge.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn(project(':arclight-forge').tasks.build)
+    dependsOn(project(':candyriya-forge').tasks.build)
 }
 
 tasks.register('neoforgeJar', Jar) {
-    archiveBaseName.set "arclight-neoforge-${libs.versions.minecraft.get()}"
-    manifest.attributes 'Main-Class': 'io.izzel.arclight.server.Launcher'
-    manifest.attributes 'Implementation-Title': 'Arclight'
-    manifest.attributes 'Implementation-Version': "arclight-${libs.versions.minecraft.get()}-${project.version}-$gitHash"
-    manifest.attributes 'Implementation-Vendor': 'Arclight Team'
+    archiveBaseName.set "candyriya-neoforge-${libs.versions.minecraft.get()}"
+    manifest.attributes 'Main-Class': 'kz.bejiihiu.candyriya.server.Launcher'
+    manifest.attributes 'Implementation-Title': 'Candyriya'
+    manifest.attributes 'Implementation-Version': "Candyriya-${libs.versions.minecraft.get()}-${project.version}-$gitHash"
+    manifest.attributes 'Implementation-Vendor': 'bejiihiu'
     manifest.attributes 'Implementation-Timestamp': new Date().format("yyyy-MM-dd HH:mm:ss")
-    manifest.attributes 'Automatic-Module-Name': 'arclight.boot'
+    manifest.attributes 'Automatic-Module-Name': 'candyriya.boot'
     from(configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
@@ -168,7 +168,7 @@ tasks.register('neoforgeJar', Jar) {
         exclude 'org/apache/commons/lang/enum/**'
     }
     into('/') {
-        it.from(project(':arclight-neoforge').tasks.relocateCraftBukkit.outputs.files.collect())
+        it.from(project(':candyriya-neoforge').tasks.relocateCraftBukkit.outputs.files.collect())
         it.rename { name -> 'common.jar' }
     }
     into('/') {
@@ -179,20 +179,20 @@ tasks.register('neoforgeJar', Jar) {
     from sourceSets.main.output
     from sourceSets.neoforge.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn(project(':arclight-neoforge').tasks.build)
+    dependsOn(project(':candyriya-neoforge').tasks.build)
 }
 
 tasks.register('fabricJar', Jar) {
-    archiveBaseName.set "arclight-fabric-${libs.versions.minecraft.get()}"
-    manifest.attributes 'Main-Class': 'io.izzel.arclight.server.Launcher'
-    manifest.attributes 'Implementation-Title': 'Arclight'
-    manifest.attributes 'Implementation-Version': "arclight-${libs.versions.minecraft.get()}-${project.version}-$gitHash"
-    manifest.attributes 'Implementation-Vendor': 'Arclight Team'
+    archiveBaseName.set "candyriya-fabric-${libs.versions.minecraft.get()}"
+    manifest.attributes 'Main-Class': 'kz.bejiihiu.candyriya.server.Launcher'
+    manifest.attributes 'Implementation-Title': 'Candyriya'
+    manifest.attributes 'Implementation-Version': "Candyriya-${libs.versions.minecraft.get()}-${project.version}-$gitHash"
+    manifest.attributes 'Implementation-Vendor': 'bejiihiu'
     manifest.attributes 'Implementation-Timestamp': new Date().format("yyyy-MM-dd HH:mm:ss")
-    manifest.attributes 'Automatic-Module-Name': 'arclight.boot'
+    manifest.attributes 'Automatic-Module-Name': 'candyriya.boot'
     from(configurations.embedFabric.collect { it.isDirectory() ? it : zipTree(it) })
     into('/') {
-        it.from(project(':arclight-fabric').tasks.relocateCraftBukkit.outputs.files.collect())
+        it.from(project(':candyriya-fabric').tasks.relocateCraftBukkit.outputs.files.collect())
         it.rename { name -> 'common.jar' }
     }
     into('/') {
@@ -202,7 +202,7 @@ tasks.register('fabricJar', Jar) {
     from sourceSets.applaunch.output
     from sourceSets.fabric.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn(project(':arclight-fabric').tasks.build)
+    dependsOn(project(':candyriya-fabric').tasks.build)
 }
 
 tasks.register('generateInstallerInfo', GenerateInstallerInfo) {
@@ -210,14 +210,14 @@ tasks.register('generateInstallerInfo', GenerateInstallerInfo) {
     neoforgeVersion = libs.versions.neoforge.get()
     minecraftVersion = libs.versions.minecraft.get()
     fabricLoaderVersion = libs.versions.fabric.loader.get()
-    def installer = file('build/arclight_installer/META-INF/installer.json')
+    def installer = file('build/candyriya_installer/META-INF/installer.json')
     outputs.file(installer)
     configuration = project.configurations.installer
     fabricExtra = project.configurations.installerFabric
 }
 
-project.sourceSets.main.output.dir file('build/arclight_installer'), builtBy: tasks.generateInstallerInfo
-project.sourceSets.fabric.output.dir file('build/arclight_installer'), builtBy: tasks.generateInstallerInfo
+project.sourceSets.main.output.dir file('build/candyriya_installer'), builtBy: tasks.generateInstallerInfo
+project.sourceSets.fabric.output.dir file('build/candyriya_installer'), builtBy: tasks.generateInstallerInfo
 
 project.sourceSets.forge.output.dir file('build/forge_async_catcher'), builtBy: tasks.register('forgeAsyncCatcher', RenameAsyncCatcherTask) {
     inputFile.set project.file('async_catcher.json')
@@ -253,11 +253,11 @@ tasks.register('runProdForge', JavaExec) {
     systemProperties 'terminal.ansi': 'true'
     systemProperties 'mixin.debug.export': 'true'
     systemProperties 'mixin.dumpTargetOnFailure': 'true'
-    systemProperties 'arclight.alwaysExtract': 'true'
-    systemProperties 'arclight.remapper.dump': './.mixin.out/plugin_classes'
+    systemProperties 'candyriya.alwaysExtract': 'true'
+    systemProperties 'candyriya.remapper.dump': './.mixin.out/plugin_classes'
     systemProperties 'sun.stdout.encoding': 'UTF-8'
     systemProperties 'sun.stderr.encoding': 'UTF-8'
-    workingDir System.env.ARCLIGHT_PROD_DIR ?: file('run_prod/forge')
+    workingDir System.env.Candyriya_PROD_DIR ?: file('run_prod/forge')
     maxHeapSize '4G'
     args 'nogui'
     standardInput System.in
@@ -273,11 +273,11 @@ tasks.register('runProdNeoforge', JavaExec) {
     systemProperties 'terminal.ansi': 'true'
     systemProperties 'mixin.debug.export': 'true'
     systemProperties 'mixin.dumpTargetOnFailure': 'true'
-    systemProperties 'arclight.alwaysExtract': 'true'
-    systemProperties 'arclight.remapper.dump': './.mixin.out/plugin_classes'
+    systemProperties 'candyriya.alwaysExtract': 'true'
+    systemProperties 'candyriya.remapper.dump': './.mixin.out/plugin_classes'
     systemProperties 'sun.stdout.encoding': 'UTF-8'
     systemProperties 'sun.stderr.encoding': 'UTF-8'
-    workingDir System.env.ARCLIGHT_PROD_DIR ?: file('run_prod/neoforge')
+    workingDir System.env.Candyriya_PROD_DIR ?: file('run_prod/neoforge')
     maxHeapSize '4G'
     args 'nogui'
     standardInput System.in
@@ -293,11 +293,11 @@ tasks.register('runProdFabric', JavaExec) {
     systemProperties 'terminal.ansi': 'true'
     systemProperties 'mixin.debug.export': 'true'
     systemProperties 'mixin.dumpTargetOnFailure': 'true'
-    systemProperties 'arclight.alwaysExtract': 'true'
-    systemProperties 'arclight.remapper.dump': './.mixin.out/plugin_classes'
+    systemProperties 'candyriya.alwaysExtract': 'true'
+    systemProperties 'candyriya.remapper.dump': './.mixin.out/plugin_classes'
     systemProperties 'sun.stdout.encoding': 'UTF-8'
     systemProperties 'sun.stderr.encoding': 'UTF-8'
-    workingDir System.env.ARCLIGHT_PROD_DIR ?: file('run_prod/fabric')
+    workingDir System.env.Candyriya_PROD_DIR ?: file('run_prod/fabric')
     maxHeapSize '4G'
     args 'nogui'
     standardInput System.in
@@ -313,8 +313,8 @@ publishing {
             name = 'IzzelAliz'
             url = uri('https://maven.izzel.io/' + (project.version.toString().endsWith('SNAPSHOT') ? 'snapshots' : 'releases'))
             credentials {
-                username = project.findProperty("mavenUser") ?: System.getenv("ARCLIGHT_USER")
-                password = project.findProperty("mavenToken") ?: System.getenv("ARCLIGHT_TOKEN")
+                username = project.findProperty("mavenUser") ?: System.getenv("Candyriya_USER")
+                password = project.findProperty("mavenToken") ?: System.getenv("Candyriya_TOKEN")
             }
         }
     }
