@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v[0-9]+'
 
 jobs:
   release:
@@ -34,37 +34,27 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew cleanBuild build collect --no-daemon
     
-    - name: Get tag name
-      id: get_tag
-      run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-    
-    - name: Determine release type
-      id: release_type
+    - name: Get build ID
+      id: get_build_id
       run: |
-        TAG="${{ steps.get_tag.outputs.TAG_NAME }}"
-        if [[ $TAG == *"beta"* ]]; then
-          echo "TYPE=beta" >> $GITHUB_OUTPUT
-        elif [[ $TAG == *"unstable"* ]]; then
-          echo "TYPE=unstable" >> $GITHUB_OUTPUT
-        elif [[ $TAG == *"release"* ]]; then
-          echo "TYPE=release" >> $GITHUB_OUTPUT
-        else
-          echo "TYPE=release" >> $GITHUB_OUTPUT
-        fi
+        BUILD_ID=$(git rev-list --count HEAD)
+        echo "BUILD_ID=$BUILD_ID" >> $GITHUB_OUTPUT
+        echo "TAG_NAME=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
     
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.get_tag.outputs.TAG_NAME }}
-        name: Candyriya ${{ steps.get_tag.outputs.TAG_NAME }}
+        tag_name: v${{ steps.get_build_id.outputs.BUILD_ID }}
+        name: Candyriya Build #${{ steps.get_build_id.outputs.BUILD_ID }}
         draft: false
-        prerelease: ${{ steps.release_type.outputs.TYPE != 'release' }}
+        prerelease: false
         files: |
           build/libs/*.jar
         body: |
-          ## Candyriya ${{ steps.get_tag.outputs.TAG_NAME }}
+          ## Candyriya Build #${{ steps.get_build_id.outputs.BUILD_ID }}
           
-          Release type: ${{ steps.release_type.outputs.TYPE }}
+          Build ID: ${{ steps.get_build_id.outputs.BUILD_ID }}
+          Git Hash: ${{ github.sha }}
           
           ### Supported Platforms
           - Forge

@@ -11,7 +11,6 @@ allprojects {
     apply plugin: 'java'
 
     group 'kz.bejiihiu.candyriya'
-    version '1.0.0-SNAPSHOT'
 
     def getGitHash = { ->
         def stdout = new ByteArrayOutputStream()
@@ -22,9 +21,21 @@ allprojects {
         return stdout.toString().trim()
     }
 
+    def getBuildId = { ->
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-list', '--count', 'HEAD'
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
+    }
+
+    version getBuildId()
+
     ext {
         versionName = 'candyriya'
         gitHash = getGitHash()
+        buildId = getBuildId()
         supportedPlatforms = ['forge', 'neoforge', 'fabric']
         commonProject = project(':candyriya-common')
         forgeProject = project(':candyriya-forge')
@@ -165,7 +176,7 @@ def gitBranch() {
 tasks.register('uploadFiles', UploadFilesTask) {
     mcVersion.set libs.versions.minecraft
     version.set "${project.version}-${project.ext.gitHash}"
-    snapshot.set project.version.toString().endsWith('-SNAPSHOT')
+    snapshot.set false
     gitHash.set project.ext.gitHash
     branch.set gitBranch()
     inputs.files tasks.collect.outputs.files

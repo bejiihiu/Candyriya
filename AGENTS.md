@@ -70,21 +70,27 @@ All pinned in `gradle/libs.versions.toml`:
 - **pr.yml** — runs on PRs: `cleanBuild build collect` + uploads artifact
 - **release.yml** — runs on tag push (`v*`): builds and creates GitHub release
 
+## Versioning
+
+Candyriya uses **build IDs** instead of semantic versioning. The version is automatically determined by the number of commits in the repository (`git rev-list --count HEAD`).
+
+For example:
+- Commit #1 → version 1
+- Commit #100 → version 100
+- Commit #1234 → version 1234
+
+This means every commit automatically increments the version number.
+
 ## Releases
 
 Create releases by pushing tags:
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v123
+git push origin v123
 ```
 
-### Tag naming conventions
-
-- `v1.0.0` — stable release
-- `v1.0.0-beta` — beta release (marked as prerelease)
-- `v1.0.0-unstable` — unstable release (marked as prerelease)
-- `v1.0.0-release` — explicit stable release
+The release workflow will automatically build and create a GitHub release with the appropriate build ID.
 
 ### Commit message tags
 
