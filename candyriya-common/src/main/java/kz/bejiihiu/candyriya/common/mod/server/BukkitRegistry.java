@@ -4,8 +4,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import kz.bejiihiu.candyriya.api.EnumHelper;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.EnumHelper;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.world.entity.EntityTypeBridge;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.MaterialBridge;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.SimpleRegistryBridge;
@@ -112,8 +112,8 @@ public class BukkitRegistry {
             constructor = GameRule.class.getDeclaredConstructor(String.class, Class.class);
             constructor.setAccessible(true);
         } catch (ReflectiveOperationException e) {
-            CandyriyaServer.LOGGER.warn("Cannot register all custom game rules for bukkit!", e);
-            CandyriyaServer.LOGGER.warn("This is a bug, and will cause commands like mvgamerule not working properly. Please report this!");
+            ArclightServer.LOGGER.warn("Cannot register all custom game rules for bukkit!", e);
+            ArclightServer.LOGGER.warn("This is a bug, and will cause commands like mvgamerule not working properly. Please report this!");
             return;
         }
         GameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
@@ -133,7 +133,7 @@ public class BukkitRegistry {
                         var instance = constructor.newInstance(key.getId(), clazz);
                         gameRules.put(key.getId(), instance);
                     } catch (ReflectiveOperationException e) {
-                        CandyriyaServer.LOGGER.warn("Cannot register custom game rule {} for bukkit!", key.getId(), e);
+                        ArclightServer.LOGGER.warn("Cannot register custom game rule {} for bukkit!", key.getId(), e);
                     }
                 }
             }
@@ -154,7 +154,7 @@ public class BukkitRegistry {
                 var bukkit = EnumHelper.makeEnum(org.bukkit.Fluid.class, name, id++, List.of(), List.of());
                 Unsafe.putObject(bukkit, keyOffset, CraftNamespacedKey.fromMinecraft(key));
                 newTypes.add(bukkit);
-                CandyriyaServer.LOGGER.debug("Registered {} as fluid {}", key, bukkit);
+                ArclightServer.LOGGER.debug("Registered {} as fluid {}", key, bukkit);
             }
         }
         EnumHelper.addEnums(org.bukkit.Fluid.class, newTypes);
@@ -170,7 +170,7 @@ public class BukkitRegistry {
                 var name = category.name();
                 var bukkit = EnumHelper.makeEnum(org.bukkit.inventory.recipe.CraftingBookCategory.class, name, id++, List.of(), List.of());
                 newTypes.add(bukkit);
-                CandyriyaServer.LOGGER.debug("Registered {} as crafting category {}", name, bukkit);
+                ArclightServer.LOGGER.debug("Registered {} as crafting category {}", name, bukkit);
             }
         }
         EnumHelper.addEnums(org.bukkit.inventory.recipe.CraftingBookCategory.class, newTypes);
@@ -186,7 +186,7 @@ public class BukkitRegistry {
                 var name = category.name();
                 var bukkit = EnumHelper.makeEnum(org.bukkit.inventory.recipe.CookingBookCategory.class, name, id++, List.of(), List.of());
                 newTypes.add(bukkit);
-                CandyriyaServer.LOGGER.debug("Registered {} as cooking category {}", name, bukkit);
+                ArclightServer.LOGGER.debug("Registered {} as cooking category {}", name, bukkit);
             }
         }
         EnumHelper.addEnums(org.bukkit.inventory.recipe.CookingBookCategory.class, newTypes);
@@ -204,11 +204,11 @@ public class BukkitRegistry {
             if (!knownTypes.remove(name)) {
                 var bukkit = EnumHelper.makeEnum(PlayerRecipeBookSettingsChangeEvent.RecipeBookType.class, name, id++, List.of(), List.of());
                 newTypes.add(bukkit);
-                CandyriyaServer.LOGGER.debug("Registered {} as recipe book type {}", name, bukkit);
+                ArclightServer.LOGGER.debug("Registered {} as recipe book type {}", name, bukkit);
             }
         }
         if (!knownTypes.isEmpty()) {
-            CandyriyaServer.LOGGER.fatal("Assertion failed, found unknown recipe book type in Bukkit: {}", knownTypes);
+            ArclightServer.LOGGER.fatal("Assertion failed, found unknown recipe book type in Bukkit: {}", knownTypes);
             throw new IllegalArgumentException("Assertion failed, found unknown recipe book type in Bukkit");
         }
         EnumHelper.addEnums(PlayerRecipeBookSettingsChangeEvent.RecipeBookType.class, newTypes);
@@ -221,7 +221,7 @@ public class BukkitRegistry {
             var name = "MOD_PHASE_" + id;
             var newPhase = EnumHelper.makeEnum(EnderDragon.Phase.class, name, id, List.of(), List.of());
             newTypes.add(newPhase);
-            CandyriyaServer.LOGGER.debug("Registered {} as ender dragon phase {}", name, newPhase);
+            ArclightServer.LOGGER.debug("Registered {} as ender dragon phase {}", name, newPhase);
         }
         EnumHelper.addEnums(EnderDragon.Phase.class, newTypes);
     }
@@ -236,7 +236,7 @@ public class BukkitRegistry {
                 var name = category.name();
                 var spawnCategory = EnumHelper.makeEnum(SpawnCategory.class, name, id++, List.of(), List.of());
                 newTypes.add(spawnCategory);
-                CandyriyaServer.LOGGER.debug("Registered {} as spawn category {}", name, spawnCategory);
+                ArclightServer.LOGGER.debug("Registered {} as spawn category {}", name, spawnCategory);
             }
         }
         EnumHelper.addEnums(SpawnCategory.class, newTypes);
@@ -267,7 +267,7 @@ public class BukkitRegistry {
                 Unsafe.putObject(statistic, keyOffset, location);
                 newTypes.add(statistic);
                 STATS.put(location, statistic);
-                CandyriyaServer.LOGGER.debug("Registered {} as stats {}", location, statistic);
+                ArclightServer.LOGGER.debug("Registered {} as stats {}", location, statistic);
                 i++;
             }
         }
@@ -279,7 +279,7 @@ public class BukkitRegistry {
                 Unsafe.putObject(statistic, keyOffset, location);
                 newTypes.add(statistic);
                 STATS.put(location, statistic);
-                CandyriyaServer.LOGGER.debug("Registered {} as custom stats {}", location, statistic);
+                ArclightServer.LOGGER.debug("Registered {} as custom stats {}", location, statistic);
                 i++;
             }
         }
@@ -304,7 +304,7 @@ public class BukkitRegistry {
                 Unsafe.putObject(bukkit, keyOffset, CraftNamespacedKey.fromMinecraft(location));
                 ART_BY_ID.put(i, bukkit);
                 ART_BY_NAME.put(lookupName, bukkit);
-                CandyriyaServer.LOGGER.debug("Registered {} as art {}", location, bukkit);
+                ArclightServer.LOGGER.debug("Registered {} as art {}", location, bukkit);
                 i++;
             }
         }
@@ -330,11 +330,11 @@ public class BukkitRegistry {
                 bukkit = EnumHelper.makeEnum(Biome.class, name, i++, ImmutableList.of(), ImmutableList.of());
                 newTypes.add(bukkit);
                 Unsafe.putObject(bukkit, keyOffset, CraftNamespacedKey.fromMinecraft(location));
-                CandyriyaServer.LOGGER.debug("Registered {} as biome {}", location, bukkit);
+                ArclightServer.LOGGER.debug("Registered {} as biome {}", location, bukkit);
             }
         }
         EnumHelper.addEnums(Biome.class, newTypes);
-        CandyriyaServer.LOGGER.info("registry.biome", newTypes.size());
+        ArclightServer.LOGGER.info("registry.biome", newTypes.size());
     }
 
     public static void registerEnvironments(Registry<LevelStem> registry) {
@@ -349,12 +349,12 @@ public class BukkitRegistry {
                 newTypes.add(environment);
                 ENVIRONMENT_MAP.put(i - 1, environment);
                 DIM_MAP.put(key, environment);
-                CandyriyaServer.LOGGER.debug("Registered {} as environment {}", key.location(), environment);
+                ArclightServer.LOGGER.debug("Registered {} as environment {}", key.location(), environment);
                 i++;
             }
         }
         EnumHelper.addEnums(World.Environment.class, newTypes);
-        CandyriyaServer.LOGGER.info("registry.environment", newTypes.size());
+        ArclightServer.LOGGER.info("registry.environment", newTypes.size());
     }
 
     private static void loadEntities() {
@@ -371,20 +371,20 @@ public class BukkitRegistry {
                     found = true;
                     ((EntityTypeBridge) (Object) entityType).bridge$setHandle(type);
                 }
-                else CandyriyaServer.LOGGER.warn("Not found {} in {}", location, EntityType.class);
+                else ArclightServer.LOGGER.warn("Not found {} in {}", location, EntityType.class);
             }
             if (!found) {
                 String name = ResourceLocationUtil.standardize(location);
                 entityType = EnumHelper.makeEnum(EntityType.class, name, i++, ENTITY_CTOR, ImmutableList.of(location.getPath(), Entity.class, -1));
                 ((EntityTypeBridge) (Object) entityType).bridge$setup(location, type, entitySpec(location));
                 newTypes.add(entityType);
-                CandyriyaServer.LOGGER.debug("Registered {} as entity {}", location, entityType);
+                ArclightServer.LOGGER.debug("Registered {} as entity {}", location, entityType);
             }
             ENTITY_NAME_MAP.put(location.toString(), entityType);
         }
         EnumHelper.addEnums(EntityType.class, newTypes);
         EntityClassLookup.init();
-        CandyriyaServer.LOGGER.info("registry.entity-type", newTypes.size());
+        ArclightServer.LOGGER.info("registry.entity-type", newTypes.size());
     }
 
     private static void loadEnchantmentTargets() {
@@ -405,7 +405,7 @@ public class BukkitRegistry {
                     List.of(String.class),
                     List.of(location.toString()));
                 newTypes.add(potionType);
-                CandyriyaServer.LOGGER.debug("Registered {} as potion type {}", location, potionType);
+                ArclightServer.LOGGER.debug("Registered {} as potion type {}", location, potionType);
             }
         }
         EnumHelper.addEnums(PotionType.class, newTypes);
@@ -426,7 +426,7 @@ public class BukkitRegistry {
                 BY_NAME.put(name, material);
                 i++;
                 blocks++;
-                CandyriyaServer.LOGGER.debug("Registered {} as block {}", location, material);
+                ArclightServer.LOGGER.debug("Registered {} as block {}", location, material);
                 list.add(material);
             } else {
                 ((MaterialBridge) (Object) material).bridge$setupVanillaBlock(matSpec(location));
@@ -450,7 +450,7 @@ public class BukkitRegistry {
                 BY_NAME.put(name, material);
                 i++;
                 items++;
-                CandyriyaServer.LOGGER.debug("Registered {} as item {}", location, material);
+                ArclightServer.LOGGER.debug("Registered {} as item {}", location, material);
                 list.add(material);
             }
             ITEM_MATERIAL.put(item, material);
@@ -463,7 +463,7 @@ public class BukkitRegistry {
             }
         }
         EnumHelper.addEnums(Material.class, list);
-        CandyriyaServer.LOGGER.info("registry.material", i - origin, blocks, items);
+        ArclightServer.LOGGER.info("registry.material", i - origin, blocks, items);
     }
 
     private static MaterialPropertySpec matSpec(ResourceLocation location) {
@@ -482,7 +482,7 @@ public class BukkitRegistry {
                 var name = net.minecraft.world.entity.Pose.values()[id].name();
                 var newPhase = EnumHelper.makeEnum(Pose.class, name, id, List.of(), List.of());
                 newTypes.add(newPhase);
-                CandyriyaServer.LOGGER.debug("Registered {} as pose {}", name, newPhase);
+                ArclightServer.LOGGER.debug("Registered {} as pose {}", name, newPhase);
             }
             EnumHelper.addEnums(Pose.class, newTypes);
         }

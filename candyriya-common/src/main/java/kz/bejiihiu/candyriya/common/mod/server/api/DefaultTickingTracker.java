@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.server.api;
 
-import kz.bejiihiu.candyriya.api.TickingTracker;
+import io.izzel.arclight.api.TickingTracker;
 import kz.bejiihiu.candyriya.common.bridge.core.entity.EntityBridge;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import org.bukkit.block.Block;

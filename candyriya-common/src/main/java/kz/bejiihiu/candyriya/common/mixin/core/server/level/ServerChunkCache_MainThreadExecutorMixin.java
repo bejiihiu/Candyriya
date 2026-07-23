@@ -3,7 +3,7 @@ package kz.bejiihiu.candyriya.common.mixin.core.server.level;
 import kz.bejiihiu.candyriya.common.bridge.core.server.MinecraftServerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ChunkMapBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.server.ServerChunkProviderBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.util.thread.BlockableEventLoop;
 import org.spongepowered.asm.mixin.Final;
@@ -39,7 +39,7 @@ public abstract class ServerChunkCache_MainThreadExecutorMixin extends Blockable
             ((ChunkMapBridge) outer.chunkMap).bridge$getCallbackExecutor().run();
             // InitAuther97: drain queued tasks when the server thread is waiting for chunks
             // This carries the AsyncCatcher to ensure no timeout unexpectedly.
-            ((MinecraftServerBridge) CandyriyaServer.getMinecraftServer()).bridge$drainQueuedTasks();
+            ((MinecraftServerBridge) ArclightServer.getMinecraftServer()).bridge$drainQueuedTasks();
         }
     }
 }

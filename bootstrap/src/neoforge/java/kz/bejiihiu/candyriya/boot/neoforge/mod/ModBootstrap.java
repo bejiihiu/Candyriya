@@ -9,8 +9,8 @@ import cpw.mods.modlauncher.LaunchPluginHandler;
 import cpw.mods.modlauncher.Launcher;
 import cpw.mods.modlauncher.serviceapi.ILaunchPluginService;
 import cpw.mods.util.LambdaExceptionUtils;
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.ArclightPlatform;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.boot.AbstractBootstrap;
 import kz.bejiihiu.candyriya.installer.ForgeInstaller;
 import kz.bejiihiu.candyriya.installer.MinecraftProvider;
@@ -78,7 +78,7 @@ public class ModBootstrap implements AbstractBootstrap {
 
     private void inject() throws Throwable {
         dirtyHacks();
-        setupMod(CandyriyaPlatform.NEOFORGE);
+        setupMod(ArclightPlatform.NEOFORGE);
         injectClassPath();
         injectLaunchPlugin();
     }

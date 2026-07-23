@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper.resource;
 
 import com.google.common.io.ByteStreams;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.mod.CandyriyaCommon;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.CandyriyaRemapper;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.GlobalClassRepo;

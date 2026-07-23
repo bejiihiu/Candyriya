@@ -2,9 +2,9 @@ package kz.bejiihiu.candyriya.boot;
 
 import com.google.gson.internal.bind.TypeAdapters;
 import com.google.gson.reflect.TypeToken;
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
-import kz.bejiihiu.candyriya.api.CandyriyaVersion;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.ArclightPlatform;
+import io.izzel.arclight.api.ArclightVersion;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.i18n.CandyriyaLocale;
 import org.apache.logging.log4j.LogManager;
 import org.objectweb.asm.ClassReader;
@@ -90,13 +90,13 @@ public interface AbstractBootstrap {
         }
     }
 
-    default void setupMod(CandyriyaPlatform platform) throws Exception {
+    default void setupMod(ArclightPlatform platform) throws Exception {
         setupMod(platform, true);
     }
 
-    default void setupMod(CandyriyaPlatform platform, boolean extract) throws Exception {
-        CandyriyaVersion.setVersion(CandyriyaVersion.FEUDAL_KINGS);
-        CandyriyaPlatform.setPlatform(platform);
+    default void setupMod(ArclightPlatform platform, boolean extract) throws Exception {
+        ArclightVersion.setVersion(ArclightVersion.FEUDAL_KINGS);
+        ArclightPlatform.setPlatform(platform);
         try (InputStream stream = getClass().getResourceAsStream("/META-INF/MANIFEST.MF")) {
             Manifest manifest = new Manifest(stream);
             Attributes attributes = manifest.getMainAttributes();
@@ -106,7 +106,7 @@ public interface AbstractBootstrap {
             }
             String buildTime = attributes.getValue("Implementation-Timestamp");
             LogManager.getLogger("Candyriya").info(CandyriyaLocale.getInstance().get("logo"),
-                    CandyriyaLocale.getInstance().get("release-name." + CandyriyaVersion.current().getReleaseName()), version, buildTime);
+                    CandyriyaLocale.getInstance().get("release-name." + ArclightVersion.current().getReleaseName()), version, buildTime);
         }
     }
 

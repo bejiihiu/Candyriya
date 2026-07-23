@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.server.world.inventory;
 
 import com.google.common.base.Preconditions;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.world.Container;
 import org.bukkit.craftbukkit.v.inventory.CraftInventory;
 import org.bukkit.inventory.ItemStack;
@@ -13,13 +13,13 @@ public class CandyriyaModdedMenuInventory extends CraftInventory {
 
     @Override
     public void setContents(ItemStack[] items) {
-        CandyriyaServer.LOGGER.debug("Overriding content for a modded container menu inventory");
+        ArclightServer.LOGGER.debug("Overriding content for a modded container menu inventory");
         super.setContents(items);
     }
 
     @Override
     public void clear() {
-        CandyriyaServer.LOGGER.debug("Clearing everything for a modded container menu inventory");
+        ArclightServer.LOGGER.debug("Clearing everything for a modded container menu inventory");
         super.clear();
     }
 }

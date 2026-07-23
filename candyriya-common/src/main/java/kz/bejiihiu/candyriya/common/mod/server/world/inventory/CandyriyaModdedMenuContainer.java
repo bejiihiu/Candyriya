@@ -3,7 +3,7 @@ package kz.bejiihiu.candyriya.common.mod.server.world.inventory;
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.player.PlayerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.IInventoryBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.inventory.PosContainerBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -95,7 +95,7 @@ public class CandyriyaModdedMenuContainer implements Container, IInventoryBridge
 
     @Override
     public void clearContent() {
-        CandyriyaServer.LOGGER.debug("Clearing everything for a modded container menu container");
+        ArclightServer.LOGGER.debug("Clearing everything for a modded container menu container");
         for (Slot slot : container.slots) {
             slot.remove(Integer.MAX_VALUE);
         }

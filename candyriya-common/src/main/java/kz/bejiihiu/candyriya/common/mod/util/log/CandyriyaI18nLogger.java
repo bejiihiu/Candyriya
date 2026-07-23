@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.util.log;
 
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.invoke.MethodHandle;

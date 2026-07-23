@@ -2,8 +2,8 @@ package kz.bejiihiu.candyriya.common.mod.util.remapper;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import kz.bejiihiu.candyriya.api.PluginPatcher;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.PluginPatcher;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.mod.util.log.CandyriyaI18nLogger;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.patcher.CandyriyaPluginPatcher;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.patcher.PluginLoggerTransformer;

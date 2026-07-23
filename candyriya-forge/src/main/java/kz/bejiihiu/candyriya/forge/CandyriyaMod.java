@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.forge;
 
-import kz.bejiihiu.candyriya.api.Candyriya;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
-import kz.bejiihiu.candyriya.forge.mod.ForgeCandyriyaServer;
+import io.izzel.arclight.api.Arclight;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.forge.mod.ForgeArclightServer;
 import kz.bejiihiu.candyriya.forge.mod.event.CandyriyaEventDispatcherRegistry;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.Level;
@@ -18,8 +18,8 @@ import java.io.PrintStream;
 public class CandyriyaMod {
 
     public CandyriyaMod() {
-        CandyriyaServer.LOGGER.info("mod-load");
-        Candyriya.setServer(new ForgeCandyriyaServer());
+        ArclightServer.LOGGER.info("mod-load");
+        Candyriya.setServer(new ForgeArclightServer());
         System.setOut(new LoggingPrintStream("STDOUT", System.out, Level.INFO));
         System.setErr(new LoggingPrintStream("STDERR", System.err, Level.ERROR));
         CandyriyaEventDispatcherRegistry.registerAllEventDispatchers();

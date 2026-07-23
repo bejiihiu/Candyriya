@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.bukkit;
 
 import com.google.common.base.Preconditions;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import org.bukkit.craftbukkit.v.block.CraftBlockType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;

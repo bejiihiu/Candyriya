@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.bukkit;
 
-import kz.bejiihiu.candyriya.api.EnumHelper;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import io.izzel.arclight.api.EnumHelper;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.world.entity.monster.SpellcasterIllager;
 import org.bukkit.craftbukkit.v.entity.CraftSpellcaster;
 import org.bukkit.entity.Spellcaster;
@@ -29,7 +29,7 @@ public class CraftSpellcasterMixin {
                 var name = SpellcasterIllager.IllagerSpell.values()[id].name();
                 var newPhase = EnumHelper.makeEnum(Spellcaster.Spell.class, name, id, List.of(), List.of());
                 newTypes.add(newPhase);
-                CandyriyaServer.LOGGER.debug("Registered {} as illager spell {}", name, newPhase);
+                ArclightServer.LOGGER.debug("Registered {} as illager spell {}", name, newPhase);
             }
             EnumHelper.addEnums(Spellcaster.Spell.class, newTypes);
             return toBukkitSpell(spell);

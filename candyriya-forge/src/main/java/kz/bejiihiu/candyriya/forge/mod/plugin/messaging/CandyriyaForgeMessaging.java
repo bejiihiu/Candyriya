@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.forge.mod.plugin.messaging;
 
 import kz.bejiihiu.candyriya.common.mod.plugin.messaging.CandyriyaPluginChannel;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.forge.mixin.forge.NetworkRegistryAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.Channel;
@@ -47,10 +47,10 @@ public class CandyriyaForgeMessaging {
                         .distinct()
                         .map(Plugin::getName)
                         .collect(Collectors.joining(", ", "[", "]"));
-                CandyriyaServer.LOGGER.error("Attempting to register a channel that has already been registered by Forge!");
-                CandyriyaServer.LOGGER.error("Channel conflict: {}, in protocol: {}", location, protocol);
-                CandyriyaServer.LOGGER.error("Registered by plugin(s): {}", pluginList);
-                CandyriyaServer.LOGGER.error("This channel will be ignored for the rest of the time!");
+                ArclightServer.LOGGER.error("Attempting to register a channel that has already been registered by Forge!");
+                ArclightServer.LOGGER.error("Channel conflict: {}, in protocol: {}", location, protocol);
+                ArclightServer.LOGGER.error("Registered by plugin(s): {}", pluginList);
+                ArclightServer.LOGGER.error("This channel will be ignored for the rest of the time!");
                 return false;
             }
         }

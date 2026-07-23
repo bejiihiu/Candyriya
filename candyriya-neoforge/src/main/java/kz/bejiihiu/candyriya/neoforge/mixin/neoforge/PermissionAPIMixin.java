@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.neoforge.mixin.neoforge;
 
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import kz.bejiihiu.candyriya.neoforge.mod.permission.CandyriyaPermissionHandler;
 import net.neoforged.neoforge.server.permission.PermissionAPI;
@@ -22,7 +22,7 @@ public abstract class PermissionAPIMixin {
             return;
         }
         var handler = new CandyriyaPermissionHandler(activeHandler);
-        CandyriyaServer.LOGGER.info("Forwarding forge permission[{}] to bukkit", activeHandler.getIdentifier());
+        ArclightServer.LOGGER.info("Forwarding forge permission[{}] to bukkit", activeHandler.getIdentifier());
         activeHandler = handler;
     }
 }

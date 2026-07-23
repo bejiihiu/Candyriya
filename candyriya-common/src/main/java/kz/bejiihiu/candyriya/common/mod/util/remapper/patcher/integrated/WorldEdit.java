@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper.patcher.integrated;
 
-import kz.bejiihiu.candyriya.api.PluginPatcher;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import io.izzel.arclight.api.PluginPatcher;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.CandyriyaRemapper;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Opcodes;
@@ -83,7 +83,7 @@ public class WorldEdit {
                 var label = new LabelNode();
                 method.instructions.add(label);
                 method.instructions.add(new LineNumberNode(--line, label));
-                method.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, Type.getInternalName(CandyriyaServer.class), "LOGGER", Type.getDescriptor(Logger.class)));
+                method.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, Type.getInternalName(ArclightServer.class), "LOGGER", Type.getDescriptor(Logger.class)));
                 method.instructions.add(new InsnNode(Opcodes.DUP));
                 method.instructions.add(new LdcInsnNode("patcher.integrated.we-enable"));
                 method.instructions.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, Type.getInternalName(Logger.class), "warn", "(Ljava/lang/String;)V", true));

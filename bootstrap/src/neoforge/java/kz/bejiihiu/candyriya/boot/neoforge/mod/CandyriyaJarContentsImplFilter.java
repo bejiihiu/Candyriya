@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.boot.neoforge.mod;
 
 import cpw.mods.jarhandling.impl.JarContentsImpl;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

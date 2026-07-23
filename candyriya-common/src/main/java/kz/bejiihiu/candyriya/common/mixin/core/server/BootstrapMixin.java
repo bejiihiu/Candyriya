@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mixin.core.server;
 
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import net.minecraft.server.Bootstrap;
 import org.bukkit.craftbukkit.v.util.CraftLegacy;
 import org.spongepowered.asm.mixin.Mixin;

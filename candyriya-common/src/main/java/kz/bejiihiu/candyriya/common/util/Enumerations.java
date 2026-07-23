@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.util;
 
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 
 import java.net.MalformedURLException;
 import java.net.URL;

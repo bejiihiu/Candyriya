@@ -2,7 +2,7 @@ package kz.bejiihiu.candyriya.common.mixin.core.server.network;
 
 import com.mojang.authlib.GameProfile;
 import kz.bejiihiu.candyriya.common.bridge.core.server.network.ServerStatusPacketListenerImplBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaPingEvent;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
@@ -29,7 +29,7 @@ public class ServerStatusPacketListenerImplMixin implements ServerStatusPacketLi
 
     @Redirect(method = "handleStatusRequest", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V"))
     private void Candyriya$handleServerPing(Connection networkManager, Packet<?> packetIn) {
-        var server = CandyriyaServer.getMinecraftServer();
+        var server = ArclightServer.getMinecraftServer();
         Object[] players = server.getPlayerList().players.toArray();
         CandyriyaPingEvent event = new CandyriyaPingEvent(networkManager, server);
         Bukkit.getPluginManager().callEvent(event);

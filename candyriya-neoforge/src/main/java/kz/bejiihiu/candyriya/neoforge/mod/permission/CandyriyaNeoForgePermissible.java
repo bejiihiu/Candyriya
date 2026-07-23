@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.neoforge.mod.permission;
 
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.server.permission.PermissionAPI;
 import net.neoforged.neoforge.server.permission.handler.IPermissionHandler;

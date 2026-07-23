@@ -2,7 +2,7 @@ package kz.bejiihiu.candyriya.common.mixin.core.server.dedicated;
 
 import kz.bejiihiu.candyriya.common.bridge.core.server.dedicated.DedicatedServerBridge;
 import kz.bejiihiu.candyriya.common.mixin.core.server.MinecraftServerMixin;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.RegistryAccess;
@@ -115,8 +115,8 @@ public abstract class DedicatedServerMixin extends MinecraftServerMixin implemen
             }
         }
         if (!threads.isEmpty()) {
-            CandyriyaServer.LOGGER.debug("Threads {} not shutting down", String.join(", ", threads));
-            CandyriyaServer.LOGGER.info("{} threads not shutting down correctly, force exiting", threads.size());
+            ArclightServer.LOGGER.debug("Threads {} not shutting down", String.join(", ", threads));
+            ArclightServer.LOGGER.info("{} threads not shutting down correctly, force exiting", threads.size());
         }
         System.exit(0);
     }

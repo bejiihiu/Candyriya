@@ -2,8 +2,8 @@ package kz.bejiihiu.candyriya.common.mod.util.remapper;
 
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
-import kz.bejiihiu.candyriya.api.PluginPatcher;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import io.izzel.arclight.api.PluginPatcher;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import io.izzel.tools.product.*;
 import org.apache.commons.io.FileUtils;
@@ -91,7 +91,7 @@ public abstract class CandyriyaClassCache implements AutoCloseable {
                 try {
                     this.save();
                 } catch (IOException e) {
-                    CandyriyaServer.LOGGER.error(MARKER, "Failed to save class cache", e);
+                    ArclightServer.LOGGER.error(MARKER, "Failed to save class cache", e);
                 }
             }, 1, 10, TimeUnit.MINUTES);
             try {
@@ -127,16 +127,16 @@ public abstract class CandyriyaClassCache implements AutoCloseable {
                 if (obsolete) {
                     Files.deleteIfExists(version);
                     Files.writeString(version, current, StandardOpenOption.CREATE);
-                    CandyriyaServer.LOGGER.info(MARKER, "Obsolete plugin class cache is cleared");
+                    ArclightServer.LOGGER.info(MARKER, "Obsolete plugin class cache is cleared");
                 }
             } catch (IOException e) {
-                CandyriyaServer.LOGGER.error(MARKER, "Failed to initialize class cache", e);
+                ArclightServer.LOGGER.error(MARKER, "Failed to initialize class cache", e);
             }
             Thread thread = new Thread(() -> {
                 try {
                     this.close();
                 } catch (Exception e) {
-                    CandyriyaServer.LOGGER.error(MARKER, "Failed to close class cache", e);
+                    ArclightServer.LOGGER.error(MARKER, "Failed to close class cache", e);
                 }
             }, "Candyriya class cache cleanup");
             thread.setDaemon(true);

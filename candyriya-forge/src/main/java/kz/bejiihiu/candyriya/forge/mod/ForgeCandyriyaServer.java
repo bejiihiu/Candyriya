@@ -1,15 +1,15 @@
 package kz.bejiihiu.candyriya.forge.mod;
 
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
-import kz.bejiihiu.candyriya.api.CandyriyaServer;
-import kz.bejiihiu.candyriya.api.TickingTracker;
+import io.izzel.arclight.api.ArclightPlatform;
+import io.izzel.arclight.api.ArclightServer;
+import io.izzel.arclight.api.TickingTracker;
 import kz.bejiihiu.candyriya.common.mod.server.api.DefaultTickingTracker;
 import kz.bejiihiu.candyriya.forge.mod.util.PluginEventHandler;
 import net.minecraftforge.eventbus.EventBus;
 import net.minecraftforge.eventbus.api.IEventBus;
 import org.bukkit.plugin.Plugin;
 
-public class ForgeCandyriyaServer implements CandyriyaServer {
+public class ForgeArclightServer implements ArclightServer {
 
     private final TickingTracker tickingTracker = new DefaultTickingTracker();
 
@@ -26,7 +26,7 @@ public class ForgeCandyriyaServer implements CandyriyaServer {
             } else if (bus instanceof IEventBus eventBus) {
                 eventBus.register(target);
             } else {
-                throw new IllegalArgumentException("Unknown bus type " + bus + " on platform " + CandyriyaPlatform.current());
+                throw new IllegalArgumentException("Unknown bus type " + bus + " on platform " + ArclightPlatform.current());
             }
         } catch (Throwable t) {
             throw new RuntimeException(t);

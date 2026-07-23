@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.fabric.mod;
 
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
+import io.izzel.arclight.api.ArclightPlatform;
 import kz.bejiihiu.candyriya.boot.AbstractBootstrap;
 import kz.bejiihiu.candyriya.common.mod.CandyriyaCommon;
 import kz.bejiihiu.candyriya.common.mod.CandyriyaMixinPlugin;
@@ -21,7 +21,7 @@ public class FabricMixinPlugin extends CandyriyaMixinPlugin implements AbstractB
             CandyriyaLocale.getInstance().format("i18n.using-language", CandyriyaConfig.spec().getLocale().getCurrent(), CandyriyaConfig.spec().getLocale().getFallback())
         );
         try {
-            this.setupMod(CandyriyaPlatform.FABRIC, false);
+            this.setupMod(ArclightPlatform.FABRIC, false);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

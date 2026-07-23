@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.boot.forge.mod;
 
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
-import kz.bejiihiu.candyriya.api.EnumHelper;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.ArclightPlatform;
+import io.izzel.arclight.api.EnumHelper;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.boot.AbstractBootstrap;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import kz.bejiihiu.candyriya.i18n.CandyriyaLocale;
@@ -39,7 +39,7 @@ public class ModuleBootstrap implements BootstrapEntryPoint, AbstractBootstrap {
             return;
         }
         try {
-            this.setupMod(CandyriyaPlatform.FORGE);
+            this.setupMod(ArclightPlatform.FORGE);
             this.dirtyHacks();
             int targetIndex = Arrays.asList(args).indexOf("--launchTarget");
             if (targetIndex >= 0 && targetIndex < args.length - 1) {

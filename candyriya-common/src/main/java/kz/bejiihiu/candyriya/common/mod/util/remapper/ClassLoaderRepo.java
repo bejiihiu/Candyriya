@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper;
 
-import kz.bejiihiu.candyriya.api.PluginPatcher;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.PluginPatcher;
+import io.izzel.arclight.api.Unsafe;
 import net.md_5.specialsource.repo.ClassRepo;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;

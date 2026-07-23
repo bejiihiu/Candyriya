@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.level;
 
-import kz.bejiihiu.candyriya.api.EnumHelper;
+import io.izzel.arclight.api.EnumHelper;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.TransformAccess;
 import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;

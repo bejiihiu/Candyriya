@@ -3,7 +3,7 @@ package kz.bejiihiu.candyriya.common.mod.server.event;
 import kz.bejiihiu.candyriya.common.bridge.core.entity.EntityBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.LivingEntityBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerPlayerBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.common.mod.server.world.item.EntityDropContainer;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,14 +59,14 @@ public class EntityEventHandler {
             // original == null : true if now we don't keepInventory
             if (beforeDeath != null) {
                 if (original == null) {
-                    CandyriyaServer.LOGGER.debug("Overriding keepInventory from false to true. Preserve modified inventory before death.");
+                    ArclightServer.LOGGER.debug("Overriding keepInventory from false to true. Preserve modified inventory before death.");
                 } else {
                     // Don't clear it. Preserve original content.
                     // player.getInventory().clearContent();
                     player.getInventory().replaceWith(original);
                 }
             } else if (!event.getKeepInventory()) {
-                CandyriyaServer.LOGGER.warn("Overriding keepInventory from true to false. This won't take effect.");
+                ArclightServer.LOGGER.warn("Overriding keepInventory from true to false. This won't take effect.");
             }
             ((ServerPlayerBridge) player).Candyriya$readDeathEvent(event);
         } else {

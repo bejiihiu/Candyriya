@@ -5,8 +5,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
-import kz.bejiihiu.candyriya.api.Unsafe;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import io.izzel.arclight.api.Unsafe;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.generated.CandyriyaReflectionHandler;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import io.izzel.tools.product.Product;
@@ -365,7 +365,7 @@ public class ClassLoaderRemapper extends LenientJarRemapper {
         if (repo instanceof ClassRepoWrapper wrapper) {
             config = wrapper.config();
         } else {
-            CandyriyaServer.LOGGER.warn("No class remap config is provided for class {}, using PLUGIN", node.name.replace('/','.'));
+            ArclightServer.LOGGER.warn("No class remap config is provided for class {}, using PLUGIN", node.name.replace('/','.'));
             config = CandyriyaRemapConfig.PLUGIN;
         }
 

@@ -1,11 +1,11 @@
 package kz.bejiihiu.candyriya.fabric.mod;
 
-import kz.bejiihiu.candyriya.api.CandyriyaServer;
-import kz.bejiihiu.candyriya.api.TickingTracker;
+import io.izzel.arclight.api.ArclightServer;
+import io.izzel.arclight.api.TickingTracker;
 import kz.bejiihiu.candyriya.common.mod.server.api.DefaultTickingTracker;
 import org.bukkit.plugin.Plugin;
 
-public class FabricCandyriyaServer implements CandyriyaServer {
+public class FabricArclightServer implements ArclightServer {
 
     private final TickingTracker tickingTracker = new DefaultTickingTracker();
 

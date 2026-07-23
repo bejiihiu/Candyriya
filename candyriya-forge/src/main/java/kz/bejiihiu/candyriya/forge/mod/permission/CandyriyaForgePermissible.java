@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.forge.mod.permission;
 
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.handler.IPermissionHandler;

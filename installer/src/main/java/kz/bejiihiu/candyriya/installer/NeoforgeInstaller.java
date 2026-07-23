@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.installer;
 
 import com.google.gson.Gson;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 
 import java.io.File;
 import java.io.IOException;

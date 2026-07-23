@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.server.block;
 
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.CandyriyaRemapper;
 import net.minecraft.world.CompoundContainer;
 

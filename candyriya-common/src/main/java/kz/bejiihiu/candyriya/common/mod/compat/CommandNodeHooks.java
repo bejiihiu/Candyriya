@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.compat;
 
 import com.mojang.brigadier.tree.CommandNode;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.bridge.core.commands.CommandSourceStackBridge;
 
 import java.util.Map;

@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.level.block;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.block.MultifaceSpreaderSpreadPosBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -37,7 +37,7 @@ public interface MultifaceSpreader_SpreadConfigMixin {
             if (source != null) {
                 return CraftEventFactory.handleBlockSpreadEvent(level, source, spreadPos.pos(), blockstate, 2);
             } else {
-                CandyriyaServer.LOGGER.debug("FIXME: unknown source for spread pos");
+                ArclightServer.LOGGER.debug("FIXME: unknown source for spread pos");
                 return level.setBlock(spreadPos.pos(), blockstate, 2);
             }
         } else {

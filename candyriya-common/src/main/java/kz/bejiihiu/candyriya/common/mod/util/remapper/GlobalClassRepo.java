@@ -3,7 +3,7 @@ package kz.bejiihiu.candyriya.common.mod.util.remapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import kz.bejiihiu.candyriya.api.PluginPatcher;
+import io.izzel.arclight.api.PluginPatcher;
 import net.md_5.specialsource.repo.ClassRepo;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;

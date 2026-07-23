@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.plugin.messaging;
 
 import kz.bejiihiu.candyriya.common.mod.CandyriyaConstants;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -89,7 +89,7 @@ public class CandyriyaPluginChannel<T extends PluginChannelHandler> {
     public void dispatchMessage(Player src, byte[] message) {
         var fire = Set.copyOf(this.incoming);
         if (fire.isEmpty()) {
-            CandyriyaServer.LOGGER.warn("Plugin channel {} has an incoming packet that has nowhere to dispatch.", type.id());
+            ArclightServer.LOGGER.warn("Plugin channel {} has an incoming packet that has nowhere to dispatch.", type.id());
             return;
         }
         for (var listener : fire) {

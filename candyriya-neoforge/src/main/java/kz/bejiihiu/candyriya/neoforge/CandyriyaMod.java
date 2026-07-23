@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.neoforge;
 
-import kz.bejiihiu.candyriya.api.Candyriya;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
-import kz.bejiihiu.candyriya.neoforge.mod.NeoForgeCandyriyaServer;
+import io.izzel.arclight.api.Arclight;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
+import kz.bejiihiu.candyriya.neoforge.mod.NeoForgeArclightServer;
 import kz.bejiihiu.candyriya.neoforge.mod.event.CandyriyaEventDispatcherRegistry;
 import net.neoforged.fml.common.Mod;
 import org.apache.logging.log4j.Level;
@@ -18,8 +18,8 @@ import java.io.PrintStream;
 public class CandyriyaMod {
 
     public CandyriyaMod() {
-        CandyriyaServer.LOGGER.info("mod-load");
-        Candyriya.setServer(new NeoForgeCandyriyaServer());
+        ArclightServer.LOGGER.info("mod-load");
+        Candyriya.setServer(new NeoForgeArclightServer());
         System.setOut(new LoggingPrintStream("STDOUT", System.out, Level.INFO));
         System.setErr(new LoggingPrintStream("STDERR", System.err, Level.ERROR));
         CandyriyaEventDispatcherRegistry.registerAllEventDispatchers();

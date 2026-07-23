@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.fabric.mod.plugin.messaging;
 
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.common.mod.plugin.messaging.CandyriyaPluginChannel;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -38,10 +38,10 @@ public class CandyriyaFabricMessaging {
                         .distinct()
                         .map(Plugin::getName)
                         .collect(Collectors.joining(", ", "[", "]"));
-                CandyriyaServer.LOGGER.error("Attempting to register a channel that has already been registered by Fabric!");
-                CandyriyaServer.LOGGER.error("Channel conflict: {}, in protocol: {}", location, protocol);
-                CandyriyaServer.LOGGER.error("Registered by plugin(s): {}", pluginList);
-                CandyriyaServer.LOGGER.error("This channel will be ignored for the rest of the time!");
+                ArclightServer.LOGGER.error("Attempting to register a channel that has already been registered by Fabric!");
+                ArclightServer.LOGGER.error("Channel conflict: {}, in protocol: {}", location, protocol);
+                ArclightServer.LOGGER.error("Registered by plugin(s): {}", pluginList);
+                ArclightServer.LOGGER.error("This channel will be ignored for the rest of the time!");
                 return false;
             }
         }

@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.forge.mixin.forge;
 
 import kz.bejiihiu.candyriya.forge.mod.permission.CandyriyaPermissionHandler;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.handler.IPermissionHandler;
@@ -22,7 +22,7 @@ public class PermissionAPIMixin {
             return;
         }
         var handler = new CandyriyaPermissionHandler(activeHandler);
-        CandyriyaServer.LOGGER.info("Forwarding forge permission[{}] to bukkit", activeHandler.getIdentifier());
+        ArclightServer.LOGGER.info("Forwarding forge permission[{}] to bukkit", activeHandler.getIdentifier());
         activeHandler = handler;
     }
 }

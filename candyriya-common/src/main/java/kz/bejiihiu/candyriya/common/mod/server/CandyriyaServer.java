@@ -34,7 +34,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Supplier;
 
-public class CandyriyaServer {
+public class ArclightServer {
 
     public static final Logger LOGGER = CandyriyaI18nLogger.getLogger("Candyriya");
 

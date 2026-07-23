@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.util;
 
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
@@ -43,7 +43,7 @@ public class DistValidate {
         return SEEN_CLASSES.computeIfAbsent(cl, c -> {
             var name = c.getName();
             var result = CandyriyaConfig.spec().getCompat().getExtraLogicWorlds().contains(cl.getName());
-            CandyriyaServer.LOGGER.warn(MARKER, "Level class {} treated as logic world: {}", name, result);
+            ArclightServer.LOGGER.warn(MARKER, "Level class {} treated as logic world: {}", name, result);
             return result;
         });
     }

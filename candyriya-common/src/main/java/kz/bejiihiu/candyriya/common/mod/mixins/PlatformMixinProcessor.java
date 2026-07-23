@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.mixins;
 
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
+import io.izzel.arclight.api.ArclightPlatform;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.OnlyInPlatform;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
@@ -13,7 +13,7 @@ public class PlatformMixinProcessor {
 
     @SuppressWarnings("unchecked")
     static boolean shouldApply(ClassNode node) {
-        var current = CandyriyaPlatform.current();
+        var current = ArclightPlatform.current();
         for (var ann : node.invisibleAnnotations) {
             if (ann.desc.equals(TYPE)) {
                 var list = (List<String[]>) ann.values.get(1);

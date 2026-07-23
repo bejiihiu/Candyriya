@@ -46,7 +46,7 @@ public class CandyriyaGameProvider extends MinecraftGameProvider {
         return arguments;
     }
 
-    private String getCandyriyaVersion() throws Exception {
+    private String getArclightVersion() throws Exception {
         try (var stream = getClass().getResourceAsStream("/META-INF/MANIFEST.MF")) {
             var manifest = new Manifest(stream);
             var attributes = manifest.getMainAttributes();
@@ -55,7 +55,7 @@ public class CandyriyaGameProvider extends MinecraftGameProvider {
     }
 
     private Path extract() throws Exception {
-        var version = getCandyriyaVersion();
+        var version = getArclightVersion();
         System.setProperty("Candyriya.version", version);
         var path = getClass().getModule().getResourceAsStream("/common.jar");
         var dir = Paths.get(".Candyriya", "mod_file");
@@ -97,7 +97,7 @@ public class CandyriyaGameProvider extends MinecraftGameProvider {
     @Override
     public String getRawGameVersion() {
         try {
-            return super.getRawGameVersion() + " Candyriya " + getCandyriyaVersion();
+            return super.getRawGameVersion() + " Candyriya " + getArclightVersion();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

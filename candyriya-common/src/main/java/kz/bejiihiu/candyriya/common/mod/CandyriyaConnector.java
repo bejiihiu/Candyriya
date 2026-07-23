@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod;
 
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
+import io.izzel.arclight.api.ArclightPlatform;
 import kz.bejiihiu.candyriya.common.mod.util.log.CandyriyaI18nLogger;
 import kz.bejiihiu.candyriya.mixin.MixinTools;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +16,7 @@ public class CandyriyaConnector implements IMixinConnector {
         MixinTools.setup();
         Mixins.addConfiguration("mixins.Candyriya.core.json");
         Mixins.addConfiguration("mixins.Candyriya.bukkit.json");
-        switch (CandyriyaPlatform.current()) {
+        switch (ArclightPlatform.current()) {
             case VANILLA -> Mixins.addConfiguration("mixins.Candyriya.vanilla.json");
             case FORGE -> Mixins.addConfiguration("mixins.Candyriya.forge.json");
             case NEOFORGE -> Mixins.addConfiguration("mixins.Candyriya.neoforge.json");

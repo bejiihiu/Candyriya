@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.boot.asm;
 
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
+import io.izzel.arclight.api.ArclightPlatform;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.objectweb.asm.Opcodes;
@@ -27,7 +27,7 @@ public class InventoryImplementer implements Implementer {
     private final String maxStackSizeMethodName;
 
     public InventoryImplementer() {
-        this.maxStackSizeMethodName = switch (CandyriyaPlatform.current()) {
+        this.maxStackSizeMethodName = switch (ArclightPlatform.current()) {
             case VANILLA, NEOFORGE -> "getMaxStackSize";
             case FORGE -> "m_6893_";
             case FABRIC -> "method_5444";

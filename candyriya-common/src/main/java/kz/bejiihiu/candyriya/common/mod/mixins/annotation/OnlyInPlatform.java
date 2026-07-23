@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.mixins.annotation;
 
-import kz.bejiihiu.candyriya.api.CandyriyaPlatform;
+import io.izzel.arclight.api.ArclightPlatform;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface OnlyInPlatform {
 
-    CandyriyaPlatform[] value();
+    ArclightPlatform[] value();
 }

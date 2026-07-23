@@ -2,10 +2,10 @@ package kz.bejiihiu.candyriya.common.mixin.bukkit.plugin;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.JavaPluginLoaderBridge;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.PluginClassLoaderBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Server;
@@ -102,7 +102,7 @@ public abstract class JavaPluginLoaderMixin implements JavaPluginLoaderBridge {
     Class<?> getClassByName(String name, boolean resolve, PluginDescriptionFile description) {
         SimplePluginManager manager = (SimplePluginManager) this.server.getPluginManager();
         if (CandyriyaConfig.spec().getCompat().isIsolatedPluginClassLoaders(name)) {
-            Set<String> loaders = CandyriyaServer.iterateDepends(description);
+            Set<String> loaders = ArclightServer.iterateDepends(description);
             for (PluginClassLoaderBridge loader : Candyriya$getLoaders()) {
                 PluginDescriptionFile desc = loader.Candyriya$desc();
                 if (loaders.contains(desc.getName()) || !Collections.disjoint(loaders, desc.getProvides())) {

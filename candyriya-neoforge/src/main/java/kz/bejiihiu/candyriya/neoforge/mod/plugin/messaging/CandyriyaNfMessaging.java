@@ -2,7 +2,7 @@ package kz.bejiihiu.candyriya.neoforge.mod.plugin.messaging;
 
 import kz.bejiihiu.candyriya.common.mod.plugin.messaging.CandyriyaPluginChannel;
 import kz.bejiihiu.candyriya.common.mod.plugin.messaging.ChannelDirection;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.neoforge.mixin.neoforge.NetworkRegistryAccessor;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.ResourceLocation;
@@ -41,13 +41,13 @@ public class CandyriyaNfMessaging {
                         .distinct()
                         .map(Plugin::getName)
                         .collect(Collectors.joining(", ", "[", "]"));
-                CandyriyaServer.LOGGER.error("Attempting to register a channel that has already been registered by NeoForge!");
-                CandyriyaServer.LOGGER.error("Channel conflict: {}, in protocol: {}", location, protocol);
-                CandyriyaServer.LOGGER.error("Registered by plugin(s): {}", pluginList);
+                ArclightServer.LOGGER.error("Attempting to register a channel that has already been registered by NeoForge!");
+                ArclightServer.LOGGER.error("Channel conflict: {}, in protocol: {}", location, protocol);
+                ArclightServer.LOGGER.error("Registered by plugin(s): {}", pluginList);
                 if (known != null) {
-                    CandyriyaServer.LOGGER.error("Registered by mod version: {}", known.version());
+                    ArclightServer.LOGGER.error("Registered by mod version: {}", known.version());
                 }
-                CandyriyaServer.LOGGER.error("This channel will be ignored for the rest of the time!");
+                ArclightServer.LOGGER.error("This channel will be ignored for the rest of the time!");
                 return false;
             }
         }

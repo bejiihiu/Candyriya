@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.item.crafting.RecipeManagerBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -24,11 +24,11 @@ public class CandyriyaSpecialRecipe extends CraftComplexRecipe {
 
     @Override
     public @NotNull ItemStack getResult() {
-        return CraftItemStack.asCraftMirror(this.recipe.getResultItem(CandyriyaServer.getMinecraftServer().registryAccess()));
+        return CraftItemStack.asCraftMirror(this.recipe.getResultItem(ArclightServer.getMinecraftServer().registryAccess()));
     }
 
     @Override
     public void addToCraftingManager() {
-        ((RecipeManagerBridge) CandyriyaServer.getMinecraftServer().getRecipeManager()).bridge$addRecipe(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe));
+        ((RecipeManagerBridge) ArclightServer.getMinecraftServer().getRecipeManager()).bridge$addRecipe(new RecipeHolder<>(CraftNamespacedKey.toMinecraft(this.getKey()), this.recipe));
     }
 }

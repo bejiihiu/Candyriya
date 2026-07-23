@@ -2,8 +2,8 @@ package kz.bejiihiu.candyriya.common.mod;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.DSL;
-import kz.bejiihiu.candyriya.api.EnumHelper;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.EnumHelper;
+import io.izzel.arclight.api.Unsafe;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import org.bukkit.TreeType;

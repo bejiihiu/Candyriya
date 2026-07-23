@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.server.entity;
 
 import kz.bejiihiu.candyriya.common.bridge.bukkit.world.entity.EntityTypeBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.AgeableMob;
@@ -260,7 +260,7 @@ public class EntityClassLookup {
             var optional = NMS_TO_BUKKIT.values().stream().filter(c -> c.bukkitClass == entityClass).findAny();
             if (optional.isEmpty()) {
                 error = true;
-                CandyriyaServer.LOGGER.error(entityClass + " has no valid entity class mapping");
+                ArclightServer.LOGGER.error(entityClass + " has no valid entity class mapping");
             }
         }
         if (error) {

@@ -9,7 +9,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.network.syncher.SynchedEntityDat
 import kz.bejiihiu.candyriya.common.bridge.core.server.network.ServerGamePacketListenerImplBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.players.PlayerListBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.common.mod.server.world.border.CandyriyaBorderChangeListener;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import kz.bejiihiu.candyriya.common.mod.util.Blackhole;
@@ -136,7 +136,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void Candyriya$loadServer(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> p_251844_, PlayerDataStorage p_203844_, int p_203845_, CallbackInfo ci) {
-        cserver = CandyriyaServer.createOrLoad((DedicatedServer) minecraftServer, (PlayerList) (Object) this);
+        cserver = ArclightServer.createOrLoad((DedicatedServer) minecraftServer, (PlayerList) (Object) this);
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))

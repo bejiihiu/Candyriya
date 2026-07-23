@@ -4,7 +4,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.Graphs;
 import cpw.mods.modlauncher.ClassTransformer;
 import cpw.mods.modlauncher.TransformingClassLoader;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.mod.CandyriyaCommon;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;

@@ -59,6 +59,7 @@
     "server.PlayerAdvancementsMixin",
     "server.ServerAdvancementManagerMixin",
     "server.ServerFunctionManagerMixin",
+    "server.ServerFunctionLibraryMixin",
     "server.ServerScoreboardMixin",
     "server.ServerTickRateManagerMixin",
     "server.WorldLoaderMixin",

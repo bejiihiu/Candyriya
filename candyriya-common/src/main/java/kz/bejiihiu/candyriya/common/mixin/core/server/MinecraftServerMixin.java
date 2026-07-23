@@ -1,14 +1,14 @@
 package kz.bejiihiu.candyriya.common.mixin.core.server;
 
 import com.mojang.datafixers.DataFixer;
-import kz.bejiihiu.candyriya.api.CandyriyaVersion;
+import io.izzel.arclight.api.ArclightVersion;
 import kz.bejiihiu.candyriya.common.bridge.bukkit.CraftServerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.command.CommandSourceBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.MinecraftServerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
 import kz.bejiihiu.candyriya.common.mod.CandyriyaConstants;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.TransformAccess;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.common.mod.server.BukkitRegistry;
 import kz.bejiihiu.candyriya.common.mod.server.world.border.CandyriyaBorderChangeListener;
 import kz.bejiihiu.candyriya.common.mod.server.world.border.CandyriyaDelegatedBorderListener;
@@ -162,7 +162,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         }
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
         this.worldLoader = CandyriyaCaptures.getDataLoadContext();
-        CandyriyaServer.setMinecraftServer((MinecraftServer) (Object) this);
+        ArclightServer.setMinecraftServer((MinecraftServer) (Object) this);
     }
 
     @Decorate(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;buildServerStatus()Lnet/minecraft/network/protocol/status/ServerStatus;"))
@@ -231,7 +231,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
             return IteratorUtil.filter(iterator, it -> {
                 final var location = it.getKey().location();
                 if (location.getNamespace().equals("bukkit")) {
-                    CandyriyaServer.LOGGER.info("Deferred {} custom dimension creation", location);
+                    ArclightServer.LOGGER.info("Deferred {} custom dimension creation", location);
                     return false;
                 } else {
                     return true;
@@ -473,7 +473,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
 
     @Inject(method = "getServerModName", remap = false, cancellable = true, at = @At("RETURN"))
     private void Candyriya$brand(CallbackInfoReturnable<String> cir) {
-        cir.setReturnValue(cir.getReturnValue() + " Candyriya/" + CandyriyaVersion.current().getReleaseName());
+        cir.setReturnValue(cir.getReturnValue() + " Candyriya/" + ArclightVersion.current().getReleaseName());
     }
 
     private boolean Candyriya$skipWatchdogSetTime = false;

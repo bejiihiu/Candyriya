@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper.generated;
 
-import kz.bejiihiu.candyriya.api.CandyriyaVersion;
-import kz.bejiihiu.candyriya.api.Unsafe;
+import io.izzel.arclight.api.ArclightVersion;
+import io.izzel.arclight.api.Unsafe;
 import kz.bejiihiu.candyriya.common.mod.util.remapper.*;
 import kz.bejiihiu.candyriya.common.util.Enumerations;
 import org.objectweb.asm.ClassReader;
@@ -157,7 +157,7 @@ public class CandyriyaReflectionHandler extends ClassLoader {
     // srg -> bukkit
     public static String handlePackageGetName(String name) {
         if (name.startsWith(PREFIX)) {
-            return PREFIX + "server." + CandyriyaVersion.current().packageName();
+            return PREFIX + "server." + ArclightVersion.current().packageName();
         } else {
             return name;
         }

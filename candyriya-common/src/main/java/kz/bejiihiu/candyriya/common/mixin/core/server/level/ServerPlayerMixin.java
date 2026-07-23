@@ -11,7 +11,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.damagesource.CombatTracker
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.portal.DimensionTransitionBridge;
 import kz.bejiihiu.candyriya.common.mixin.core.world.entity.player.PlayerMixin;
 import kz.bejiihiu.candyriya.common.mod.mixins.annotation.RenameInto;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import kz.bejiihiu.candyriya.common.mod.server.block.ChestBlockDoubleInventoryHacks;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import kz.bejiihiu.candyriya.common.mod.util.Blackhole;
@@ -286,7 +286,7 @@ public abstract class ServerPlayerMixin extends PlayerMixin implements ServerPla
         if (world == null) {
             this.bridge$revive();
             Vec3 position = null;
-            if (this.respawnDimension != null && (world = CandyriyaServer.getMinecraftServer().getLevel(this.respawnDimension)) != null && this.getRespawnPosition() != null) {
+            if (this.respawnDimension != null && (world = ArclightServer.getMinecraftServer().getLevel(this.respawnDimension)) != null && this.getRespawnPosition() != null) {
                 position = ServerPlayer.findRespawnAndUseSpawnBlock((ServerLevel) world, this.getRespawnPosition(), this.getRespawnAngle(), false, false).map(ServerPlayer.RespawnPosAngle::position).orElse(null);
             }
             if (world == null || position == null) {

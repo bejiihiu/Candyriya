@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod.plugin.messaging;
 
 import kz.bejiihiu.candyriya.common.mod.CandyriyaConstants;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
@@ -18,7 +18,7 @@ public class PacketRecorder {
 
     public void recordUnknown(ResourceLocation id) {
         if (id == null) {
-            CandyriyaServer.LOGGER.debug("Received packet with null id. This should never happen.");
+            ArclightServer.LOGGER.debug("Received packet with null id. This should never happen.");
             return;
         }
         int num = unknown.getInt(id);
@@ -39,6 +39,6 @@ public class PacketRecorder {
                 .collect(Collectors.joining(", ", "unknown=[", "];"));
         unknown.clear();
 
-        CandyriyaServer.LOGGER.debug("Packet error statistics: {}", unknowns);
+        ArclightServer.LOGGER.debug("Packet error statistics: {}", unknowns);
     }
 }

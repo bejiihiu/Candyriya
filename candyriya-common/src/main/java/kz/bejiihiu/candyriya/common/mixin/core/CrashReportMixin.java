@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core;
 
-import kz.bejiihiu.candyriya.api.CandyriyaVersion;
-import kz.bejiihiu.candyriya.common.mod.server.CandyriyaServer;
+import io.izzel.arclight.api.ArclightVersion;
+import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
 import net.minecraft.CrashReport;
 import net.minecraft.SystemReport;
 import org.bukkit.craftbukkit.v.CraftCrashReport;
@@ -19,8 +19,8 @@ public class CrashReportMixin {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void Candyriya$additional(String string, Throwable throwable, CallbackInfo ci) {
-        this.systemReport.setDetail("Candyriya Release", CandyriyaVersion.current()::getReleaseName);
-        if (CandyriyaServer.isInitialized()) {
+        this.systemReport.setDetail("Candyriya Release", ArclightVersion.current()::getReleaseName);
+        if (ArclightServer.isInitialized()) {
             this.systemReport.setDetail("Candyriya", new CraftCrashReport());
         } else {
             this.systemReport.setDetail("Candyriya", "The crash happens before the server initialization.");

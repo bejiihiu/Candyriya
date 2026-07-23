@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mod.util.remapper.patcher.integrated;
 
-import kz.bejiihiu.candyriya.api.PluginPatcher;
+import io.izzel.arclight.api.PluginPatcher;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.util.ArrayList;

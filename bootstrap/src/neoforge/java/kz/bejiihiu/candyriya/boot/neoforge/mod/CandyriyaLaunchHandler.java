@@ -6,7 +6,7 @@ public class CandyriyaLaunchHandler extends NeoForgeServerLaunchHandler {
 
     @Override
     public String name() {
-        return "Candyriyaserver";
+        return "ArclightServer";
     }
 
     @Override
