@@ -24,6 +24,12 @@ Candyriya — a Bukkit/Spigot/Paper server implementation running on Forge, NeoF
 ./gradlew :bootstrap:runProdFabric
 ```
 
+**Java 21** is required for building. If your system Java is a different version, use Java 21 from Prism Launcher:
+```powershell
+$env:JAVA_HOME = "C:\Users\bejii\AppData\Roaming\PrismLauncher\java\eclipse_temurin_jre21.0.7+6"
+./gradlew cleanBuild build collect
+```
+
 Build output jars land in `build/libs/` via the `collect` task (copies from `bootstrap:forgeJar`, `neoforgeJar`, `fabricJar`).
 
 ## Module layout
@@ -66,9 +72,35 @@ All pinned in `gradle/libs.versions.toml`:
 
 ## CI
 
-- **gradle.yml** — runs on push to any branch: `cleanBuild build collect uploadFiles`
+### Workflows
+
+- **gradle.yml** — runs on push to version branches (`v*`): `cleanBuild build collect uploadFiles`
 - **pr.yml** — runs on PRs: `cleanBuild build collect` + uploads artifact
-- **release.yml** — runs on tag push (`v*`): builds and creates GitHub release
+- **release.yml** — runs on push to `main`: builds and creates GitHub release
+- **auto-merge.yml** — runs on push to version branches (`v*`): automatically creates PR and merges to `main`
+
+### Branch strategy
+
+- **`v1.21.1`** — main development branch for Minecraft 1.21.1. All development happens here.
+- **`main`** — production branch. Automatically receives merges from `v1.21.1` via auto-merge workflow. Releases are created from this branch.
+
+When adding support for new Minecraft versions, create a new branch (e.g., `v1.21.4`) and develop there.
+
+### Commit message tags
+
+Use these tags in commit messages to control CI behavior:
+
+- `[ci ignore]` — skip CI build and auto-merge for this commit
+- `[ci beta]` — mark release as beta (prerelease)
+- `[ci unstable]` — mark release as unstable (prerelease)
+- `[ci release]` — mark release as stable (default)
+
+Examples:
+```bash
+git commit -m "fix: some bugfix [ci ignore]"  # won't trigger CI
+git commit -m "feat: experimental feature [ci beta]"  # beta release
+git commit -m "release: stable release [ci release]"  # stable release
+```
 
 ## Versioning
 
@@ -83,23 +115,18 @@ This means every commit automatically increments the version number.
 
 ## Releases
 
-Create releases by pushing tags:
+Releases are created automatically when code is merged to `main` branch. The auto-merge workflow handles this:
 
-```bash
-git tag v123
-git push origin v123
-```
+1. Push to `v1.21.1` → builds project
+2. Auto-merge workflow creates PR to `main` and merges it
+3. Push to `main` → creates GitHub release with build artifacts
 
-The release workflow will automatically build and create a GitHub release with the appropriate build ID.
+Release type is determined by commit message tags:
+- `[ci beta]` → prerelease (beta)
+- `[ci unstable]` → prerelease (unstable)
+- `[ci release]` or no tag → stable release
 
-### Commit message tags
-
-Use these tags in commit messages to control CI behavior:
-
-- `[ci ignore]` — skip CI for this commit
-- `[ci beta]` — build as beta release
-- `[ci unstable]` — build as unstable release
-- `[ci release]` — build as stable release
+Build ID is automatically calculated from commit count (`git rev-list --count HEAD`).
 
 ## Tools for fixing bugs and finding mappings
 
@@ -110,6 +137,9 @@ Use Java's built-in `javap` to inspect class structure, methods, and bytecode:
 ```powershell
 # Find Java 17 javap (project uses Java 21 but javap works on any version)
 & "C:\Program Files\Java\jdk-17\bin\javap.exe" -p -c "path\to\class.class"
+
+# Java 21 from Prism Launcher
+& "C:\Users\bejii\AppData\Roaming\PrismLauncher\java\eclipse_temurin_jre21.0.7+6\bin\javap.exe" -p -c "path\to\class.class"
 
 # View method signatures only
 javap -p "path\to\class.class"

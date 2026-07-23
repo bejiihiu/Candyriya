@@ -1,0 +1,44 @@
+name: Auto Merge to Main
+
+on:
+  push:
+    branches:
+      - 'v*'
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check if should skip
+      id: check_skip
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        if echo "$COMMIT_MSG" | grep -q "\[ci ignore\]"; then
+          echo "SKIP=true" >> $GITHUB_OUTPUT
+        else
+          echo "SKIP=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create Pull Request
+      if: steps.check_skip.outputs.SKIP != 'true'
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        base: main
+        branch: ${{ github.ref_name }}
+        title: "Auto-merge from ${{ github.ref_name }}"
+        body: |
+          Automated merge from `${{ github.ref_name }}` to `main`.
+          
+          Commit: ${{ github.sha }}
+        delete-branch: false
+        merge: true
+        merge-method: merge

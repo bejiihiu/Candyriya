@@ -43,18 +43,39 @@ jobs:
         echo "BUILD_ID=$BUILD_ID" >> $GITHUB_OUTPUT
         echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
     
+    - name: Determine release type
+      id: release_type
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        echo "Commit message: $COMMIT_MSG"
+        
+        if echo "$COMMIT_MSG" | grep -q "\[ci beta\]"; then
+          echo "TYPE=beta" >> $GITHUB_OUTPUT
+          echo "PRERELEASE=true" >> $GITHUB_OUTPUT
+          echo "LABEL=Beta" >> $GITHUB_OUTPUT
+        elif echo "$COMMIT_MSG" | grep -q "\[ci unstable\]"; then
+          echo "TYPE=unstable" >> $GITHUB_OUTPUT
+          echo "PRERELEASE=true" >> $GITHUB_OUTPUT
+          echo "LABEL=Unstable" >> $GITHUB_OUTPUT
+        else
+          echo "TYPE=release" >> $GITHUB_OUTPUT
+          echo "PRERELEASE=false" >> $GITHUB_OUTPUT
+          echo "LABEL=Stable" >> $GITHUB_OUTPUT
+        fi
+    
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: build-${{ steps.get_build_id.outputs.BUILD_ID }}
-        name: Build #${{ steps.get_build_id.outputs.BUILD_ID }}
+        name: Build #${{ steps.get_build_id.outputs.BUILD_ID }} (${{ steps.release_type.outputs.LABEL }})
         draft: false
-        prerelease: false
+        prerelease: ${{ steps.release_type.outputs.PRERELEASE }}
         files: |
           build/libs/*.jar
         body: |
           ## Build #${{ steps.get_build_id.outputs.BUILD_ID }}
           
+          **Type:** ${{ steps.release_type.outputs.LABEL }}
           **Commit:** ${{ github.sha }}
           **Short SHA:** ${{ steps.get_build_id.outputs.SHORT_SHA }}
           
