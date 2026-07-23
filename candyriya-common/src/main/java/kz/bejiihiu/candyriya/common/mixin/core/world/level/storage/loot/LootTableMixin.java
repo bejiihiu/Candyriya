@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.level.storage.loot;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.storage.loot.LootTableBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;

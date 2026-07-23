@@ -2,9 +2,9 @@ package kz.bejiihiu.candyriya.common.mixin.core.world.entity.animal.frog;
 
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerLevelBridge;
 import kz.bejiihiu.candyriya.common.mixin.core.world.entity.PathfinderMobMixin;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.animal.frog.Tadpole;
 import org.bukkit.craftbukkit.v.event.CraftEventFactory;

@@ -2,9 +2,9 @@ package kz.bejiihiu.candyriya.common.mixin.core.world.entity;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.AreaEffectCloudBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.LivingEntityBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;

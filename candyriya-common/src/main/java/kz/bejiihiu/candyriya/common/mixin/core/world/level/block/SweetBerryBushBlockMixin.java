@@ -1,9 +1,9 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.level.block;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.damagesource.DamageSourceBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Eject;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Eject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;

@@ -5,7 +5,7 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.server.ChunkHolderBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ChunkMapBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.server.ServerChunkProviderBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.DistanceManagerBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
+import io.izzel.arclight.mixin.Decorate;
 import net.minecraft.server.level.*;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;

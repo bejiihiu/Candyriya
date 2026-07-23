@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.entity;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.MobBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
+import io.izzel.arclight.mixin.Decorate;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.NeutralMob;
 import org.bukkit.event.entity.EntityTargetEvent;

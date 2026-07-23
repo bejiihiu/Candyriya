@@ -2,8 +2,8 @@ package kz.bejiihiu.candyriya.common.mixin.core.world.effect;
 
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerPlayerBridge;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectUtil;
 import org.spongepowered.asm.mixin.Mixin;

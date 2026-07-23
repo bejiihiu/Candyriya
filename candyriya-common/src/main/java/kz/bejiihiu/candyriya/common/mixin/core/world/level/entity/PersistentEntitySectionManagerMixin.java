@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.level.entity;
 
 import kz.bejiihiu.candyriya.common.bridge.core.entity.EntityBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.Local;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;

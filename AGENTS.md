@@ -25,8 +25,9 @@ Candyriya — a Bukkit/Spigot/Paper server implementation running on Forge, NeoF
 ```
 
 **Java 21** is required for building. If your system Java is a different version, use Java 21 from Prism Launcher:
+
 ```powershell
-$env:JAVA_HOME = "C:\Users\bejii\AppData\Roaming\PrismLauncher\java\eclipse_temurin_jre21.0.7+6"
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-21.0.11\"
 ./gradlew cleanBuild build collect
 ```
 
@@ -34,16 +35,16 @@ Build output jars land in `build/libs/` via the `collect` task (copies from `boo
 
 ## Module layout
 
-| Module | Role |
-|---|---|
-| `candyriya-common` | Shared code: Bukkit API bridging, Mixin processors, remapper, access wideners. All platform code depends on this. |
-| `candyriya-forge` | Forge-specific mixins and adapters |
-| `candyriya-neoforge` | NeoForge-specific mixins and adapters |
-| `candyriya-fabric` | Fabric-specific mixins and adapters |
-| `bootstrap` | Server launcher, fat-jar assembly (`forgeJar`/`neoforgeJar`/`fabricJar`), installer info generation, async catcher config |
-| `installer` | Runtime installer libraries (embedded into bootstrap jar) |
-| `i18n-config` | Internationalization config (HOCON-based) |
-| `buildSrc` | Custom Gradle plugin (`CandyriyaGradlePlugin`) — handles Spigot build, mapping processing, jar remapping/relocation |
+| Module               | Role                                                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `candyriya-common`   | Shared code: Bukkit API bridging, Mixin processors, remapper, access wideners. All platform code depends on this.         |
+| `candyriya-forge`    | Forge-specific mixins and adapters                                                                                        |
+| `candyriya-neoforge` | NeoForge-specific mixins and adapters                                                                                     |
+| `candyriya-fabric`   | Fabric-specific mixins and adapters                                                                                       |
+| `bootstrap`          | Server launcher, fat-jar assembly (`forgeJar`/`neoforgeJar`/`fabricJar`), installer info generation, async catcher config |
+| `installer`          | Runtime installer libraries (embedded into bootstrap jar)                                                                 |
+| `i18n-config`        | Internationalization config (HOCON-based)                                                                                 |
+| `buildSrc`           | Custom Gradle plugin (`CandyriyaGradlePlugin`) — handles Spigot build, mapping processing, jar remapping/relocation       |
 
 ## Architecture notes
 
@@ -57,6 +58,7 @@ Build output jars land in `build/libs/` via the `collect` task (copies from `boo
 ## Key versions
 
 All pinned in `gradle/libs.versions.toml`:
+
 - Minecraft 1.21.1, Forge 52.1.14, NeoForge 21.1.228, Fabric Loader 0.19.2
 - Spigot reversion 4344, Bukkit API v1_21_R1
 - Mixin 0.8.5, Lombok 1.18.38
@@ -96,6 +98,7 @@ Use these tags in commit messages to control CI behavior:
 - `[ci release]` — mark release as stable (default)
 
 Examples:
+
 ```bash
 git commit -m "fix: some bugfix [ci ignore]"  # won't trigger CI
 git commit -m "feat: experimental feature [ci beta]"  # beta release
@@ -107,6 +110,7 @@ git commit -m "release: stable release [ci release]"  # stable release
 Candyriya uses **build IDs** instead of semantic versioning. The version is automatically determined by the number of commits in the repository (`git rev-list --count HEAD`).
 
 For example:
+
 - Commit #1 → version 1
 - Commit #100 → version 100
 - Commit #1234 → version 1234
@@ -122,6 +126,7 @@ Releases are created automatically when code is merged to `main` branch. The aut
 3. Push to `main` → creates GitHub release with build artifacts
 
 Release type is determined by commit message tags:
+
 - `[ci beta]` → prerelease (beta)
 - `[ci unstable]` → prerelease (unstable)
 - `[ci release]` or no tag → stable release
@@ -133,13 +138,15 @@ Build ID is automatically calculated from commit count (`git rev-list --count HE
 When fixing issues from Arclight or debugging Minecraft-related problems, use these tools:
 
 ### 1. **javap** — decompile .class files
+
 Use Java's built-in `javap` to inspect class structure, methods, and bytecode:
+
 ```powershell
-# Find Java 17 javap (project uses Java 21 but javap works on any version)
-& "C:\Program Files\Java\jdk-17\bin\javap.exe" -p -c "path\to\class.class"
+# Find Java 21 javap (project uses Java 21 but javap works on any version)
+& "C:\Program Files\Java\jdk-21.0.11\bin\javap.exe" -p -c "path\to\class.class"
 
 # Java 21 from Prism Launcher
-& "C:\Users\bejii\AppData\Roaming\PrismLauncher\java\eclipse_temurin_jre21.0.7+6\bin\javap.exe" -p -c "path\to\class.class"
+& "C:\Program Files\Java\jdk-21.0.11\bin\javap.exe" -p -c "path\to\class.class"
 
 # View method signatures only
 javap -p "path\to\class.class"
@@ -149,13 +156,16 @@ javap -p -c -l "path\to\class.class"
 ```
 
 **Where to find .class files:**
+
 - Extract from Minecraft jars in `.gradle\loom-cache\minecraftMaven\`
 - Use `Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory()` to extract jars
 
 ### 2. **mappings.dev** — find method/field names across mapping namespaces
+
 Website: https://mappings.dev
 
 Shows mappings for:
+
 - **Mojang** (official, used by NeoForge)
 - **Searge** (SRG, used by Forge)
 - **Yarn** (used by Fabric)
@@ -164,23 +174,28 @@ Shows mappings for:
 Example: `https://mappings.dev/1.21.1/net/minecraft/server/ServerFunctionLibrary.html`
 
 ### 3. **Firecrawl** — web search and scraping
+
 ```
 firecrawl_search — search GitHub, forums, documentation
 firecrawl_scrape — extract content from specific URLs
 ```
 
 Use to:
+
 - Find similar fixes in other projects (Arclight, Forge, NeoForge, Fabric)
 - Search for error messages and solutions
 - Read documentation from mappings.dev, NeoForge docs, etc.
 
 ### 4. **GitHub search** — find existing fixes
+
 Search patterns:
+
 - `site:github.com "ClassName" mixin @Redirect`
 - `site:github.com/IzzelAliz/Arclight "error message"`
 - `site:github.com "methodName" mixin minecraft`
 
 ### 5. **Gradle cache locations**
+
 ```
 # Minecraft merged jars (Mojang mappings)
 .gradle\loom-cache\minecraftMaven\net\minecraft\minecraft-merged-*\
@@ -193,6 +208,7 @@ Search patterns:
 ```
 
 ### Common workflow for fixing issues:
+
 1. **Read the issue** — understand the error message and stack trace
 2. **Find the class** — use `javap` on extracted Minecraft jars to see method signatures
 3. **Check mappings** — use mappings.dev to find Mojang/Searge/Yarn names

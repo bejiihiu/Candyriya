@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.neoforge.mixin.core.server.network;
 
 import kz.bejiihiu.candyriya.common.mod.server.ArclightServer;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerLinks;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;

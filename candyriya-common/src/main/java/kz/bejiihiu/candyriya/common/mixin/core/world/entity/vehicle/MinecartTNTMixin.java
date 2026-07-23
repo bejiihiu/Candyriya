@@ -1,6 +1,6 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.entity.vehicle;
 
-import kz.bejiihiu.candyriya.mixin.Eject;
+import io.izzel.arclight.mixin.Eject;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.MinecartTNT;

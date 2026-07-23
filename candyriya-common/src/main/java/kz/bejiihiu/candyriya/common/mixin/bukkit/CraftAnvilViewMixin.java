@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.common.mixin.bukkit;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.inventory.AnvilMenuBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import org.bukkit.craftbukkit.v.inventory.view.CraftAnvilView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

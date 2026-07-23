@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.fabric.mixin.fabric.base;
 
 import kz.bejiihiu.candyriya.fabric.mod.event.FabricEventAdaptor;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.fabricmc.fabric.api.event.EventFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

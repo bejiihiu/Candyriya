@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core.server;
 
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.server.MinecraftServer;
 import org.spigotmc.AsyncCatcher;
 import org.spongepowered.asm.mixin.Mixin;

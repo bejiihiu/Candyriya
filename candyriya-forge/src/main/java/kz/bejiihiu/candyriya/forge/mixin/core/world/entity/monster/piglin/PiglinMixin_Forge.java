@@ -2,8 +2,8 @@ package kz.bejiihiu.candyriya.forge.mixin.core.world.entity.monster.piglin;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.monster.piglin.PiglinBridge;
 import kz.bejiihiu.candyriya.forge.mixin.core.world.entity.LivingEntityMixin_Forge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;

@@ -2,9 +2,9 @@ package kz.bejiihiu.candyriya.common.mixin.core.world.entity.monster.piglin;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.MobBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.monster.piglin.PiglinBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;

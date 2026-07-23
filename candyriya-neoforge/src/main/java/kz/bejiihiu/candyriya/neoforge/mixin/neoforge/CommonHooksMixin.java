@@ -2,8 +2,8 @@ package kz.bejiihiu.candyriya.neoforge.mixin.neoforge;
 
 import kz.bejiihiu.candyriya.common.mod.server.event.EntityEventHandler;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;

@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.entity.monster;
 
 import kz.bejiihiu.candyriya.common.mixin.core.world.entity.raid.RaiderMixin;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.alchemy.PotionContents;

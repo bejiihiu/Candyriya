@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mod;
 
 import kz.bejiihiu.candyriya.common.mod.mixins.*;
-import kz.bejiihiu.candyriya.mixin.MixinTools;
+import io.izzel.arclight.mixin.MixinTools;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;

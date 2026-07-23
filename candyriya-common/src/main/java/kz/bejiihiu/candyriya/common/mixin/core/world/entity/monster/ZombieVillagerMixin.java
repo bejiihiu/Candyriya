@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.entity.monster;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.entity.LivingEntityBridge;
-import kz.bejiihiu.candyriya.mixin.Eject;
+import io.izzel.arclight.mixin.Eject;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;

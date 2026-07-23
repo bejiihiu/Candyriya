@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.level.block;
 
 import kz.bejiihiu.candyriya.common.mod.server.block.CauldronHooks;
-import kz.bejiihiu.candyriya.mixin.Eject;
+import io.izzel.arclight.mixin.Eject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;

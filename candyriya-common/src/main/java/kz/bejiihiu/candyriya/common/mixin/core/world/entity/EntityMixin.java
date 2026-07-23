@@ -12,8 +12,8 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.level.portal.DimensionTran
 import kz.bejiihiu.candyriya.common.mod.server.BukkitRegistry;
 import kz.bejiihiu.candyriya.common.mod.server.entity.CandyriyaSpawnReason;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.BlockUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;

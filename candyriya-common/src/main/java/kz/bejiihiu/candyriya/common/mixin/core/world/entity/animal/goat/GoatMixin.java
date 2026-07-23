@@ -1,7 +1,7 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.entity.animal.goat;
 
 import kz.bejiihiu.candyriya.common.mixin.core.world.entity.animal.AnimalMixin;
-import kz.bejiihiu.candyriya.mixin.Eject;
+import io.izzel.arclight.mixin.Eject;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

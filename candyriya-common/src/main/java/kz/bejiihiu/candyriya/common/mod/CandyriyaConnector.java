@@ -2,7 +2,7 @@ package kz.bejiihiu.candyriya.common.mod;
 
 import io.izzel.arclight.api.ArclightPlatform;
 import kz.bejiihiu.candyriya.common.mod.util.log.CandyriyaI18nLogger;
-import kz.bejiihiu.candyriya.mixin.MixinTools;
+import io.izzel.arclight.mixin.MixinTools;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.connect.IMixinConnector;

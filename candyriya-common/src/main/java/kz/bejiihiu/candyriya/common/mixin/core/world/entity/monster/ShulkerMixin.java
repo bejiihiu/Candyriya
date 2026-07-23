@@ -2,9 +2,9 @@ package kz.bejiihiu.candyriya.common.mixin.core.world.entity.monster;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
 import kz.bejiihiu.candyriya.common.mixin.core.world.entity.PathfinderMobMixin;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.monster.Shulker;
 import org.bukkit.Bukkit;

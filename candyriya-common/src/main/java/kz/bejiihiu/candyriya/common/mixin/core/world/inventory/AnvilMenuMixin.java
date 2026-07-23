@@ -4,8 +4,8 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.entity.player.PlayerBridge
 import kz.bejiihiu.candyriya.common.bridge.core.world.inventory.AnvilMenuBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.inventory.ContainerLevelAccessBridge;
 import kz.bejiihiu.candyriya.common.mod.server.world.inventory.CandyriyaAnvilView;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.DataSlot;

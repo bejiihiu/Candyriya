@@ -2,9 +2,9 @@ package kz.bejiihiu.candyriya.common.mixin.core.network;
 
 import com.mojang.datafixers.util.Pair;
 import kz.bejiihiu.candyriya.common.bridge.core.network.syncher.SynchedEntityDataBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.server.level.ServerPlayer;

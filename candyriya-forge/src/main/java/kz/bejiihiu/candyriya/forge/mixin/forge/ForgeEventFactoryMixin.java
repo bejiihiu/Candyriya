@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.forge.mixin.forge;
 
 import kz.bejiihiu.candyriya.common.mod.server.event.EntityEventHandler;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;

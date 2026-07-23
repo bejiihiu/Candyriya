@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.item;
 
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerPlayerBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;

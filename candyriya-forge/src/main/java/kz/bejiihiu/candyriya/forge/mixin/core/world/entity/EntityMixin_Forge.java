@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.forge.mixin.core.world.entity;
 
 import kz.bejiihiu.candyriya.common.bridge.core.entity.EntityBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.tools.product.Product;
 import io.izzel.tools.product.Product4;
 import net.minecraft.core.BlockPos;

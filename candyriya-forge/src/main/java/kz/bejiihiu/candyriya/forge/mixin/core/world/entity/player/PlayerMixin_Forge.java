@@ -4,9 +4,9 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.entity.player.PlayerBridge
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaCaptures;
 import kz.bejiihiu.candyriya.common.mod.util.CandyriyaDamageContainer;
 import kz.bejiihiu.candyriya.forge.mixin.core.world.entity.LivingEntityMixin_Forge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;

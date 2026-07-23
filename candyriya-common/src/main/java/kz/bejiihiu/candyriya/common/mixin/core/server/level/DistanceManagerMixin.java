@@ -2,9 +2,9 @@ package kz.bejiihiu.candyriya.common.mixin.core.server.level;
 
 import kz.bejiihiu.candyriya.common.bridge.core.world.server.ChunkHolderBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.DistanceManagerBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.server.level.*;

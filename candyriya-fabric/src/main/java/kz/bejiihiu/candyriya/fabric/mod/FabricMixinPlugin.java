@@ -6,7 +6,7 @@ import kz.bejiihiu.candyriya.common.mod.CandyriyaCommon;
 import kz.bejiihiu.candyriya.common.mod.CandyriyaMixinPlugin;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import kz.bejiihiu.candyriya.i18n.CandyriyaLocale;
-import kz.bejiihiu.candyriya.mixin.MixinTools;
+import io.izzel.arclight.mixin.MixinTools;
 import org.apache.logging.log4j.LogManager;
 import org.slf4j.LoggerFactory;
 

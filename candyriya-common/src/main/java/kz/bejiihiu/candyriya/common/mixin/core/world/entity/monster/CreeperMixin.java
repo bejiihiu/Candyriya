@@ -4,9 +4,9 @@ import kz.bejiihiu.candyriya.common.bridge.core.world.entity.monster.CreeperBrid
 import kz.bejiihiu.candyriya.common.bridge.core.world.damagesource.DamageSourceBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.level.WorldBridge;
 import kz.bejiihiu.candyriya.common.mixin.core.world.entity.PathfinderMobMixin;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;

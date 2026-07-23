@@ -2,9 +2,9 @@ package kz.bejiihiu.candyriya.neoforge.mixin.core.world.item;
 
 import kz.bejiihiu.candyriya.common.bridge.core.server.level.ServerPlayerBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.item.ItemStackBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
-import kz.bejiihiu.candyriya.mixin.Local;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

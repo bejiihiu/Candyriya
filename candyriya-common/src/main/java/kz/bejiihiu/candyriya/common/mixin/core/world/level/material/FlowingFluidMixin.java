@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.common.mixin.core.world.level.material;
 
 import kz.bejiihiu.candyriya.common.mod.util.DistValidate;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;

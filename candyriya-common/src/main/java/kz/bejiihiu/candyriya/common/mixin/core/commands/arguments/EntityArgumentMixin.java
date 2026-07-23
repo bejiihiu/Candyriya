@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import kz.bejiihiu.candyriya.common.bridge.core.commands.arguments.EntityArgumentBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.commands.arguments.selector.EntitySelectorParserBridge;
-import kz.bejiihiu.candyriya.mixin.Decorate;
+import io.izzel.arclight.mixin.Decorate;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;

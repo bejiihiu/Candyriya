@@ -1,8 +1,8 @@
 package kz.bejiihiu.candyriya.common.mixin.bukkit;
 
 import kz.bejiihiu.candyriya.common.mod.server.world.CandyriyaWorldConfig;
-import kz.bejiihiu.candyriya.mixin.Decorate;
-import kz.bejiihiu.candyriya.mixin.DecorationOps;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
