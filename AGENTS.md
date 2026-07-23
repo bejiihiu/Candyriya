@@ -100,3 +100,72 @@ Use these tags in commit messages to control CI behavior:
 - `[ci beta]` — build as beta release
 - `[ci unstable]` — build as unstable release
 - `[ci release]` — build as stable release
+
+## Tools for fixing bugs and finding mappings
+
+When fixing issues from Arclight or debugging Minecraft-related problems, use these tools:
+
+### 1. **javap** — decompile .class files
+Use Java's built-in `javap` to inspect class structure, methods, and bytecode:
+```powershell
+# Find Java 17 javap (project uses Java 21 but javap works on any version)
+& "C:\Program Files\Java\jdk-17\bin\javap.exe" -p -c "path\to\class.class"
+
+# View method signatures only
+javap -p "path\to\class.class"
+
+# View full bytecode with line numbers
+javap -p -c -l "path\to\class.class"
+```
+
+**Where to find .class files:**
+- Extract from Minecraft jars in `.gradle\loom-cache\minecraftMaven\`
+- Use `Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory()` to extract jars
+
+### 2. **mappings.dev** — find method/field names across mapping namespaces
+Website: https://mappings.dev
+
+Shows mappings for:
+- **Mojang** (official, used by NeoForge)
+- **Searge** (SRG, used by Forge)
+- **Yarn** (used by Fabric)
+- **Intermediary** (used by Fabric)
+
+Example: `https://mappings.dev/1.21.1/net/minecraft/server/ServerFunctionLibrary.html`
+
+### 3. **Firecrawl** — web search and scraping
+```
+firecrawl_search — search GitHub, forums, documentation
+firecrawl_scrape — extract content from specific URLs
+```
+
+Use to:
+- Find similar fixes in other projects (Arclight, Forge, NeoForge, Fabric)
+- Search for error messages and solutions
+- Read documentation from mappings.dev, NeoForge docs, etc.
+
+### 4. **GitHub search** — find existing fixes
+Search patterns:
+- `site:github.com "ClassName" mixin @Redirect`
+- `site:github.com/IzzelAliz/Arclight "error message"`
+- `site:github.com "methodName" mixin minecraft`
+
+### 5. **Gradle cache locations**
+```
+# Minecraft merged jars (Mojang mappings)
+.gradle\loom-cache\minecraftMaven\net\minecraft\minecraft-merged-*\
+
+# Forge merged jars (SRG mappings)
+.gradle\loom-cache\minecraftMaven\net\minecraft\forge-*-minecraft-merged-*\
+
+# Spigot BuildTools output
+.gradle\Candyriya\candyriya_cache\buildtools\
+```
+
+### Common workflow for fixing issues:
+1. **Read the issue** — understand the error message and stack trace
+2. **Find the class** — use `javap` on extracted Minecraft jars to see method signatures
+3. **Check mappings** — use mappings.dev to find Mojang/Searge/Yarn names
+4. **Search for solutions** — use firecrawl to find similar fixes in other projects
+5. **Write the mixin** — use correct method names from mappings
+6. **Test compilation** — run `./gradlew :candyriya-common:compileJava`
