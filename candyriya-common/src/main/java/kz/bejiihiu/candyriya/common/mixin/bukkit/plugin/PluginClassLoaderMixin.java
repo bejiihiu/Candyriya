@@ -14,6 +14,7 @@ import kz.bejiihiu.candyriya.common.mod.util.remapper.RemappingClassLoader;
 import kz.bejiihiu.candyriya.i18n.CandyriyaConfig;
 import io.izzel.tools.product.Product2;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.SimplePluginManager;
@@ -146,7 +147,14 @@ public abstract class PluginClassLoaderMixin extends URLClassLoader implements R
 
     @Override
     public Logger Candyriya$systemLogger() {
-        return ((JavaPluginLoaderBridge)(Object) loader).Candyriya$server().getLogger();
+        // fix: NPE when plugin is null during dynamic loading (Arclight#2059)
+        // loader может быть null если этот лоадер ещё конструируется,
+        // а другой плаглин дёргает Candyriya$loadFromExternal в этот момент
+        if (this.loader == null) {
+            return Bukkit.getLogger();
+        }
+        Server server = ((JavaPluginLoaderBridge) (Object) loader).Candyriya$server();
+        return server != null ? server.getLogger() : Bukkit.getLogger();
     }
 
     public PluginClassLoaderMixin(URL[] urls) {
@@ -204,6 +212,9 @@ public abstract class PluginClassLoaderMixin extends URLClassLoader implements R
                     PluginDescriptionFile provider = cl.Candyriya$desc();
                     if (provider != this.description && !this.seenIllegalAccess.contains(provider.getName()) && !cl.Candyriya$getPluginManager().isTransitiveDepend(this.description, provider)) {
                         this.seenIllegalAccess.add(provider.getName());
+                        // fix: this.plugin can be null during construction (Arclight#2059)
+                        // когда плагин динамически грузится, Class.forName() в конструкторе
+                        // триггерит loadClass0 до того как this.plugin инициализируется
                         if (this.plugin != null) {
                             this.plugin.getLogger().log(Level.WARNING, "Loaded class {0} from {1} which is not a depend or softdepend of this plugin.", new Object[]{name, provider.getFullName()});
                         } else {
