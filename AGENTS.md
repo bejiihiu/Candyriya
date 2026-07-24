@@ -4,6 +4,17 @@
 
 Candyriya — a Bukkit/Spigot/Paper server implementation running on Forge, NeoForge, and Fabric mod loaders. Fork of [Arclight](https://github.com/IzzelAliz/Arclight). Targets **Minecraft 1.21.1**, Java 21.
 
+## Project Philosophy
+
+The original Arclight project is an incredible piece of work by IzzelAliz. This fork exists because upstream slowed down on PRs and issues. IzzelAliz worked hard for years — he deserves his rest.
+
+Candyriya is **community-first**: fast bugfixes, quick PR merges, active maintenance. AI agents assist with development, but all code is reviewed and tested by a human before merge. This is the base minimum of 2026.
+
+- **Not competing with Arclight** — this is a continuation, not a replacement.
+- **Fast iteration** — bugfixes ship as beta builds within hours.
+- **Transparent** — open issues, open PRs, open development.
+- **Community:** [Telegram devfolia.t.me](https://t.me/devfolia)
+
 ## Patching Convention
 
 **CRITICAL: Read this before making any changes.**
