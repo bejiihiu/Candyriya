@@ -28,6 +28,7 @@
     "CraftItemStackMixin",
     "CraftLegacyLegacyMixin",
     "CraftLegacyUtilMixin",
+    "CraftMagicNumbersMixin",
     "CraftMetaItemMixin",
     "CraftPlayerMixin",
     "CraftRecipeMixin",
