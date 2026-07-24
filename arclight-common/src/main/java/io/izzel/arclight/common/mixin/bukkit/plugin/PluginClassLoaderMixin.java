@@ -185,13 +185,21 @@ public abstract class PluginClassLoaderMixin extends URLClassLoader implements R
             if (c == null) {
                 // If still not found, then invoke findClass in order
                 // to find the class.
+                // Candyriya start - set TCCL for SPI/ServiceLoader support [Arclight#2054]
+                // ServiceLoader.load() uses Thread.currentThread().getContextClassLoader()
+                // to discover META-INF/services providers. Without this, plugin ServiceLoader
+                // calls use the mod classloader (parent) instead of PluginClassLoader,
+                // making plugin META-INF/services files invisible.
+                ClassLoader prev = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this);
                 try {
                     c = findClass(name);
                     if (resolve) resolveClass(c);
-                    return c;
-                } catch (ClassNotFoundException e) {
-                    // There's no such class
+                } finally {
+                    Thread.currentThread().setContextClassLoader(prev);
                 }
+                // Candyriya end
+                return c;
             }
         }
 
@@ -247,18 +255,23 @@ public abstract class PluginClassLoaderMixin extends URLClassLoader implements R
      * @author IzzelAliz
      * @reason
      */
+    // Candyriya start - fix SPI/ServiceLoader support: null-safe parent [Arclight#2054]
     @Overwrite
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
         Objects.requireNonNull(name);
         @SuppressWarnings("unchecked")
         Enumeration<URL>[] tmp = (Enumeration<URL>[]) new Enumeration<?>[2];
+        tmp[0] = findResources(name);
         if (getParent() != null) {
             tmp[1] = getParent().getResources(name);
         }
-        tmp[0] = findResources(name);
-        return Iterators.asEnumeration(Iterators.concat(Iterators.forEnumeration(tmp[0]), Iterators.forEnumeration(tmp[1])));
+        return Iterators.asEnumeration(Iterators.concat(
+            Iterators.forEnumeration(tmp[0]),
+            tmp[1] != null ? Iterators.forEnumeration(tmp[1]) : Collections.emptyIterator()
+        ));
     }
+    // Candyriya end
 
     /**
      * @author IzzelAliz
