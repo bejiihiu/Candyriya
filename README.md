@@ -1,14 +1,32 @@
 # Candyriya
 
-A Bukkit server implementation on common mod loaders.
-
-Fork of [Arclight](https://github.com/IzzelAliz/Arclight) with continued development and community-driven improvements.
+Community-first fork of [Arclight](https://github.com/IzzelAliz/Arclight) — fast bugfixes, open PRs, active maintenance.
 
 [![Downloads count](https://img.shields.io/github/downloads/bejiihiu/Candyriya/total?style=flat-square)](https://github.com/bejiihiu/Candyriya/releases) ![License](https://img.shields.io/github/license/bejiihiu/Candyriya?style=flat-square)
 
 ## About
 
-Candyriya is a fork of the Arclight project, bringing Bukkit/Spigot/Paper plugin support to modded Minecraft servers running on Forge, NeoForge, and Fabric.
+Candyriya is a community-driven fork of [Arclight](https://github.com/IzzelAliz/Arclight) — a Bukkit/Spigot/Paper plugin support layer for modded Minecraft servers running on Forge, NeoForge, and Fabric.
+
+The original Arclight project has been an incredible piece of work by IzzelAliz over many years. This fork exists to continue that legacy — providing quick bugfixes, accepting community PRs, and keeping things running. I have no intention of "replacing" Arclight or taking its community. I just want to make sure people who depend on this kind of server have a maintained option.
+
+### What Candyriya is
+
+- **Community-first** — PRs are reviewed and merged quickly. Open an issue, get a fix.
+- **Fast iteration** — bugfixes ship as beta builds within hours, not weeks.
+- **Transparent** — AI agents assist with development, but all code is reviewed and tested by a human before merge.
+- **Backward-compatible** — same plugin API, same mod compatibility, same Arclight internals.
+
+### What Candyriya is not
+
+- Not a competing project — this is a continuation of Arclight's work.
+- Not fully automated — AI helps with code, humans do the review and testing.
+
+## Community
+
+- **Telegram**: [devfolia.t.me](https://t.me/devfolia)
+- **Issues**: [GitHub Issues](https://github.com/bejiihiu/Candyriya/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/bejiihiu/Candyriya/discussions)
 
 ## Download
 
@@ -40,15 +58,11 @@ cd Candyriya
 
 Build output jars land in `build/libs/`.
 
-## Support
-
-- Report issues: [GitHub Issues](https://github.com/bejiihiu/Candyriya/issues)
-
 ## Contributing
 
 We welcome contributions! Feel free to submit PRs.
 
-When patching Arclight code, use the `// Candyriya start` / `// Candyriya end` comment pattern to mark changes.
+When patching Arclight code, use the `// Candyriya start` / `// Candyriya end` comment pattern to mark changes. See [AGENTS.md](AGENTS.md) for full conventions.
 
 ## Acknowledgments
 

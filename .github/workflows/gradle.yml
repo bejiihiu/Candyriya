@@ -74,15 +74,19 @@ jobs:
           if echo "$COMMIT_MSG" | grep -q '\[ci beta\]'; then
             echo "prerelease=beta" >> $GITHUB_OUTPUT
             echo "make_release=true" >> $GITHUB_OUTPUT
+            echo "tag=beta" >> $GITHUB_OUTPUT
           elif echo "$COMMIT_MSG" | grep -q '\[ci unstable\]'; then
             echo "prerelease=unstable" >> $GITHUB_OUTPUT
             echo "make_release=true" >> $GITHUB_OUTPUT
+            echo "tag=unstable" >> $GITHUB_OUTPUT
           elif echo "$COMMIT_MSG" | grep -q '\[ci release\]'; then
             echo "prerelease=false" >> $GITHUB_OUTPUT
             echo "make_release=true" >> $GITHUB_OUTPUT
+            echo "tag=stable" >> $GITHUB_OUTPUT
           else
             echo "prerelease=beta" >> $GITHUB_OUTPUT
             echo "make_release=true" >> $GITHUB_OUTPUT
+            echo "tag=beta" >> $GITHUB_OUTPUT
           fi
 
       - name: Create GitHub Release
@@ -90,13 +94,33 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ steps.info.outputs.build_id }}
-          name: Candyriya Build ${{ steps.info.outputs.build_id }}
+          name: Candyriya Build ${{ steps.info.outputs.build_id }} (${{ steps.release.outputs.tag }})
           prerelease: ${{ steps.release.outputs.prerelease != 'false' }}
           generate_release_notes: true
           files: ./build/libs/*.jar
           body: |
-            **Candyriya Build ${{ steps.info.outputs.build_id }}**
-            Commit: `${{ steps.info.outputs.git_hash }}`
-            Branch: `${{ github.ref_name }}`
-            Minecraft: 1.21.1
+            ## Candyriya Build ${{ steps.info.outputs.build_id }}
+
+            **Type:** ${{ steps.release.outputs.tag }}
+            **Commit:** `${{ steps.info.outputs.git_hash }}`
+            **Branch:** `${{ github.ref_name }}`
+            **Minecraft:** 1.21.1
+
+            ---
+
+            ### Downloads
+            | Loader | File |
+            |--------|------|
+            | Forge | `candyriya-forge-1.21.1.jar` |
+            | NeoForge | `candyriya-neoforge-1.21.1.jar` |
+            | Fabric | `candyriya-fabric-1.21.1.jar` |
+
+            ### Install
+            ```bash
+            java -jar candyriya-<loader>-1.21.1.jar nogui
+            ```
+
+            ---
+
+            **Community:** [Telegram](https://t.me/devfolia) | [Issues](https://github.com/bejiihiu/Candyriya/issues)
           draft: false

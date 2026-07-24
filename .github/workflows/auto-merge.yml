@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Skip if ci ignore
         id: skip
@@ -27,27 +27,14 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Pull Request
-        if: steps.skip.outputs.skip != 'true'
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: merge ${{ github.ref_name }} into main"
-          branch: auto-merge-${{ github.sha }}
-          base: main
-          title: "Merge ${{ github.ref_name }} to main"
-          body: |
-            Auto-merge from `${{ github.ref_name }}`.
-            Commit: ${{ github.sha }}
-          delete-branch: true
-
-      - name: Auto-approve and merge
+      - name: Merge to main
         if: steps.skip.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_NUMBER=$(gh pr list --head auto-merge-${{ github.sha }} --json number -q '.[0].number' 2>/dev/null || echo "")
-          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "" ]; then
-            gh pr review "$PR_NUMBER" --approve
-            gh pr merge "$PR_NUMBER" --auto --squash
-          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+          git merge origin/${{ github.ref_name }} --no-edit
+          git push origin main

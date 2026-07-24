@@ -69,8 +69,28 @@ jobs:
           generate_release_notes: true
           files: ./build/libs/*.jar
           body: |
-            **Candyriya Build ${{ steps.info.outputs.build_id }}** (${{ steps.release.outputs.label }})
-            Commit: `${{ steps.info.outputs.git_hash }}`
-            Branch: `${{ github.ref_name }}`
-            Minecraft: 1.21.1
+            ## Candyriya Build ${{ steps.info.outputs.build_id }}
+
+            **Type:** ${{ steps.release.outputs.label }}
+            **Commit:** `${{ steps.info.outputs.git_hash }}`
+            **Branch:** `${{ github.ref_name }}`
+            **Minecraft:** 1.21.1
+
+            ---
+
+            ### Downloads
+            | Loader | File |
+            |--------|------|
+            | Forge | `candyriya-forge-1.21.1.jar` |
+            | NeoForge | `candyriya-neoforge-1.21.1.jar` |
+            | Fabric | `candyriya-fabric-1.21.1.jar` |
+
+            ### Install
+            ```bash
+            java -jar candyriya-<loader>-1.21.1.jar nogui
+            ```
+
+            ---
+
+            **Community:** [Telegram](https://t.me/devfolia) | [Issues](https://github.com/bejiihiu/Candyriya/issues)
           draft: false
