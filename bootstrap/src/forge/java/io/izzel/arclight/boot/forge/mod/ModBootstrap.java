@@ -47,7 +47,7 @@ public class ModBootstrap implements AbstractBootstrap {
             return;
         }
         // Candyriya start - brand
-        var logger = LogManager.getLogger(kz.bejiihiu.candyriya.Brand.NAME);
+        var logger = LogManager.getLogger("Candyriya");
         // Candyriya end
         var marker = MarkerManager.getMarker("INSTALL");
         try {

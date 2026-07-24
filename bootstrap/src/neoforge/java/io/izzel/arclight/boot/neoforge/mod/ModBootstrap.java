@@ -45,7 +45,7 @@ public class ModBootstrap implements AbstractBootstrap {
         var plugin = Launcher.INSTANCE.environment().findLaunchPlugin("arclight_implementer");
         if (plugin.isPresent()) return;
         // Candyriya start - brand
-        var logger = LogManager.getLogger(kz.bejiihiu.candyriya.Brand.NAME);
+        var logger = LogManager.getLogger("Candyriya");
         // Candyriya end
         var marker = MarkerManager.getMarker("INSTALL");
         try {

@@ -106,7 +106,7 @@ public interface AbstractBootstrap {
             }
             String buildTime = attributes.getValue("Implementation-Timestamp");
             // Candyriya start - brand
-            LogManager.getLogger(kz.bejiihiu.candyriya.Brand.NAME).info(ArclightLocale.getInstance().get("logo"),
+            LogManager.getLogger("Candyriya").info(ArclightLocale.getInstance().get("logo"),
             // Candyriya end
                     ArclightLocale.getInstance().get("release-name." + ArclightVersion.current().getReleaseName()), version, buildTime);
         }

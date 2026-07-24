@@ -27,7 +27,7 @@ public class ArclightJarContentsImplFilter {
     private static VarHandle PACKAGES;
     private static Set<String> serviceLayerPackages;
     // Candyriya start - brand
-    private static final Logger LOGGER = LogManager.getLogger(kz.bejiihiu.candyriya.Brand.NAME);
+    private static final Logger LOGGER = LogManager.getLogger("Candyriya");
     // Candyriya end
 
     static {
