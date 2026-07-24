@@ -102,7 +102,7 @@ public abstract class JavaPluginLoaderMixin implements JavaPluginLoaderBridge {
     Class<?> getClassByName(String name, boolean resolve, PluginDescriptionFile description) {
         SimplePluginManager manager = (SimplePluginManager) this.server.getPluginManager();
         if (CandyriyaConfig.spec().getCompat().isIsolatedPluginClassLoaders(name)) {
-            Set<String> loaders = ArclightServer.iterateDepends(description);
+            Set<String> loaders = CandyriyaServer.iterateDepends(description);
             for (PluginClassLoaderBridge loader : Candyriya$getLoaders()) {
                 PluginDescriptionFile desc = loader.Candyriya$desc();
                 if (loaders.contains(desc.getName()) || !Collections.disjoint(loaders, desc.getProvides())) {

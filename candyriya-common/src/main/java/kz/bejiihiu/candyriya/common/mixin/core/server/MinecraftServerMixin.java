@@ -162,7 +162,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         }
         this.vanillaCommandDispatcher = worldStem.dataPackResources().getCommands();
         this.worldLoader = CandyriyaCaptures.getDataLoadContext();
-        ArclightServer.setMinecraftServer((MinecraftServer) (Object) this);
+        CandyriyaServer.setMinecraftServer((MinecraftServer) (Object) this);
     }
 
     @Decorate(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;buildServerStatus()Lnet/minecraft/network/protocol/status/ServerStatus;"))

@@ -243,7 +243,7 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
         lastPitch = Float.MAX_VALUE;
         lastYaw = Float.MAX_VALUE;
         justTeleported = false;
-        this.chatMessageChain = new FutureChain(ArclightServer.getChatExecutor());
+        this.chatMessageChain = new FutureChain(CandyriyaServer.getChatExecutor());
         bridge$setPlayer(playerIn);
     }
 

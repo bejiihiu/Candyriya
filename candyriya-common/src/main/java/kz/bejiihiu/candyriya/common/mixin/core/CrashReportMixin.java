@@ -20,7 +20,7 @@ public class CrashReportMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void Candyriya$additional(String string, Throwable throwable, CallbackInfo ci) {
         this.systemReport.setDetail("Candyriya Release", ArclightVersion.current()::getReleaseName);
-        if (ArclightServer.isInitialized()) {
+        if (CandyriyaServer.isInitialized()) {
             this.systemReport.setDetail("Candyriya", new CraftCrashReport());
         } else {
             this.systemReport.setDetail("Candyriya", "The crash happens before the server initialization.");

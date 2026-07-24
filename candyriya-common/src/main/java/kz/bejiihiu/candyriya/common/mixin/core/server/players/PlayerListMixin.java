@@ -136,7 +136,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void Candyriya$loadServer(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> p_251844_, PlayerDataStorage p_203844_, int p_203845_, CallbackInfo ci) {
-        cserver = ArclightServer.createOrLoad((DedicatedServer) minecraftServer, (PlayerList) (Object) this);
+        cserver = CandyriyaServer.createOrLoad((DedicatedServer) minecraftServer, (PlayerList) (Object) this);
     }
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
