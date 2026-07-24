@@ -144,10 +144,15 @@ public abstract class PluginClassLoaderMixin extends URLClassLoader implements R
         return (SimplePluginManager) ((JavaPluginLoaderBridge) (Object) loader).arclight$server().getPluginManager();
     }
 
+    // Candyriya start - null-safe systemLogger for dynamic plugin loading [Arclight#2059]
     @Override
     public Logger arclight$systemLogger() {
-        return ((JavaPluginLoaderBridge)(Object) loader).arclight$server().getLogger();
+        JavaPluginLoaderBridge bridge = (JavaPluginLoaderBridge)(Object) loader;
+        return bridge != null && bridge.arclight$server() != null
+            ? bridge.arclight$server().getLogger()
+            : Bukkit.getLogger();
     }
+    // Candyriya end
 
     public PluginClassLoaderMixin(URL[] urls) {
         super(urls);
@@ -204,11 +209,13 @@ public abstract class PluginClassLoaderMixin extends URLClassLoader implements R
                     PluginDescriptionFile provider = cl.arclight$desc();
                     if (provider != this.description && !this.seenIllegalAccess.contains(provider.getName()) && !cl.arclight$getPluginManager().isTransitiveDepend(this.description, provider)) {
                         this.seenIllegalAccess.add(provider.getName());
+                        // Candyriya start - fixed NPE on dynamic plugin loading [Arclight#2059]
                         if (this.plugin != null) {
                             this.plugin.getLogger().log(Level.WARNING, "Loaded class {0} from {1} which is not a depend or softdepend of this plugin.", new Object[]{name, provider.getFullName()});
                         } else {
                             arclight$systemLogger().log(Level.WARNING, "[{0}] Loaded class {1} from {2} which is not a depend or softdepend of this plugin.", new Object[]{this.description.getName(), name, provider.getFullName()});
                         }
+                        // Candyriya end
                     }
                 }
 
