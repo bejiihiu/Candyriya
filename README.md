@@ -62,8 +62,6 @@ Build output jars land in `build/libs/`.
 
 We welcome contributions! Feel free to submit PRs.
 
-When patching Arclight code, use the `// Candyriya start` / `// Candyriya end` comment pattern to mark changes. See [AGENTS.md](AGENTS.md) for full conventions.
-
 ## Acknowledgments
 
 - Original [Arclight](https://github.com/IzzelAliz/Arclight) project by IzzelAliz and contributors
