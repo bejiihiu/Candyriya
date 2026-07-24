@@ -49,6 +49,7 @@
     "event.AsyncStructureSpawnEventMixin",
     "event.CraftEventFactoryMixin",
     "event.EntityDamageEventMixin",
+    "event.PlayerDeathEventMixin",
     "inventory.CraftItemStackMixin",
     "plugin.JavaPluginLoaderMixin",
     "plugin.JavaPluginMixin",
