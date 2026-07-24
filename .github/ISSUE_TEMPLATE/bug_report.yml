@@ -1,0 +1,70 @@
+name: Bug Report
+description: Report a bug in Candyriya
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the info below.
+
+  - type: input
+    id: version
+    attributes:
+      label: Candyriya version
+      description: "Run `/version` or check the jar filename (e.g. build-1121)"
+      placeholder: "build-1121"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod loader
+      options:
+        - Forge
+        - NeoForge
+        - Fabric
+    validations:
+      required: true
+
+  - type: input
+    id: mc_version
+    attributes:
+      label: Minecraft version
+      description: "Should be 1.21.1"
+      placeholder: "1.21.1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: "What happened?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: "How can we reproduce this?"
+      value: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: "Attach crash logs or server log (use https://hastebin.com or similar for long logs)"
+      render: shell
+
+  - type: textarea
+    id: mods
+    attributes:
+      label: Installed mods/plugins
+      description: "List your mods/plugins, or paste `/plugins` and `/forge list` output"
