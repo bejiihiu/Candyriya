@@ -77,6 +77,15 @@ public class BukkitRegistry {
     private static final Map<Integer, Art> ART_BY_ID = Unsafe.getStatic(Art.class, "BY_ID");
     private static final BiMap<ResourceLocation, Statistic> STATS = HashBiMap.create(Unsafe.getStatic(CraftStatistic.class, "statistics"));
 
+    /**
+     * Returns the NMS Item for a given Bukkit Material, including modded materials.
+     * Used as a fallback when CraftMagicNumbers.getItem() returns null for mod items.
+     * @see <a href="https://github.com/IzzelAliz/Arclight/issues/1467">Arclight#1467</a>
+     */
+    public static Item getItem(Material material) {
+        return MATERIAL_ITEM.get(material);
+    }
+
     public static void registerAll(DedicatedServer console) {
         loadMaterials();
         loadPotions();

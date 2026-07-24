@@ -2,6 +2,7 @@ package kz.bejiihiu.candyriya.common.mixin.bukkit;
 
 import kz.bejiihiu.candyriya.common.bridge.bukkit.CraftItemStackBridge;
 import kz.bejiihiu.candyriya.common.bridge.core.world.item.ItemStackBridge;
+import kz.bejiihiu.candyriya.common.mod.server.BukkitRegistry;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Material;
@@ -25,6 +26,11 @@ public abstract class CraftItemStackMixin extends org.bukkit.inventory.ItemStack
     /**
      * @author InitAuther97
      * @reason reduce CraftItemType#bukkitToMinecraft call usage.
+     * Fixed: use BukkitRegistry.getItem() as fallback for mod materials.
+     * Without this, CraftItemType.bukkitToMinecraft() returns null for mod items,
+     * causing handle=null and getType() returning AIR — breaking NBTAPI and any
+     * plugin that reads item types from CraftItemStack.
+     * @see <a href="https://github.com/IzzelAliz/Arclight/issues/1467">Arclight#1467</a>
      */
     @Overwrite
     public void setType(Material type) {
@@ -32,7 +38,12 @@ public abstract class CraftItemStackMixin extends org.bukkit.inventory.ItemStack
             if (type == Material.AIR) {
                 this.handle = null;
             } else {
-                final var craftType = CraftItemType.bukkitToMinecraft(type);
+                // First try standard Spigot mapping
+                var craftType = CraftItemType.bukkitToMinecraft(type);
+                // Fallback to BukkitRegistry for mod materials not in CraftMagicNumbers maps
+                if (craftType == null) {
+                    craftType = BukkitRegistry.getItem(type);
+                }
                 if (craftType == null) {
                     this.handle = null;
                 } else if (this.handle == null) {
