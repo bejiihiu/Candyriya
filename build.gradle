@@ -1,5 +1,5 @@
-import kz.bejiihiu.candyriya.gradle.CandyriyaGradlePlugin
-import kz.bejiihiu.candyriya.gradle.tasks.UploadFilesTask
+import io.izzel.arclight.gradle.ArclightGradlePlugin
+import io.izzel.arclight.gradle.tasks.UploadFilesTask
 
 plugins {
     id 'architectury-plugin' version '3.4-SNAPSHOT' apply false
@@ -30,20 +30,19 @@ allprojects {
         return stdout.toString().trim()
     }
 
-    version getBuildId()
-
     ext {
         versionName = 'candyriya'
         gitHash = getGitHash()
         buildId = getBuildId()
+        version = getBuildId()
         supportedPlatforms = ['forge', 'neoforge', 'fabric']
-        commonProject = project(':candyriya-common')
-        forgeProject = project(':candyriya-forge')
-        fabricProject = project(':candyriya-fabric')
-        neoForgeProject = project(':candyriya-neoforge')
+        commonProject = project(':arclight-common')
+        forgeProject = project(':arclight-forge')
+        fabricProject = project(':arclight-fabric')
+        neoForgeProject = project(':arclight-neoforge')
         platformProjects = [ext.forgeProject, ext.fabricProject, ext.neoForgeProject]
         subProjects = ext.platformProjects + [ext.commonProject]
-        generatedSpigot = "kz.bejiihiu.candyriya.generated:spigot:${libs.versions.minecraft.get()}:deobf"
+        generatedSpigot = "io.izzel.arclight.generated:spigot:${libs.versions.minecraft.get()}:deobf"
     }
 
     java {
@@ -80,7 +79,7 @@ rootProject.ext.subProjects.each { Project p ->
     configure(p) {
         apply plugin: 'architectury-plugin'
         apply plugin: 'dev.architectury.loom'
-        apply plugin: CandyriyaGradlePlugin
+        apply plugin: ArclightGradlePlugin
 
         architectury {
             minecraft = libs.versions.minecraft.get()
@@ -90,7 +89,7 @@ rootProject.ext.subProjects.each { Project p ->
             silentMojangMappingsLicense()
         }
 
-        candyriya {
+        arclight {
             mcVersion = libs.versions.minecraft.get()
             bukkitVersion = libs.versions.bukkit.api.get()
             spigotReversion = libs.versions.spigot.reversion.get()
@@ -140,10 +139,10 @@ rootProject.ext.platformProjects.each { Project p ->
         }
 
         jar {
-            manifest.attributes 'MixinConnector': 'kz.bejiihiu.candyriya.common.mod.CandyriyaConnector'
+            manifest.attributes 'MixinConnector': 'io.izzel.arclight.common.mod.ArclightConnector'
             manifest.attributes 'Implementation-Title': 'Candyriya'
-            manifest.attributes 'Implementation-Version': "${p.name}-${libs.versions.minecraft.get()}-${project.version}+$gitHash"
-            manifest.attributes 'Implementation-Vendor': 'bejiihiu'
+            manifest.attributes 'Implementation-Version': "${p.name}-${libs.versions.minecraft.get()}-build${project.ext.buildId}+$gitHash"
+            manifest.attributes 'Implementation-Vendor': 'Candyriya Team (based on Arclight)'
             manifest.attributes 'Implementation-Timestamp': new Date().format("yyyy-MM-dd HH:mm:ss")
         }
 
@@ -175,7 +174,7 @@ def gitBranch() {
 
 tasks.register('uploadFiles', UploadFilesTask) {
     mcVersion.set libs.versions.minecraft
-    version.set "${project.version}-${project.ext.gitHash}"
+    version.set "build${project.ext.buildId}-${project.ext.gitHash}"
     snapshot.set false
     gitHash.set project.ext.gitHash
     branch.set gitBranch()

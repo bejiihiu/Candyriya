@@ -1,7 +1,6 @@
-name: Build
+name: Build and Release
 
 on:
-  workflow_dispatch: 
   push:
     branches:
       - 'v*'
@@ -10,56 +9,94 @@ jobs:
   check-skip:
     runs-on: ubuntu-latest
     outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+      should_skip: ${{ steps.check.outputs.should_skip }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - id: skip_check
-        uses: actions/github-script@v7
+      - uses: actions/github-script@v7
+        id: check
         with:
           script: |
-            const commitMessage = context.payload.head_commit?.message || '';
-            const shouldSkip = commitMessage.includes('[ci ignore]');
-            console.log(`Commit message: ${commitMessage}`);
-            console.log(`Should skip: ${shouldSkip}`);
-            return shouldSkip;
+            const commitMsg = context.payload.head_commit?.message || '';
+            if (commitMsg.includes('[ci ignore]')) {
+              core.setOutput('should_skip', 'true');
+            } else {
+              core.setOutput('should_skip', 'false');
+            }
 
   build:
     needs: check-skip
     if: needs.check-skip.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-    
-    - name: Cache Gradle
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-    
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    
-    - name: Clean Gradle caches
-      run: |
-        rm -rf .gradle
-        rm -rf */build
-        rm -rf build
-    
-    - name: Build
-      env:
-        Candyriya_FILES_TOKEN: ${{ secrets.Candyriya_FILES_TOKEN }}
-      run: |
-        ./gradlew cleanBuild build collect uploadFiles --no-daemon --stacktrace
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/libs.versions.toml') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Clean Gradle caches before build
+        run: rm -rf ~/.gradle/caches/modules-2/files-2.1/dev.architectury/architectury-loom ~/.gradle/caches/modules-2/files-2.1/architectury-plugin
+
+      - name: Build
+        run: ./gradlew cleanBuild build collect --no-daemon --stacktrace
+
+      - name: Get build info
+        id: info
+        run: |
+          BUILD_ID=$(git rev-list --count HEAD)
+          GIT_HASH=$(git rev-parse --short HEAD)
+          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "git_hash=$GIT_HASH" >> $GITHUB_OUTPUT
+
+      - name: Determine release type
+        id: release
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          if echo "$COMMIT_MSG" | grep -q '\[ci beta\]'; then
+            echo "prerelease=beta" >> $GITHUB_OUTPUT
+            echo "make_release=true" >> $GITHUB_OUTPUT
+          elif echo "$COMMIT_MSG" | grep -q '\[ci unstable\]'; then
+            echo "prerelease=unstable" >> $GITHUB_OUTPUT
+            echo "make_release=true" >> $GITHUB_OUTPUT
+          elif echo "$COMMIT_MSG" | grep -q '\[ci release\]'; then
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+            echo "make_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=beta" >> $GITHUB_OUTPUT
+            echo "make_release=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        if: steps.release.outputs.make_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ steps.info.outputs.build_id }}
+          name: Candyriya Build ${{ steps.info.outputs.build_id }}
+          prerelease: ${{ steps.release.outputs.prerelease != 'false' }}
+          generate_release_notes: true
+          files: ./build/libs/*.jar
+          body: |
+            **Candyriya Build ${{ steps.info.outputs.build_id }}**
+            Commit: `${{ steps.info.outputs.git_hash }}`
+            Branch: `${{ github.ref_name }}`
+            Minecraft: 1.21.1
+          draft: false

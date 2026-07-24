@@ -1,8 +1,0 @@
-package kz.bejiihiu.candyriya.common.mixin.vanilla.world.level.block;
-
-import net.minecraft.world.level.block.RedStoneOreBlock;
-import org.spongepowered.asm.mixin.Mixin;
-
-@Mixin(RedStoneOreBlock.class)
-public abstract class RedStoneOreBlockMixin_Vanilla extends BlockMixin_Vanilla {
-}

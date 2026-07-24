@@ -11,34 +11,45 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    
+      actions: write
+
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    
-    - name: Check if should skip
-      id: check_skip
-      run: |
-        COMMIT_MSG=$(git log -1 --pretty=%B)
-        if echo "$COMMIT_MSG" | grep -q "\[ci ignore\]"; then
-          echo "SKIP=true" >> $GITHUB_OUTPUT
-        else
-          echo "SKIP=false" >> $GITHUB_OUTPUT
-        fi
-    
-    - name: Create Pull Request
-      if: steps.check_skip.outputs.SKIP != 'true'
-      uses: peter-evans/create-pull-request@v6
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        base: main
-        branch: ${{ github.ref_name }}
-        title: "Auto-merge from ${{ github.ref_name }}"
-        body: |
-          Automated merge from `${{ github.ref_name }}` to `main`.
-          
-          Commit: ${{ github.sha }}
-        delete-branch: false
-        merge: true
-        merge-method: merge
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Skip if ci ignore
+        id: skip
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          if echo "$COMMIT_MSG" | grep -q '\[ci ignore\]'; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.skip.outputs.skip != 'true'
+        uses: gh-action-create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: auto-merge-${{ github.sha }}
+          base: main
+          title: "Merge to main"
+          body: |
+            Auto-merge from `${{ github.ref_name }}` branch.
+            Commit: ${{ github.sha }}
+            Commit message: ${{ github.event.head_commit.message }}
+          commit-message: "chore: merge from ${{ github.ref_name }}"
+          delete-branch: true
+
+      - name: Auto approve
+        if: steps.skip.outputs.skip != 'true'
+        run: |
+          PR_NUMBER=$(gh pr list --head auto-merge-${{ github.sha }} --json number -q '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr review $PR_NUMBER --approve
+            gh pr merge $PR_NUMBER --auto --squash
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
