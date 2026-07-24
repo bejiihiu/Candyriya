@@ -227,19 +227,28 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
     @Decorate(method = "createLevels", at = @At(value = "INVOKE", target = "Ljava/util/Set;iterator()Ljava/util/Iterator;"))
     private Iterator<Map.Entry<ResourceKey<LevelStem>, LevelStem>> arclight$skipBukkitLevels(Set<Map.Entry<ResourceKey<LevelStem>, LevelStem>> instance) throws Throwable {
         final var iterator = (Iterator<Map.Entry<ResourceKey<LevelStem>, LevelStem>>) DecorationOps.callsite().invoke(instance);
-        if (ArclightConfig.spec().getExperimental().canOverrideWorldgen()) {
-            return IteratorUtil.filter(iterator, it -> {
-                final var location = it.getKey().location();
-                if (location.getNamespace().equals("bukkit")) {
+        // Candyriya start - respect allow-end setting [Arclight#2064]
+        final boolean allowEnd = this.server == null || this.server.getAllowEnd();
+        final boolean canOverride = ArclightConfig.spec().getExperimental().canOverrideWorldgen();
+        // Candyriya end
+        return IteratorUtil.filter(iterator, it -> {
+            final var key = it.getKey();
+            final var location = key.location();
+            if (location.getNamespace().equals("bukkit")) {
+                if (canOverride) {
                     ArclightServer.LOGGER.info("Deferred {} custom dimension creation", location);
                     return false;
-                } else {
-                    return true;
                 }
-            });
-        } else {
-            return iterator;
-        }
+                return true;
+            }
+            // Candyriya start - respect allow-end setting [Arclight#2064]
+            if (!allowEnd && key.equals(LevelStem.END)) {
+                ArclightServer.LOGGER.info("Skipped End dimension (allow-end=false)");
+                return false;
+            }
+            // Candyriya end
+            return true;
+        });
     }
 
     @Inject(method = "createLevels", at = @At("RETURN"))
