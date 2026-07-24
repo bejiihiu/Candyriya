@@ -11,7 +11,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      actions: write
 
     steps:
       - uses: actions/checkout@v4
@@ -30,26 +29,25 @@ jobs:
 
       - name: Create Pull Request
         if: steps.skip.outputs.skip != 'true'
-        uses: gh-action-create-pull-request@v7
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: merge ${{ github.ref_name }} into main"
           branch: auto-merge-${{ github.sha }}
           base: main
-          title: "Merge to main"
+          title: "Merge ${{ github.ref_name }} to main"
           body: |
-            Auto-merge from `${{ github.ref_name }}` branch.
+            Auto-merge from `${{ github.ref_name }}`.
             Commit: ${{ github.sha }}
-            Commit message: ${{ github.event.head_commit.message }}
-          commit-message: "chore: merge from ${{ github.ref_name }}"
           delete-branch: true
 
-      - name: Auto approve
+      - name: Auto-approve and merge
         if: steps.skip.outputs.skip != 'true'
-        run: |
-          PR_NUMBER=$(gh pr list --head auto-merge-${{ github.sha }} --json number -q '.[0].number')
-          if [ -n "$PR_NUMBER" ]; then
-            gh pr review $PR_NUMBER --approve
-            gh pr merge $PR_NUMBER --auto --squash
-          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --head auto-merge-${{ github.sha }} --json number -q '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "" ]; then
+            gh pr review "$PR_NUMBER" --approve
+            gh pr merge "$PR_NUMBER" --auto --squash
+          fi
