@@ -23,7 +23,9 @@ public class Main_Forge {
             method.invoke(null, (Object) target);
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Fail to launch Arclight.");
+            // Candyriya start - brand
+            System.err.println("Fail to launch Candyriya.");
+            // Candyriya end
             System.exit(-1);
         }
     }

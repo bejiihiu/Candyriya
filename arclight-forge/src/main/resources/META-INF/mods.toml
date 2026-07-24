@@ -5,10 +5,10 @@ license="GNU GENERAL PUBLIC LICENSE Version 3"
 [[mods]]
     modId="arclight"
     version="${version}"
-    displayName="Arclight Mod"
+    displayName="Candyriya Mod"
     displayTest="IGNORE_SERVER_VERSION"
-    credits="lona,夜幕"
-    authors="IzzelAliz"
+    credits="lona,夜幕, IzzelAliz (Arclight)"
+    authors="bejiihiu"
     description='''
-    Arclight bukkit layer for MinecraftForge
+    Candyriya bukkit layer for MinecraftForge (based on Arclight)
     '''

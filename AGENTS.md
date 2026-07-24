@@ -35,10 +35,15 @@ return kz.bejiihiu.candyriya.Brand.NAME;
 - `settings.gradle` — `rootProject.name`
 - `build.gradle` — `group`, `version`, manifest attributes, jar names
 - `bootstrap/build.gradle` — jar `archiveBaseName`, manifest attributes
-- User-visible strings (server name, logger names, crash reports) — use `Brand.java`
+- User-visible strings (server name, logger names, crash reports) — use `Brand.java` or inline `"Candyriya"`
+- `i18n-config/src/main/resources/META-INF/i18n/*.conf` — URLs and "Arclight" branded strings → replace with Candyriya
+- `mods.toml`, `neoforge.mods.toml` — `displayName` and `description` (NOT `modId`)
+- `fabric.mod.json` — `name`, `authors`, `description` (NOT `id`)
 - `.github/workflows/*` — fully replace with our own
+- `.github/ISSUE_TEMPLATE/*` — rebrand to Candyriya
 - `README.md`, `AGENTS.md`, `LICENSE` — fully replace
 - Files in `kz.bejiihiu.candyriya/` — this is our namespace
+- Java code comments with upstream issue links — OK to keep as historical references
 
 ### What is NOT OK to change
 
@@ -110,6 +115,7 @@ All pinned in `gradle/libs.versions.toml`:
 - **pr.yml** — runs on PRs: `cleanBuild build collect` + uploads artifact
 - **release.yml** — runs on push to `main`: builds and creates GitHub release
 - **auto-merge.yml** — runs on push to version branches (`v*`): auto-creates PR and merges to `main`
+- **sync-upstream.yml** — runs weekly (Monday 12:00 UTC) + manual trigger: fetches upstream Arclight, creates PR if no conflicts, opens issue if conflicts
 
 ### Branch strategy
 

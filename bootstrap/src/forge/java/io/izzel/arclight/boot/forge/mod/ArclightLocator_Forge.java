@@ -67,7 +67,9 @@ public class ArclightLocator_Forge implements IModLocator {
         try {
             var version = System.getProperty("arclight.version");
             if (version == null) {
-                throw new IllegalStateException("Arclight bootloader is not initialized");
+                // Candyriya start - brand
+                throw new IllegalStateException("Candyriya bootloader is not initialized");
+                // Candyriya end
             }
             var cl = forName("net.minecraftforge.fml.loading.moddiscovery.ModFile");
             var lookup = MethodHandles.lookup();

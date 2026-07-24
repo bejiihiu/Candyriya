@@ -34,7 +34,9 @@ public class ModuleBootstrap implements BootstrapEntryPoint, AbstractBootstrap {
             }
             Unsafe.ensureClassInitialized(EnumHelper.class);
         } catch (Throwable t) {
-            System.err.println("Your Java is not compatible with Arclight.");
+            // Candyriya start - brand
+            System.err.println("Your Java is not compatible with Candyriya.");
+            // Candyriya end
             t.printStackTrace();
             return;
         }
@@ -50,7 +52,9 @@ public class ModuleBootstrap implements BootstrapEntryPoint, AbstractBootstrap {
                 .findFirst().orElseThrow().get().main(args);
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Fail to launch Arclight.");
+            // Candyriya start - brand
+            System.err.println("Fail to launch Candyriya.");
+            // Candyriya end
         }
     }
 

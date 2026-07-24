@@ -15,7 +15,9 @@ import java.util.function.Consumer;
 
 public class ArclightJarInJarAdaptor implements IDependencyLocator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("ArclightJiJ");
+    // Candyriya start - brand
+    private static final Logger LOGGER = LoggerFactory.getLogger("CandyriyaJiJ");
+    // Candyriya end
 
     private final IDependencyLocator delegate;
 
@@ -27,7 +29,9 @@ public class ArclightJarInJarAdaptor implements IDependencyLocator {
     public List<IModFile> scanMods(Iterable<IModFile> loadedMods) {
         return delegate.scanMods(loadedMods).stream().filter(it -> {
             var optional = getClass().getModule().getLayer().findModule(it.getModFileInfo().moduleName());
-            optional.ifPresent(module -> LOGGER.info("Skip jij dependency {}@{} because Arclight has {}",
+            // Candyriya start - brand
+            optional.ifPresent(module -> LOGGER.info("Skip jij dependency {}@{} because Candyriya has {}",
+            // Candyriya end
                 it.getModFileInfo().moduleName(), it.getModFileInfo().versionString(), module.getDescriptor().toNameAndVersion()));
             return optional.isEmpty();
         }).toList();

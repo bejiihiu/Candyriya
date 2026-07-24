@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Arclight is a hybrid server, and inevitably some issues exist.
-        If you encounter a problem, please report it to Arclight first, no disturb the mod/plugin authors!
+        Candyriya is a hybrid server, and inevitably some issues exist.
+        If you encounter a problem, please report it to Candyriya first, no disturb the mod/plugin authors!
 
   - type: checkboxes
     id: pre-requirements
@@ -15,9 +15,9 @@ body:
       label: I have tried that...
       description: Please confirm the following to avoid invalid feedback
       options:
-        - label: I am using the latest [Arclight build](https://arclight.izzel.io/)
+        - label: I am using the latest [Candyriya build](https://github.com/bejiihiu/Candyriya/releases)
           required: true
-        - label: I have read the [FAQ](https://wiki.izzel.io/s/arclight-docs/doc/faq-ApcZ25PXVT) and [Troubleshooting](https://wiki.izzel.io/s/arclight-docs/doc/troubleshooting-1Ay2vsmIrn), they didn't solve my issue
+        - label: I have read the [FAQ](https://github.com/bejiihiu/Candyriya/wiki) and [Troubleshooting](https://github.com/bejiihiu/Candyriya/wiki), they didn't solve my issue
           required: true
         - label: I have searched existing Issues and found no duplicates
           required: true
@@ -44,11 +44,11 @@ body:
       required: true
 
   - type: input
-    id: arclight-version
+    id: candyriya-version
     attributes:
-      label: Arclight Version
-      description: The version is printed when the Arclight server starts
-      placeholder: e.g. arclight-1.15.2-1.0.3-SNAPSHOT-9455d03
+      label: Candyriya Version
+      description: The version is printed when the Candyriya server starts
+      placeholder: e.g. build-1117
     validations:
       required: true
 

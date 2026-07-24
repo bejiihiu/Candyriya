@@ -2,11 +2,11 @@
   "id": "arclight",
   "version": "${version}",
   "schemaVersion": 1,
-  "name": "Arclight Mod",
+  "name": "Candyriya Mod",
   "authors": [
-    "IzzelAliz"
+    "bejiihiu"
   ],
-  "description": "Arclight bukkit layer for Fabric",
+  "description": "Candyriya bukkit layer for Fabric (based on Arclight)",
   "license": "GNU GENERAL PUBLIC LICENSE Version 3",
   "environment": "server",
   "mixins": [

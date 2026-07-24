@@ -17,14 +17,18 @@ public class Launcher {
     public static void main(String[] args) throws Throwable {
         int javaVersion = (int) Float.parseFloat(System.getProperty("java.class.version"));
         if (javaVersion < MIN_CLASS_VERSION) {
-            System.err.println("Arclight requires Java " + MIN_JAVA_VERSION);
+            // Candyriya start - brand
+            System.err.println("Candyriya requires Java " + MIN_JAVA_VERSION);
+            // Candyriya end
             System.err.println("Current: " + System.getProperty("java.version"));
             System.exit(-1);
             return;
         }
 
         if (javaVersion > MAX_CLASS_VERSION) {
-            System.err.println("Warning: Arclight is known to be compatible with up to Java " + MAX_JAVA_VERSION + " and may not run on later versions");
+            // Candyriya start - brand
+            System.err.println("Warning: Candyriya is known to be compatible with up to Java " + MAX_JAVA_VERSION + " and may not run on later versions");
+            // Candyriya end
             System.err.println("Current: " + System.getProperty("java.version"));
             System.err.flush();
             Thread.sleep(3000);

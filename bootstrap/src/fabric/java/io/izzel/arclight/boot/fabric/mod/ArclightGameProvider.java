@@ -97,7 +97,9 @@ public class ArclightGameProvider extends MinecraftGameProvider {
     @Override
     public String getRawGameVersion() {
         try {
-            return super.getRawGameVersion() + " Arclight " + getArclightVersion();
+            // Candyriya start - brand
+            return super.getRawGameVersion() + " Candyriya " + getArclightVersion();
+            // Candyriya end
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Arclight是混合服务端，不可避免地存在一些问题，遇到问题请先向Arclight反馈，不要去烦模组/插件作者
+        Candyriya是混合服务端，不可避免地存在一些问题，遇到问题请先向Candyriya反馈，不要去烦模组/插件作者
 
   - type: checkboxes
     id: pre-requirements
@@ -14,9 +14,9 @@ body:
       label: 我已经做过以下尝试：
       description: 请进行如下尝试，以免无效反馈
       options:
-        - label: 我正在使用最新的[Arclight构建版本](https://arclight.izzel.io/)
+        - label: 我正在使用最新的[Candyriya构建版本](https://github.com/bejiihiu/Candyriya/releases)
           required: true
-        - label: 我已经阅读[常见问题](https://wiki.izzel.io/s/arclight-docs/doc/faq-ApcZ25PXVT)及[常见故障解决方案](https://wiki.izzel.io/s/arclight-docs/doc/troubleshooting-1Ay2vsmIrn)，无法解决我遇到的问题
+        - label: 我已经阅读[常见问题](https://github.com/bejiihiu/Candyriya/wiki)及[常见故障解决方案](https://github.com/bejiihiu/Candyriya/wiki)，无法解决我遇到的问题
           required: true
         - label: 我已经搜索过现有Issues，没有相同的问题
           required: true
@@ -43,11 +43,11 @@ body:
       required: true
 
   - type: input
-    id: arclight-version
+    id: candyriya-version
     attributes:
-      label: Arclight版本
-      description: 在Arclight服务端启动时会输出版本
-      placeholder: 如：arclight-1.15.2-1.0.3-SNAPSHOT-9455d03
+      label: Candyriya版本
+      description: 在Candyriya服务端启动时会输出版本
+      placeholder: 如：build-1117
     validations:
       required: true
 

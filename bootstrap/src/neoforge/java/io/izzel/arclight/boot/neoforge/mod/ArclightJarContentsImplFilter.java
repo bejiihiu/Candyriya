@@ -34,7 +34,9 @@ public class ArclightJarContentsImplFilter {
         try {
             PACKAGES = LOOKUP.findVarHandle(JarContentsImpl.class, "packages", Set.class);
         } catch (ReflectiveOperationException e) {
-            LOGGER.error("Arclight failed to filter JarContents. This may cause dependency conflicts with some mods!", e);
+            // Candyriya start - brand
+            LOGGER.error("Candyriya failed to filter JarContents. This may cause dependency conflicts with some mods!", e);
+            // Candyriya end
         }
         serviceLayerPackages = ArclightJarContentsImplFilter.class
                 .getModule()

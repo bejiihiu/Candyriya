@@ -53,7 +53,9 @@ public class ModBootstrap implements AbstractBootstrap {
             load(paths.toArray(new Path[0]));
             new ModBootstrap().inject();
         } catch (Throwable e) {
-            logger.error("Error bootstrap Arclight", e);
+            // Candyriya start - brand
+            logger.error("Error bootstrap Candyriya", e);
+            // Candyriya end
             throw new RuntimeException(e);
         }
     }

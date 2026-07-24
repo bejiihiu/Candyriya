@@ -63,7 +63,9 @@ public abstract class ArclightClassCache implements AutoCloseable {
 
         private static String currentVersionInfo() {
             var builder = new StringBuilder();
-            builder.append("Arclight class cache").append(", ");
+            // Candyriya start - brand
+            builder.append("Candyriya class cache").append(", ");
+            // Candyriya end
             builder.append("spec=").append(SPEC_VERSION).append(", ");
             var arclight = ArclightClassCache.class.getPackage().getImplementationVersion();
             builder.append("arclight=").append(arclight).append(", ");
