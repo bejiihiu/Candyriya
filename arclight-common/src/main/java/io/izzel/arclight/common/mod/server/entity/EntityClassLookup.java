@@ -348,7 +348,9 @@ public class EntityClassLookup {
         add(Raider.class, new EntityClass<>(org.bukkit.entity.Raider.class, ArclightModRaider.class, ArclightModRaider::new));
         add(VehicleEntity.class, new EntityClass<>(org.bukkit.entity.Vehicle.class, ArclightModVehicle.class, ArclightModVehicle::new));
         add(AbstractWindCharge.class, new EntityClass<>(org.bukkit.entity.AbstractWindCharge.class, ArclightModWindCharge.class, ArclightModWindCharge::new));
-        add(LivingEntity.class, new EntityClass<>(org.bukkit.entity.LivingEntity.class, org.bukkit.craftbukkit.v.entity.CraftLivingEntity.class, org.bukkit.craftbukkit.v.entity.CraftLivingEntity::new));
+        // Candyriya start - fix NPE in modded entity getEquipment() [Arclight#2029]
+        add(LivingEntity.class, new EntityClass<>(org.bukkit.entity.LivingEntity.class, ArclightModLivingEntity.class, ArclightModLivingEntity::new));
+        // Candyriya end
         add(Monster.class, new EntityClass<>(org.bukkit.entity.Monster.class, org.bukkit.craftbukkit.v.entity.CraftMonster.class, org.bukkit.craftbukkit.v.entity.CraftMonster::new));
         add(PathfinderMob.class, new EntityClass<>(org.bukkit.entity.Creature.class, org.bukkit.craftbukkit.v.entity.CraftCreature.class, org.bukkit.craftbukkit.v.entity.CraftCreature::new));
         add(AgeableMob.class, new EntityClass<>(org.bukkit.entity.Ageable.class, org.bukkit.craftbukkit.v.entity.CraftAgeable.class, org.bukkit.craftbukkit.v.entity.CraftAgeable::new));
