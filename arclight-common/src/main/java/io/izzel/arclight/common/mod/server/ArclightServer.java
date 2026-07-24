@@ -105,6 +105,9 @@ public class ArclightServer {
                 LOGGER.error("registry.error", t);
                 throw t;
             }
+            // Candyriya start - bstats metrics
+            kz.bejiihiu.candyriya.CandyriyaMetrics.init();
+            // Candyriya end
         } else {
             ((CraftServerBridge) (Object) server).bridge$setPlayerList(playerList);
         }

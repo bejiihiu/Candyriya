@@ -3,6 +3,8 @@
 Community-first fork of [Arclight](https://github.com/IzzelAliz/Arclight) — fast bugfixes, open PRs, active maintenance.
 
 [![Downloads count](https://img.shields.io/github/downloads/bejiihiu/Candyriya/total?style=flat-square)](https://github.com/bejiihiu/Candyriya/releases) ![License](https://img.shields.io/github/license/bejiihiu/Candyriya?style=flat-square)
+[![bStats Servers](https://img.shields.io/bstats/servers/32849?style=flat-square&label=servers)](https://bstats.org/plugin/server-implementation/Candyriya/32849)
+[![bStats Players](https://img.shields.io/bstats/players/32849?style=flat-square&label=players)](https://bstats.org/plugin/server-implementation/Candyriya/32849)
 
 ## About
 
