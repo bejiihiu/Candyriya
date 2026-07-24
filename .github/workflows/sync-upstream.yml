@@ -1,0 +1,77 @@
+name: Sync Upstream Arclight
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'  # Every Monday at 12:00 UTC
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: git fetch upstream master
+
+      - name: Check for new commits
+        id: check
+        run: |
+          LOCAL=$(git rev-parse HEAD)
+          UPSTREAM=$(git rev-parse upstream/master)
+          MERGE_BASE=$(git merge-base HEAD upstream/master)
+          if [ "$MERGE_BASE" = "$UPSTREAM" ]; then
+            echo "status=up-to-date" >> $GITHUB_OUTPUT
+            echo "Already up to date with upstream."
+          elif [ "$MERGE_BASE" = "$LOCAL" ]; then
+            echo "status=fast-forward" >> $GITHUB_OUTPUT
+            echo "Can fast-forward to upstream."
+          else
+            echo "status=diverged" >> $GITHUB_OUTPUT
+            echo "Has diverged from upstream, needs merge."
+          fi
+
+      - name: Try merge (no commit)
+        if: steps.check.outputs.status != 'up-to-date'
+        id: merge
+        run: |
+          git merge upstream/master --no-commit --no-edit 2> merge_output.txt && echo "conflicts=false" >> $GITHUB_OUTPUT || echo "conflicts=true" >> $GITHUB_OUTPUT
+          git merge --abort 2>/dev/null || true
+
+      - name: Create sync PR (no conflicts)
+        if: steps.check.outputs.status != 'up-to-date' && steps.merge.outputs.conflicts == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="sync/upstream-$(date +%Y%m%d)"
+          git checkout -b "$BRANCH"
+          git merge upstream/master --no-edit
+          git push origin "$BRANCH"
+          gh pr create \
+            --base v1.21.1 \
+            --head "$BRANCH" \
+            --title "chore: sync upstream Arclight ($(date +%Y-%m-%d))" \
+            --body "Auto-synced from upstream Arclight.\n\nCommits included:\n\`\`\`\n$(git log HEAD...upstream/master --oneline)\n\`\`\`" \
+            --label "upstream-sync"
+
+      - name: Report conflicts
+        if: steps.merge.outputs.conflicts == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "Upstream sync has conflicts — manual merge needed" \
+            --body "Auto-sync from upstream Arclight found merge conflicts.\n\nRun locally:\n\`\`\`bash\ngit fetch upstream\ngit merge upstream/master\n# resolve conflicts\n\`\`\`" \
+            --label "upstream-sync,needs-manual-merge"
