@@ -1,5 +1,6 @@
 package io.izzel.arclight.common.mixin.core.stats;
 
+import io.izzel.arclight.common.mod.server.ArclightServer;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatsCounter;
 import net.minecraft.world.entity.player.Player;
@@ -19,12 +20,16 @@ public abstract class StatisticsCounterMixin {
     @Shadow public abstract int getValue(Stat<?> stat);
     // @formatter:on
 
+    // Candyriya start - fix async PlayerStatisticIncrementEvent [Arclight#2117]
     @Inject(method = "increment", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
         at = @At(value = "INVOKE", target = "Lnet/minecraft/stats/StatsCounter;setValue(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/stats/Stat;I)V"))
     public void arclight$statsIncl(Player player, Stat<?> stat, int amount, CallbackInfo ci, int i) {
-        Cancellable cancellable = CraftEventFactory.handleStatisticsIncrease(player, stat, this.getValue(stat), i);
-        if (cancellable != null && cancellable.isCancelled()) {
-            ci.cancel();
-        }
+        ArclightServer.executeOnMainThread(() -> {
+            Cancellable cancellable = CraftEventFactory.handleStatisticsIncrease(player, stat, this.getValue(stat), i);
+            if (cancellable != null && cancellable.isCancelled()) {
+                ci.cancel();
+            }
+        });
     }
+    // Candyriya end
 }
