@@ -3,6 +3,7 @@ package kz.bejiihiu.candiriya.launcher
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.Locale
 import kz.bejiihiu.candiriya.Candiriya
 import kz.bejiihiu.candiriya.config.ConfigLoader
 import org.apache.logging.log4j.LogManager
@@ -34,10 +35,13 @@ public fun main(args: Array<String>) {
         candiriya.start()
         // startup timing xd
         val elapsedSec = (System.nanoTime() - startNs) / 1_000_000_000.0
-        logger.info("Done ({}s)! For help, type \"help\"", String.format("%.3f", elapsedSec))
+        logger.info(
+            "Done ({}s)! For help, type \"help\"",
+            String.format(Locale.US, "%.3f", elapsedSec)
+        )
     } catch (e: Exception) {
         val elapsedSec = (System.nanoTime() - startNs) / 1_000_000_000.0
-        logger.error("Failed to start in {}s", String.format("%.3f", elapsedSec), e)
+        logger.error("Failed to start in {}s", String.format(Locale.US, "%.3f", elapsedSec), e)
         System.exit(1)
         return
     }
