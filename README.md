@@ -1,21 +1,58 @@
-# Candyriya
+# Candiriya
 
-This project uses [Gradle](https://gradle.org/). To build and run the application, use the *Gradle* tool window by
-clicking the Gradle icon in the right-hand toolbar, or run it directly from the terminal:
+[![CI](https://github.com/bejiihiu/Candyriya/actions/workflows/ci.yml/badge.svg)](https://github.com/bejiihiu/Candyriya/actions/workflows/ci.yml)
 
-* Run `./gradlew run` to build and run the application.
-* Run `./gradlew build` to only build the application.
-* Run `./gradlew check` to run all checks, including tests.
-* Run `./gradlew clean` to clean all build outputs.
+Multithreaded Minecraft proxy (Velocity/BungeeCord-inspired) — Phase 0 Foundation.
 
-Note the usage of the Gradle Wrapper (`./gradlew`). This is the suggested way to use Gradle in production projects.
+## Quick start
 
-[Learn more about the Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
+```bash
+./gradlew :launcher:run
+# creates ./candiriya.toml with defaults on first run
+# binds to 0.0.0.0:25577, logs to console + logs/candiriya.log
+# Ctrl+C -> STOPPING -> STOPPED
+```
 
-[Learn more about Gradle tasks](https://docs.gradle.org/current/userguide/command_line_interface.html#common_tasks).
+Fat jar:
 
-This project follows the suggested multi-module setup and consists of the `app` and `utils` subprojects. The shared
-build logic was extracted to a convention plugin located in `buildSrc`.
+```bash
+./gradlew :launcher:shadowJar
+java -jar launcher/build/libs/candiriya.jar --config ./candiriya.toml
+```
 
-This project uses a version catalog (see `gradle/libs.versions.toml`) to declare and version dependencies and both a
-build cache and a configuration cache (see `gradle.properties`).
+## Config
+
+`candiriya.toml` (generated from `config/src/main/resources/candiriya.default.toml`):
+
+```toml
+[network]
+bind = "0.0.0.0:25577"
+workers = 0
+
+[shutdown]
+quietPeriodMs = 200
+timeoutMs = 5000
+
+[logging]
+level = "INFO"
+```
+
+## Modules
+
+- `core` lifecycle `STARTING→RUNNING→STOPPING→STOPPED`
+- `config` TOML via night-config
+- `network` Netty bootstrap (no-op handler)
+- `protocol` codec registry stub
+- `launcher` main + Log4j2 async + shadow jar
+
+## Check
+
+```bash
+./gradlew check --parallel
+```
+
+Includes: ktlint (android), Checkstyle (google_checks.xml), SpotBugs (MAX/LOW), Checker Framework (nullness), JUnit5.
+
+## Requirements
+
+Java 21, Kotlin 2.4.0

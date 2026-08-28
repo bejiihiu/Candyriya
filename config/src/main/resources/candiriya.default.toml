@@ -1,0 +1,19 @@
+# Candiriya proxy config - default template
+# this file is copied to ./candiriya.toml on first run if missing
+# edit values and restart the proxy :)
+
+[network]
+# address to bind, format host:port
+bind = "0.0.0.0:25577"
+# netty worker threads, 0 = 2 * cpu count
+workers = 0
+
+[shutdown]
+# quiet period for netty graceful shutdown (ms)
+quietPeriodMs = 200
+# timeout for netty graceful shutdown (ms)
+timeoutMs = 5000
+
+[logging]
+# log level: TRACE, DEBUG, INFO, WARN, ERROR
+level = "INFO"

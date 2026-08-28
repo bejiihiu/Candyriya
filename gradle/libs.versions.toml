@@ -7,16 +7,61 @@ kotlin = "2.4.0"
 kotlinxDatetime = "0.8.0"
 kotlinxSerializationJSON = "1.11.0"
 kotlinxCoroutines = "1.10.2"
+netty = "4.1.115.Final"
+guava = "33.3.1-jre"
+log4j = "2.24.3"
+disruptor = "3.4.4"
+nightconfigToml = "3.8.1"
+nightconfigCore = "3.8.1"
+checkerQual = "3.49.0"
+spotbugs = "4.8.6"
+spotbugsGradle = "6.0.8"
+spotbugsAnnotations = "4.8.6"
+checkstyle = "10.21.0"
+ktlintGradle = "12.1.2"
+junit = "5.11.3"
+junitPlatform = "1.11.3"
+mockk = "1.13.13"
+assertj = "3.27.3"
+shadow = "8.1.1"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
 kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+nettyBom = { module = "io.netty:netty-bom", version.ref = "netty" }
+nettyTransport = { module = "io.netty:netty-transport", version.ref = "netty" }
+nettyCodec = { module = "io.netty:netty-codec", version.ref = "netty" }
+nettyHandler = { module = "io.netty:netty-handler", version.ref = "netty" }
+nettyBuffer = { module = "io.netty:netty-buffer", version.ref = "netty" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+log4jApi = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
+log4jCore = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
+disruptor = { module = "com.lmax:disruptor", version.ref = "disruptor" }
+nightconfigToml = { module = "com.electronwill.night-config:toml", version.ref = "nightconfigToml" }
+nightconfigCore = { module = "com.electronwill.night-config:core", version.ref = "nightconfigCore" }
+checkerQual = { module = "org.checkerframework:checker-qual", version.ref = "checkerQual" }
+spotbugs = { module = "com.github.spotbugs:spotbugs", version.ref = "spotbugs" }
+spotbugsAnnotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugsAnnotations" }
+junitApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junitParams = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junitEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 
 # Libraries can be bundled together for easier import
 [bundles]
 kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerialization", "kotlinxCoroutines"]
+netty = ["nettyTransport", "nettyCodec", "nettyHandler", "nettyBuffer"]
+logging = ["log4jApi", "log4jCore", "disruptor"]
+nightconfig = ["nightconfigToml", "nightconfigCore"]
+testing = ["junitApi", "junitParams", "mockk", "assertj"]
 
 [plugins]
 kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugsGradle" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.7" }
