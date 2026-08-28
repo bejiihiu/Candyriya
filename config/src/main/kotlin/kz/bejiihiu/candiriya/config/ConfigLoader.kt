@@ -8,10 +8,13 @@ import org.apache.logging.log4j.LogManager
 
 /**
  * Loads [ProxyConfig] from TOML. If file doesn't exist, creates default from resource.
+ *
+ * Synchronous [load] is fine on startup. For future reloads use [loadAsync] via scheduler.
  */
 public object ConfigLoader {
     private val logger = LogManager.getLogger(ConfigLoader::class.java)
 
+    // TODO: for future reloads this should go through scheduler — sync is ok only on startup xd
     public fun load(path: Path): ProxyConfig {
         if (Files.notExists(path)) {
             logger.info("config not found at {}, creating default", path)
@@ -20,6 +23,21 @@ public object ConfigLoader {
         val fileConfig = CommentedFileConfig.builder(path).parsingMode(ParsingMode.ADD).build()
         fileConfig.load()
         return parse(fileConfig)
+    }
+
+    /**
+     * Async wrapper for future reloads. Delegates to [load] via scheduler.
+     * Keeps sync [load] intact. Pass `scheduler::execute` or any executor.
+     *
+     * Example: `ConfigLoader.loadAsync(path, scheduler::execute) { cfg -> ... }`
+     */
+    public fun loadAsync(
+        path: Path,
+        executor: (Runnable) -> Unit,
+        callback: (ProxyConfig) -> Unit
+    ) {
+        // yep, just dispatch via scheduler, no new threads here xd
+        executor { callback(load(path)) }
     }
 
     private fun createDefault(path: Path) {

@@ -13,6 +13,7 @@ public fun main(args: Array<String>) {
     val logger = LogManager.getLogger("Main")
     val configPath = parseConfigPath(args)
     logger.info("starting Candiriya with config {}", configPath)
+    // sync load is ok on startup; future reloads should go via scheduler
     val config = try {
         ConfigLoader.load(configPath)
     } catch (e: Exception) {
@@ -29,6 +30,16 @@ public fun main(args: Array<String>) {
         logger.error("failed to start", e)
         System.exit(1)
         return
+    }
+
+    // further background tasks should go via candiriya.getScheduler() — single facade xd
+    // example: candiriya.getScheduler().launch { /* coroutine example */ }
+    // yep, go through scheduler, not raw threads xd
+    candiriya.getScheduler().execute {
+        logger.info(
+            "launcher ready tick={}",
+            candiriya.getTickScheduler().getCurrentTick()
+        )
     }
 
     // block until shutdown

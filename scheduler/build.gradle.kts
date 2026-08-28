@@ -8,6 +8,8 @@ dependencies {
     implementation(libs.log4jApi)
     implementation(libs.guava)
     implementation(libs.kotlinxCoroutines)
+    // netty for ThreadController.createBossGroup / createWorkerGroup - platform threads with proper naming
+    implementation(libs.nettyTransport)
     compileOnly(libs.checkerQual)
     compileOnly(libs.spotbugsAnnotations)
 

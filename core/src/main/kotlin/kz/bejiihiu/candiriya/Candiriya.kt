@@ -1,5 +1,6 @@
 package kz.bejiihiu.candiriya
 
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
 import kz.bejiihiu.candiriya.config.ProxyConfig
@@ -43,8 +44,8 @@ public class Candiriya(
         logger.info("Candiriya STARTING -> starting network on {}", config.network.bind)
         threadController.start()
         tickScheduler.start()
-        // yep, create server lazily here xd
-        val server = NetworkServer(config)
+        // yep, create server lazily here xd — groups come from ThreadController
+        val server = NetworkServer(config, threadController)
         networkServer = server
         try {
             server.start().sync()
@@ -65,6 +66,11 @@ public class Candiriya(
             logger.warn("unexpected state during start: {}", state.get())
         }
         logger.info("Candiriya RUNNING on {}", config.network.bind)
+        // show that scheduler is actually used, not just exists xd
+        scheduler.execute { logger.info("candiriya ready tick={}", tickScheduler.getCurrentTick()) }
+        scheduler.scheduleAtFixedRate(Duration.ofSeconds(5), Duration.ofSeconds(5)) {
+            logger.debug("tick={}", tickScheduler.getCurrentTick())
+        }
     }
 
     public fun stop() {

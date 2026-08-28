@@ -1,11 +1,14 @@
 package kz.bejiihiu.candiriya.scheduler.threads
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import io.netty.channel.EventLoopGroup
+import io.netty.channel.nio.NioEventLoopGroup
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
@@ -98,6 +101,39 @@ public class ThreadController(
         exec.allowCoreThreadTimeOut(false)
         logger.info("created asyncPool parallelism={} (platform threads)", parallelism)
         return exec
+    }
+
+    /**
+     * Creates netty boss group with single platform thread.
+     * Uses platform threads (not virtual) to avoid pinning issues with Netty.
+     */
+    public fun createBossGroup(): EventLoopGroup {
+        val factory = createNettyThreadFactory("candiriya-netty-boss-%d")
+        // yep virtual threads go brr xd but netty needs platform threads here
+        return NioEventLoopGroup(1, factory)
+    }
+
+    /**
+     * Creates netty worker group with [ProxyConfig.network.workers] threads.
+     * Uses platform threads (not virtual) to avoid pinning issues with Netty.
+     */
+    public fun createWorkerGroup(): EventLoopGroup {
+        val factory = createNettyThreadFactory("candiriya-netty-worker-%d")
+        val workers = config.network.workers
+        return if (workers > 0) NioEventLoopGroup(workers, factory) else NioEventLoopGroup(factory)
+    }
+
+    /**
+     * Creates a platform [ThreadFactory] with given name format for Netty.
+     */
+    public fun createNettyThreadFactory(nameFormat: String): ThreadFactory {
+        return ThreadFactoryBuilder()
+            .setNameFormat(nameFormat)
+            .setDaemon(false)
+            .setUncaughtExceptionHandler { thread, ex ->
+                logger.error("uncaught exception in {}", thread.name, ex)
+            }
+            .build()
     }
 
     public fun start() {

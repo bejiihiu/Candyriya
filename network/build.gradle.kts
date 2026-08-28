@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api(project(":config"))
+    api(project(":scheduler"))
     api(libs.nettyTransport)
     api(libs.nettyCodec)
     api(libs.nettyHandler)
