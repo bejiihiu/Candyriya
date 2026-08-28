@@ -32,12 +32,26 @@ public data class ProtocolConfig(
 
 public data class BackendConfig(
     val host: String = "127.0.0.1",
-    val port: Int = 25565
-)
+    val port: Int = 25565,
+    val connectTimeoutMs: Int = 5000,
+    val retryAttempts: Int = 0,
+    val retryDelayMs: Long = 500
+) {
+    // TODO: picks up when we add multi-backend like velocity's [servers] map
+    // for now single backend, but structure is ready for Map<String, BackendConfig> xd
+}
+
+public enum class ForwardingMode {
+    NONE,
+    LEGACY,
+    BUNGEEGUARD,
+    MODERN
+}
 
 public data class SecurityConfig(
     val onlineMode: Boolean = false,
-    val forwardingSecret: String = ""
+    val forwardingSecret: String = "",
+    val forwardingMode: ForwardingMode = ForwardingMode.NONE
 )
 
 public data class StatusConfig(

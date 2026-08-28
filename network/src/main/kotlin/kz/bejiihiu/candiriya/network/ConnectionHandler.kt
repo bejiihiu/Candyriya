@@ -8,6 +8,7 @@ import io.netty.handler.codec.CorruptedFrameException
 import io.netty.handler.codec.DecoderException
 import io.netty.handler.timeout.ReadTimeoutException
 import kz.bejiihiu.candiriya.config.ProxyConfig
+import kz.bejiihiu.candiriya.network.session.BackendState
 import kz.bejiihiu.candiriya.protocol.ConnectionState
 import kz.bejiihiu.candiriya.protocol.MinecraftPacket
 import kz.bejiihiu.candiriya.protocol.StringUtil
@@ -21,9 +22,16 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.apache.logging.log4j.LogManager
 
 /**
- * Handles client→proxy Minecraft packets.
- * Supports handshake→status/login + backend proxy forwarding.
+ * Handles client→proxy packets. The real proxy logic lives here.
+ * Supports handshake→status/login plus backend forwarding with proper backpressure.
+ *
+ * Big difference from old version: no more dropping packets when backend isn't ready.
+ * We queue them (bounded) and drain after backend connects — fixes the 4-byte stall xd
  */
+@SuppressFBWarnings(
+    value = ["URF_UNREAD_FIELD", "DE_MIGHT_IGNORE", "DLS_DEAD_LOCAL_STORE"],
+    justification = "backendConnection is used for lifecycle, dead store is kotlin's fault xd"
+)
 public class ConnectionHandler(
     private val config: ProxyConfig,
     private val scheduler: Scheduler? = null,
@@ -37,18 +45,25 @@ public class ConnectionHandler(
 
     public fun setState(newState: ConnectionState) {
         state = newState
-        session.state = newState
+        session.transitionTo(newState)
     }
 
     private var packetCounter: Long = 0
 
     private val session = kz.bejiihiu.candiriya.network.session.ProxySession(config)
 
+    private var backendConnection: BackendConnection? = null
+
     override fun channelActive(ctx: ChannelHandlerContext) {
+        // fresh session, always handshake
         state = ConnectionState.HANDSHAKE
-        session.state = ConnectionState.HANDSHAKE
+        session.transitionTo(ConnectionState.HANDSHAKE)
+        session.backendState = BackendState.IDLE
         session.setClient(ctx)
         logger.info("client {} connected", ctx.channel().remoteAddress())
+        // AUTO_READ is false (see NetworkServer), so we must trigger first read manually
+        // without this, we never get handshake — classic netty pitfall
+        ctx.read()
         super.channelActive(ctx)
     }
 
@@ -58,20 +73,39 @@ public class ConnectionHandler(
             val tick = tickScheduler?.getCurrentTick() ?: -1
             logger.debug("chan {} packets={} tick={}", ctx.channel().id(), packetCounter, tick)
         }
-        // also periodic debug counter via scheduler (simple metrics)
         if (packetCounter == 1L) {
             scheduler?.execute {
                 logger.debug("first packet from {} id={}", ctx.channel().remoteAddress(), packet.id)
             }
         }
 
-        when (state) {
-            ConnectionState.HANDSHAKE -> handleHandshake(ctx, packet)
-            ConnectionState.STATUS -> handleStatus(ctx, packet)
-            ConnectionState.LOGIN -> handleLogin(ctx, packet)
-            ConnectionState.CONFIGURATION -> handleConfiguration(ctx, packet)
-            ConnectionState.PLAY -> handlePlay(ctx, packet)
-            ConnectionState.CLOSED -> logger.warn("packet in closed state id={}", packet.id)
+        try {
+            when (state) {
+                ConnectionState.HANDSHAKE -> handleHandshake(ctx, packet)
+                ConnectionState.STATUS -> handleStatus(ctx, packet)
+                ConnectionState.LOGIN -> handleLogin(ctx, packet)
+                ConnectionState.CONFIGURATION -> handleConfiguration(ctx, packet)
+                ConnectionState.PLAY -> handlePlay(ctx, packet)
+                ConnectionState.CLOSED -> logger.warn("packet in closed state id={}", packet.id)
+            }
+        } finally {
+            // backpressure: ask for next packet unless we're closed
+            // if we queued for backend, this still lets us keep reading until queue full
+            if (state != ConnectionState.CLOSED && ctx.channel().isActive) {
+                // for LOGIN we might be waiting for backend — still read to fill queue (bounded)
+                // but don't overwhelm if backend write buffer is full (check writability)
+                val backend = session.backendChannel
+                if (backend == null || backend.isWritable) {
+                    ctx.read()
+                } else {
+                    // backend clogged, wait a bit then resume — simple backpressure
+                    ctx.channel().eventLoop().schedule(
+                        { if (ctx.channel().isActive) ctx.read() },
+                        10,
+                        java.util.concurrent.TimeUnit.MILLISECONDS
+                    )
+                }
+            }
         }
     }
 
@@ -99,8 +133,8 @@ public class ConnectionHandler(
                 nextStateVal,
                 ctx.channel().remoteAddress()
             )
-            // accept any protocolVersion, just log
-            // TODO: Velocity-style version translation
+            // be a slut — accept any protocol version like velocity does xd
+            // don't validate proto, just log and go
             state = when (nextStateVal) {
                 1 -> ConnectionState.STATUS
                 2 -> ConnectionState.LOGIN
@@ -114,7 +148,7 @@ public class ConnectionHandler(
                     return
                 }
             }
-            session.state = state
+            session.transitionTo(state)
             session.protocolVersion = proto
             session.serverAddress = addr
             session.serverPort = port
@@ -143,8 +177,9 @@ public class ConnectionHandler(
                             if (!future.isSuccess) {
                                 logger.warn("failed to send status response", future.cause())
                             }
-                            // don't release outBuf here, encoder copies; release after flush
                             outBuf.release()
+                            // trigger next read for ping
+                            if (ctx.channel().isActive) ctx.read()
                         }
                     } catch (e: Exception) {
                         outBuf.release()
@@ -173,6 +208,7 @@ public class ConnectionHandler(
                         packet.id,
                         ctx.channel().remoteAddress()
                     )
+                    ctx.read()
                 }
             }
         } catch (e: Exception) {
@@ -182,12 +218,10 @@ public class ConnectionHandler(
     }
 
     private fun handleLogin(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
-        // LoginStart is 0x00 with username (+ optional uuid)
         try {
             when (packet.id) {
                 0x00 -> {
                     val username = StringUtil.readString(packet.data, 16)
-                    // try read uuid if present (16 bytes)
                     var uuid: java.util.UUID? = null
                     if (packet.data.readableBytes() >= 16) {
                         val most = packet.data.readLong()
@@ -205,12 +239,12 @@ public class ConnectionHandler(
                         ?: kz.bejiihiu.candiriya.protocol.UuidUtil.offlineUuid(
                             username
                         )
-                    // connect to backend
+                    // connect to backend (with retry from config)
                     connectToBackend(ctx)
                 }
                 else -> {
-                    // encryption / plugin responses — forward to backend if connected
-                    forwardToBackend(packet)
+                    // encryption / plugin responses — forward or queue if backend not ready
+                    forwardToBackend(ctx, packet)
                 }
             }
         } catch (e: Exception) {
@@ -220,93 +254,105 @@ public class ConnectionHandler(
     }
 
     private fun handleConfiguration(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
-        // client is in CONFIGURATION (1.21.5); forward to backend
-        // if packet is FinishConfiguration ack (0x03), transition to PLAY
         if (packet.id == 0x03) {
             logger.info("client {} finish configuration -> PLAY", ctx.channel().remoteAddress())
             state = ConnectionState.PLAY
-            session.state = ConnectionState.PLAY
+            session.transitionTo(ConnectionState.PLAY)
         }
-        forwardToBackend(packet)
+        forwardToBackend(ctx, packet)
     }
 
     private fun handlePlay(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
-        forwardToBackend(packet)
+        forwardToBackend(ctx, packet)
     }
 
-    private fun forwardToBackend(packet: MinecraftPacket) {
+    private fun forwardToBackend(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
         val backend = session.backendChannel
-        if (backend == null || !backend.isActive) {
-            logger.warn("no backend for packet id={} from {}", packet.id, session.username)
+        // if no backend yet or not writable, queue it — don't drop like old code did xd
+        if (backend == null || !backend.isActive || session.backendState != BackendState.CONNECTED) {
+            val queued = session.enqueueForBackend(packet)
+            if (!queued) {
+                logger.warn("queue full, disconnecting {}", session.username)
+                val reason = Component.text(
+                    "Proxy queue overflow — try again"
+                ).color(NamedTextColor.RED)
+                val disc = createDisconnectPacket(reason)
+                ctx.writeAndFlush(disc).addListener {
+                    disc.data.release()
+                    session.closeBoth("queue overflow")
+                }
+            }
+            // don't need to do anything else, packet is queued and will be drained on backend connect
             return
         }
+
+        // check writability for backpressure
+        if (!backend.isWritable) {
+            logger.debug(
+                "backend not writable for {}, queuing packet id={}",
+                session.username,
+                packet.id
+            )
+            val queued = session.enqueueForBackend(packet)
+            if (!queued) session.closeBoth("backend clogged")
+            return
+        }
+
         val dup = packet.data.retainedDuplicate()
         val fwd = MinecraftPacket(packet.id, dup)
         backend.writeAndFlush(fwd).addListener { fut ->
             dup.release()
-            if (!fut.isSuccess) logger.warn("failed forward to backend", fut.cause())
+            if (!fut.isSuccess) {
+                logger.warn("failed forward to backend for {}", session.username, fut.cause())
+                // don't close immediately if we can queue, but if write failed backend is probably dead
+                if (!session.isClosed()) {
+                    session.closeBoth("backend write failed")
+                }
+            } else {
+                // success — resume reading on client if we paused for backpressure
+                if (ctx.channel().isActive) ctx.read()
+            }
+            // also resume reading on backend channel
+            try {
+                backend.read()
+            } catch (_: Exception) {}
         }
     }
 
     private fun connectToBackend(ctx: ChannelHandlerContext) {
-        val host = config.backend.host
-        val port = config.backend.port
-        logger.info("connecting {} to backend {}:{}", session.username, host, port)
-        val bootstrap = io.netty.bootstrap.Bootstrap()
-            .group(ctx.channel().eventLoop())
-            .channel(io.netty.channel.socket.nio.NioSocketChannel::class.java)
-            .option(io.netty.channel.ChannelOption.SO_KEEPALIVE, true)
-            .option(io.netty.channel.ChannelOption.TCP_NODELAY, true)
-            .handler(
-                object : io.netty.channel.ChannelInitializer<
-                    io.netty.channel.socket.SocketChannel
-                    >() {
-                    override fun initChannel(ch: io.netty.channel.socket.SocketChannel) {
-                        ch.pipeline().addLast(
-                            "frameDecoder",
-                            kz.bejiihiu.candiriya.protocol.MinecraftVarintFrameDecoder(
-                                config.protocol.maxPacketSize
-                            )
-                        )
-                        ch.pipeline().addLast(
-                            "packetDecoder",
-                            kz.bejiihiu.candiriya.protocol.MinecraftPacketDecoder()
-                        )
-                        ch.pipeline().addLast(
-                            "packetEncoder",
-                            kz.bejiihiu.candiriya.protocol.MinecraftVarintLengthEncoder()
-                        )
-                        ch.pipeline().addLast(
-                            "backendHandler",
-                            BackendHandler(session)
-                        )
-                    }
-                }
+        // already connecting?
+        if (session.backendState == BackendState.CONNECTING || session.backendState == BackendState.CONNECTED) {
+            logger.debug(
+                "already connecting/connected for {}, ignoring duplicate connect",
+                session.username
             )
-        bootstrap.connect(host, port).addListener { fut ->
-            if (!fut.isSuccess) {
-                logger.warn(
-                    "failed to connect {} to backend {}:{}",
-                    session.username,
-                    host,
-                    port,
-                    fut.cause()
-                )
+            return
+        }
+        val conn = BackendConnection(session, config)
+        backendConnection = conn
+        conn.connect(
+            clientChannel = ctx.channel(),
+            onConnected = { _ ->
+                // drain any packets that arrived while connecting
+                session.drainQueueToBackend()
+                // make sure client keeps reading
+                if (ctx.channel().isActive) ctx.read()
+            },
+            onFailed = { cause ->
+                logger.warn("could not connect {} to backend", session.username, cause)
+                val msg = cause.message ?: "unknown"
                 val reason = Component.text(
-                    "Could not connect to backend: ${fut.cause()?.message ?: "unknown"}"
-                )
-                    .color(NamedTextColor.RED)
+                    "Could not connect to backend: $msg"
+                ).color(NamedTextColor.RED)
                 val disc = createDisconnectPacket(reason)
+                // send disconnect to client then close both sides with flush
                 ctx.writeAndFlush(disc).addListener {
                     disc.data.release()
+                    session.closeBoth("backend connect failed: $msg")
                     ctx.close()
                 }
-            } else {
-                val ch = (fut as io.netty.channel.ChannelFuture).channel()
-                session.setBackend(ch)
-                logger.info("backend connected for {}", session.username)
             }
-        }
+        )
     }
 
     @SuppressFBWarnings(
@@ -314,7 +360,6 @@ public class ConnectionHandler(
         justification = "kept for future fallback"
     )
     private fun handleLoginDisconnect(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
-        // fallback disconnect (unused)
         logger.info(
             "login packet id={} from {} — disconnecting (login not implemented)",
             packet.id,
@@ -334,16 +379,12 @@ public class ConnectionHandler(
         justification = "kotlin try-catch generates self assign bytecode"
     )
     private fun buildStatusJson(): String {
-        // motd comes from config as MiniMessage string
-        // parse via adventure, then serialize to gson json for status description
         val motdComponent: Component = try {
             MiniMessage.miniMessage().deserialize(config.status.motd)
         } catch (_: Exception) {
-            // fallback to plain text if minimessage borked xd
             Component.text(config.status.motd)
         }
         val motdJson: String = GsonComponentSerializer.gson().serialize(motdComponent)
-        // version name/protocol from config, supports 26.x + old clients (Velocity-style any proto)
         val versionNameEsc = config.status.versionName
             .replace("\\", "\\\\")
             .replace("\"", "\\\"")
@@ -371,7 +412,7 @@ public class ConnectionHandler(
             )
             else -> logger.warn("exception on {}", ctx.channel().remoteAddress(), cause)
         }
-        session.closeBoth("exception")
+        session.closeBoth("exception: ${cause.message}")
         ctx.close()
     }
 
@@ -380,5 +421,13 @@ public class ConnectionHandler(
         state = ConnectionState.CLOSED
         session.closeBoth()
         super.channelInactive(ctx)
+    }
+
+    override fun channelWritabilityChanged(ctx: ChannelHandlerContext) {
+        // if channel becomes writable again, resume reading
+        if (ctx.channel().isWritable) {
+            ctx.read()
+        }
+        super.channelWritabilityChanged(ctx)
     }
 }

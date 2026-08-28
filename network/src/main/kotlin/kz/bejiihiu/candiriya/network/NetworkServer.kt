@@ -40,8 +40,17 @@ public class NetworkServer(
         val bootstrap = ServerBootstrap()
             .group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel::class.java)
+            // keepalive + nodelay are standard for mc
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             .childOption(ChannelOption.TCP_NODELAY, true)
+            // backpressure stuff — don't auto-read, we control ctx.read() manually
+            // this fixes the 4-byte stall bug from StackOverflow 78088619 xd
+            .childOption(ChannelOption.AUTO_READ, false)
+            .childOption(ChannelOption.AUTO_CLOSE, false)
+            .childOption(
+                ChannelOption.WRITE_BUFFER_WATER_MARK,
+                io.netty.channel.WriteBufferWaterMark(32 * 1024, 64 * 1024)
+            )
             .childHandler(
                 object : ChannelInitializer<SocketChannel>() {
                     override fun initChannel(ch: SocketChannel) {
@@ -61,7 +70,6 @@ public class NetworkServer(
                             "connection",
                             ConnectionHandler(config, scheduler, tickScheduler)
                         )
-                        // TODO: compression/encryption handlers here
                         ch.pipeline().addLast("logger", LoggingHandler())
                     }
                 }

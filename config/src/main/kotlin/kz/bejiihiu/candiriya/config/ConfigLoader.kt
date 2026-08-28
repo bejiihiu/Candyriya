@@ -31,11 +31,7 @@ public object ConfigLoader {
      *
      * Example: `ConfigLoader.loadAsync(path, scheduler::execute) { cfg -> ... }`
      */
-    public fun loadAsync(
-        path: Path,
-        executor: (Runnable) -> Unit,
-        callback: (ProxyConfig) -> Unit
-    ) {
+    public fun loadAsync(path: Path, executor: (Runnable) -> Unit, callback: (ProxyConfig) -> Unit) {
         // yep, just dispatch via scheduler, no new threads here xd
         executor { callback(load(path)) }
     }
@@ -68,8 +64,32 @@ public object ConfigLoader {
         ).toInt()
         val backendHost = config.getOrElse<String>("backend.host", "127.0.0.1")
         val backendPort = config.getOrElse<Number>("backend.port", 25565).toInt()
+        val backendConnectTimeoutMs = config.getOrElse<Number>(
+            "backend.connectTimeoutMs",
+            5000
+        ).toInt()
+        val backendRetryAttempts = config.getOrElse<Number>(
+            "backend.retryAttempts",
+            0
+        ).toInt()
+        val backendRetryDelayMs = config.getOrElse<Number>(
+            "backend.retryDelayMs",
+            500
+        ).toLong()
         val onlineMode = config.getOrElse<Boolean>("security.onlineMode", false)
-        val forwardingSecret = config.getOrElse<String>("security.forwardingSecret", "")
+        val forwardingSecret = config.getOrElse<String>(
+            "security.forwardingSecret",
+            ""
+        )
+        val forwardingModeRaw = config.getOrElse<String>(
+            "security.forwardingMode",
+            "NONE"
+        )
+        val forwardingMode = try {
+            ForwardingMode.valueOf(forwardingModeRaw.uppercase())
+        } catch (_: IllegalArgumentException) {
+            ForwardingMode.NONE
+        }
         val motd = config.getOrElse<String>(
             "status.motd",
             StatusConfig.DEFAULT_MOTD
@@ -109,6 +129,15 @@ public object ConfigLoader {
             asyncParallelism >= 0
         ) { "threads.asyncParallelism must be >=0, got $asyncParallelism" }
         require(tickRateMs in 10..1000) { "scheduler.tickRateMs must be 10..1000, got $tickRateMs" }
+        require(backendConnectTimeoutMs in 100..60000) {
+            "backend.connectTimeoutMs must be 100..60000, got $backendConnectTimeoutMs"
+        }
+        require(backendRetryAttempts in 0..10) {
+            "backend.retryAttempts must be 0..10, got $backendRetryAttempts"
+        }
+        require(backendRetryDelayMs in 0..10000) {
+            "backend.retryDelayMs must be 0..10000, got $backendRetryDelayMs"
+        }
 
         return ProxyConfig(
             network = NetworkConfig(
@@ -120,8 +149,18 @@ public object ConfigLoader {
                 maxPacketSize = maxPacketSize,
                 compressionThreshold = compressionThreshold
             ),
-            backend = BackendConfig(host = backendHost, port = backendPort),
-            security = SecurityConfig(onlineMode = onlineMode, forwardingSecret = forwardingSecret),
+            backend = BackendConfig(
+                host = backendHost,
+                port = backendPort,
+                connectTimeoutMs = backendConnectTimeoutMs,
+                retryAttempts = backendRetryAttempts,
+                retryDelayMs = backendRetryDelayMs
+            ),
+            security = SecurityConfig(
+                onlineMode = onlineMode,
+                forwardingSecret = forwardingSecret,
+                forwardingMode = forwardingMode
+            ),
             status = StatusConfig(
                 motd = motd,
                 maxPlayers = maxPlayers,
@@ -160,10 +199,14 @@ public object ConfigLoader {
     [backend]
     host = "127.0.0.1"
     port = 25565
+    connectTimeoutMs = 5000
+    retryAttempts = 0
+    retryDelayMs = 500
 
     [security]
     onlineMode = false
     forwardingSecret = ""
+    forwardingMode = "NONE"
 
     [status]
     # MOTD shown in server list — MiniMessage format (<green>, <gradient>, etc.)
