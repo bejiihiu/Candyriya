@@ -15,12 +15,7 @@ import org.junit.jupiter.api.Test
 
 public class ConnectionHandlerTest {
 
-    private fun createHandshake(
-        proto: Int = 767,
-        addr: String = "localhost",
-        port: Int = 25565,
-        nextState: Int = 1
-    ): ByteBuf {
+    private fun createHandshake(proto: Int = 767, addr: String = "localhost", port: Int = 25565, nextState: Int = 1): ByteBuf {
         val payload = Unpooled.buffer()
         VarInt.writeVarInt(payload, 0x00) // packet id
         VarInt.writeVarInt(payload, proto)

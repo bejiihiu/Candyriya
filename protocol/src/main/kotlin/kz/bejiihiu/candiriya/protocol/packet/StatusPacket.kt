@@ -30,8 +30,7 @@ public data class StatusResponsePacket(val json: String) : Packet {
         StringUtil.writeString(buf, json)
     }
     public companion object : PacketDecoder<StatusResponsePacket> {
-        override fun decode(buf: ByteBuf): StatusResponsePacket =
-            StatusResponsePacket(StringUtil.readString(buf, 262144))
+        override fun decode(buf: ByteBuf): StatusResponsePacket = StatusResponsePacket(StringUtil.readString(buf, 262144))
     }
 }
 

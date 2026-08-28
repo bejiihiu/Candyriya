@@ -1,11 +1,17 @@
 package kz.bejiihiu.candiriya
 
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
+import kz.bejiihiu.candiriya.command.CommandManager
+import kz.bejiihiu.candiriya.command.builtin.CandiriyaCommand
 import kz.bejiihiu.candiriya.config.ProxyConfig
 import kz.bejiihiu.candiriya.lifecycle.LifecycleState
 import kz.bejiihiu.candiriya.network.NetworkServer
+import kz.bejiihiu.candiriya.permission.PermissionManager
+import kz.bejiihiu.candiriya.permission.PermissionsFile
 import kz.bejiihiu.candiriya.player.PlayerManager
 import kz.bejiihiu.candiriya.scheduler.DefaultScheduler
 import kz.bejiihiu.candiriya.scheduler.Scheduler
@@ -20,7 +26,8 @@ import org.apache.logging.log4j.LogManager
  */
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = ["EI_EXPOSE_REP"], justification = "exposed for tests xd")
 public class Candiriya(
-    private val config: ProxyConfig
+    private val config: ProxyConfig,
+    private val permissionsFile: Path = Paths.get("permissions.toml")
 ) {
     private val logger = LogManager.getLogger(Candiriya::class.java)
     private val state = AtomicReference(LifecycleState.STOPPED)
@@ -32,6 +39,8 @@ public class Candiriya(
         TickScheduler(threadController, config.scheduler.tickRateMs)
     private val contextRegistry: ContextRegistry = ContextRegistry(config, threadController)
     private val playerManager: PlayerManager = PlayerManager(contextRegistry)
+    private val permissionManager: PermissionManager = PermissionManager(permissionsFile)
+    private val commandManager: CommandManager = CommandManager()
 
     public fun getState(): LifecycleState = state.get()
 
@@ -45,12 +54,33 @@ public class Candiriya(
 
     public fun getPlayerManager(): PlayerManager = playerManager
 
+    public fun getPermissionManager(): PermissionManager = permissionManager
+
+    public fun getCommandManager(): CommandManager = commandManager
+
+    public fun getPermissionsFile(): Path = permissionsFile
+
     public fun start() {
         // only STOPPED -> STARTING is valid
         if (!state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
             throw IllegalStateException("cannot start from ${state.get()}, expected STOPPED")
         }
         logger.info("Candiriya STARTING -> starting network on {}", config.network.bind)
+        // init permissions — file first, then defaults
+        try {
+            PermissionsFile.ensureExists(permissionsFile)
+            permissionManager.loadFromFile(permissionsFile)
+        } catch (e: Exception) {
+            logger.warn("failed to init permissions", e)
+        }
+        // register builtin command (only candiriya for now, per requirement)
+        try {
+            val candiriyaCmd = CandiriyaCommand(commandManager, permissionManager, permissionsFile)
+            commandManager.register("candiriya", candiriyaCmd, "candyriya", "candirya")
+            logger.info("registered /candiriya command")
+        } catch (e: Exception) {
+            logger.warn("failed to register builtin commands", e)
+        }
         threadController.start()
         tickScheduler.start()
         // yep, create server lazily here xd — groups come from ThreadController

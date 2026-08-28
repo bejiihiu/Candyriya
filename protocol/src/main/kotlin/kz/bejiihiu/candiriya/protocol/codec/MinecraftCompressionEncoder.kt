@@ -27,11 +27,7 @@ public class MinecraftCompressionEncoder(
 
     private val deflater = Deflater()
 
-    override fun encode(
-        ctx: ChannelHandlerContext,
-        msg: kz.bejiihiu.candiriya.protocol.MinecraftPacket,
-        out: ByteBuf
-    ) {
+    override fun encode(ctx: ChannelHandlerContext, msg: kz.bejiihiu.candiriya.protocol.MinecraftPacket, out: ByteBuf) {
         // build raw = VarInt(id) + data
         val dataSize = msg.data.readableBytes()
         val idSize = VarInt.varIntSize(msg.id)
