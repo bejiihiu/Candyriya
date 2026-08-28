@@ -1,0 +1,31 @@
+# Candiriya proxy config - default template
+# this file is copied to ./candiriya.toml on first run if missing
+# edit values and restart the proxy :)
+
+[network]
+# address to bind, format host:port
+bind = "0.0.0.0:25577"
+# netty worker threads, 0 = 2 * cpu count
+workers = 0
+
+[shutdown]
+# quiet period for netty graceful shutdown (ms)
+quietPeriodMs = 200
+# timeout for netty graceful shutdown (ms)
+timeoutMs = 5000
+
+[logging]
+# log level: TRACE, DEBUG, INFO, WARN, ERROR
+level = "INFO"
+
+[threads]
+# use virtual threads for async pool (java 21+)
+virtual = true
+# core size for scheduled pool (platform threads)
+scheduledCoreSize = 2
+# parallelism for async pool when virtual=false, 0 = cpu count
+asyncParallelism = 0
+
+[scheduler]
+# tick duration in ms (50ms = 20 tps, like Paper/Folia)
+tickRateMs = 50

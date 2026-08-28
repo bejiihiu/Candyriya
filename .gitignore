@@ -43,3 +43,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Candiriya ###
+logs/
+candiriya.toml
+*.log
