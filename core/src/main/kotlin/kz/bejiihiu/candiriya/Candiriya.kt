@@ -6,8 +6,10 @@ import java.util.concurrent.atomic.AtomicReference
 import kz.bejiihiu.candiriya.config.ProxyConfig
 import kz.bejiihiu.candiriya.lifecycle.LifecycleState
 import kz.bejiihiu.candiriya.network.NetworkServer
+import kz.bejiihiu.candiriya.player.PlayerManager
 import kz.bejiihiu.candiriya.scheduler.DefaultScheduler
 import kz.bejiihiu.candiriya.scheduler.Scheduler
+import kz.bejiihiu.candiriya.scheduler.context.ContextRegistry
 import kz.bejiihiu.candiriya.scheduler.threads.ThreadController
 import kz.bejiihiu.candiriya.scheduler.tick.TickScheduler
 import org.apache.logging.log4j.LogManager
@@ -16,6 +18,7 @@ import org.apache.logging.log4j.LogManager
  * Main orchestrator that coordinates config and network.
  * State machine is guarded by [AtomicReference].
  */
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = ["EI_EXPOSE_REP"], justification = "exposed for tests xd")
 public class Candiriya(
     private val config: ProxyConfig
 ) {
@@ -27,6 +30,8 @@ public class Candiriya(
     private val scheduler: Scheduler = DefaultScheduler(threadController) { state.get() }
     private val tickScheduler: TickScheduler =
         TickScheduler(threadController, config.scheduler.tickRateMs)
+    private val contextRegistry: ContextRegistry = ContextRegistry(config, threadController)
+    private val playerManager: PlayerManager = PlayerManager(contextRegistry)
 
     public fun getState(): LifecycleState = state.get()
 
@@ -35,6 +40,10 @@ public class Candiriya(
     public fun getTickScheduler(): TickScheduler = tickScheduler
 
     public fun getThreadController(): ThreadController = threadController
+
+    public fun getContextRegistry(): ContextRegistry = contextRegistry
+
+    public fun getPlayerManager(): PlayerManager = playerManager
 
     public fun start() {
         // only STOPPED -> STARTING is valid
@@ -49,7 +58,9 @@ public class Candiriya(
             config,
             threadController,
             scheduler = scheduler,
-            tickScheduler = tickScheduler
+            tickScheduler = tickScheduler,
+            contextRegistry = contextRegistry,
+            playerManager = playerManager
         )
         networkServer = server
         try {
@@ -71,10 +82,11 @@ public class Candiriya(
             logger.warn("unexpected state during start: {}", state.get())
         }
         logger.info("Candiriya RUNNING on {}", config.network.bind)
+        logger.info("contexts={} players={}", contextRegistry.size(), playerManager.count())
         // show that scheduler is actually used, not just exists xd
-        scheduler.execute { logger.info("candiriya ready tick={}", tickScheduler.getCurrentTick()) }
+        scheduler.execute { logger.info("candiriya ready tick={} contexts={}", tickScheduler.getCurrentTick(), contextRegistry.size()) }
         scheduler.scheduleAtFixedRate(Duration.ofSeconds(5), Duration.ofSeconds(5)) {
-            logger.debug("tick={}", tickScheduler.getCurrentTick())
+            logger.debug("tick={} players={} ctxStats={}", tickScheduler.getCurrentTick(), playerManager.count(), contextRegistry.stats())
         }
     }
 
@@ -103,6 +115,11 @@ public class Candiriya(
             tickScheduler.close()
         } catch (e: Exception) {
             logger.error("error closing tickScheduler", e)
+        }
+        try {
+            contextRegistry.close()
+        } catch (e: Exception) {
+            logger.error("error closing contextRegistry", e)
         }
         try {
             scheduler.close()

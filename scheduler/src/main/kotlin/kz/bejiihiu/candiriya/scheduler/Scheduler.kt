@@ -32,17 +32,9 @@ public interface Scheduler : AutoCloseable {
 
     public fun execute(delay: Duration, task: Runnable): TaskHandle
 
-    public fun scheduleAtFixedRate(
-        initialDelay: Duration,
-        period: Duration,
-        task: Runnable
-    ): TaskHandle
+    public fun scheduleAtFixedRate(initialDelay: Duration, period: Duration, task: Runnable): TaskHandle
 
-    public fun scheduleWithFixedDelay(
-        initialDelay: Duration,
-        delay: Duration,
-        task: Runnable
-    ): TaskHandle
+    public fun scheduleWithFixedDelay(initialDelay: Duration, delay: Duration, task: Runnable): TaskHandle
 
     public fun launch(block: suspend () -> Unit): TaskHandle
 
@@ -84,11 +76,7 @@ public class DefaultScheduler(
         return submitScheduled(delay, task)
     }
 
-    override fun scheduleAtFixedRate(
-        initialDelay: Duration,
-        period: Duration,
-        task: Runnable
-    ): TaskHandle {
+    override fun scheduleAtFixedRate(initialDelay: Duration, period: Duration, task: Runnable): TaskHandle {
         checkLifecycle()
         require(!period.isZero && !period.isNegative) { "period must be >0" }
         val id = idGen.incrementAndGet()
@@ -106,11 +94,7 @@ public class DefaultScheduler(
         return handle
     }
 
-    override fun scheduleWithFixedDelay(
-        initialDelay: Duration,
-        delay: Duration,
-        task: Runnable
-    ): TaskHandle {
+    override fun scheduleWithFixedDelay(initialDelay: Duration, delay: Duration, task: Runnable): TaskHandle {
         checkLifecycle()
         require(!delay.isZero && !delay.isNegative) { "delay must be >0" }
         val id = idGen.incrementAndGet()

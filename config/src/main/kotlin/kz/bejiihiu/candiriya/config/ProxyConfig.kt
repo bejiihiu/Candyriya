@@ -83,5 +83,6 @@ public data class ThreadsConfig(
 )
 
 public data class SchedulerConfig(
-    val tickRateMs: Long = 50
+    val tickRateMs: Long = 50,
+    val contexts: Int = 4
 )

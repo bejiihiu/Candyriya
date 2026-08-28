@@ -64,3 +64,6 @@ asyncParallelism = 0
 [scheduler]
 # tick duration in ms (50ms = 20 tps, like Paper/Folia)
 tickRateMs = 50
+# number of execution contexts (like Folia regions) — players spread across them
+# 0 = cpu count, max 32
+contexts = 4

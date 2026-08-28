@@ -1,5 +1,6 @@
 package kz.bejiihiu.candiriya.network
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
@@ -11,10 +12,12 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import java.util.concurrent.TimeUnit
 import kz.bejiihiu.candiriya.config.ProxyConfig
+import kz.bejiihiu.candiriya.player.PlayerManager
 import kz.bejiihiu.candiriya.protocol.MinecraftPacketDecoder
 import kz.bejiihiu.candiriya.protocol.MinecraftVarintFrameDecoder
 import kz.bejiihiu.candiriya.protocol.MinecraftVarintLengthEncoder
 import kz.bejiihiu.candiriya.scheduler.Scheduler
+import kz.bejiihiu.candiriya.scheduler.context.ContextRegistry
 import kz.bejiihiu.candiriya.scheduler.threads.ThreadController
 import kz.bejiihiu.candiriya.scheduler.tick.TickScheduler
 import org.apache.logging.log4j.LogManager
@@ -25,13 +28,16 @@ import org.apache.logging.log4j.LogManager
  *
  * Threading is owned by [ThreadController] — no direct NioEventLoopGroup creation here.
  */
+@SuppressFBWarnings(value = ["EI_EXPOSE_REP", "EI_EXPOSE_REP2"], justification = "fields intentionally exposed xd")
 public class NetworkServer(
     private val config: ProxyConfig,
     private val threadController: ThreadController,
     private val bossGroup: EventLoopGroup = threadController.createBossGroup(),
     private val workerGroup: EventLoopGroup = threadController.createWorkerGroup(),
     private val scheduler: Scheduler? = null,
-    private val tickScheduler: TickScheduler? = null
+    private val tickScheduler: TickScheduler? = null,
+    private val contextRegistry: ContextRegistry? = null,
+    private val playerManager: PlayerManager? = null
 ) {
     private val logger = LogManager.getLogger(NetworkServer::class.java)
     private var channel: Channel? = null
@@ -68,7 +74,7 @@ public class NetworkServer(
                         ch.pipeline().addLast("packetEncoder", MinecraftVarintLengthEncoder())
                         ch.pipeline().addLast(
                             "connection",
-                            ConnectionHandler(config, scheduler, tickScheduler)
+                            ConnectionHandler(config, scheduler, tickScheduler, contextRegistry, playerManager)
                         )
                         ch.pipeline().addLast("logger", LoggingHandler())
                     }

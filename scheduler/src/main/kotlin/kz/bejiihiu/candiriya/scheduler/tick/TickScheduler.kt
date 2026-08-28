@@ -69,8 +69,7 @@ public class TickScheduler(
     /**
      * Convenience overload for one-shot tick delay.
      */
-    public fun runAtTick(delayTicks: Long, task: Runnable): TaskHandle =
-        runAtTick(delayTicks, 0, task)
+    public fun runAtTick(delayTicks: Long, task: Runnable): TaskHandle = runAtTick(delayTicks, 0, task)
 
     private fun onTick() {
         val tick = currentTick.incrementAndGet()

@@ -104,6 +104,7 @@ public object ConfigLoader {
         val scheduledCoreSize = config.getOrElse<Number>("threads.scheduledCoreSize", 2).toInt()
         val asyncParallelism = config.getOrElse<Number>("threads.asyncParallelism", 0).toInt()
         val tickRateMs = config.getOrElse<Number>("scheduler.tickRateMs", 50).toLong()
+        val contexts = config.getOrElse<Number>("scheduler.contexts", 4).toInt()
 
         // validation
         val port = try {
@@ -129,6 +130,7 @@ public object ConfigLoader {
             asyncParallelism >= 0
         ) { "threads.asyncParallelism must be >=0, got $asyncParallelism" }
         require(tickRateMs in 10..1000) { "scheduler.tickRateMs must be 10..1000, got $tickRateMs" }
+        require(contexts in 0..32) { "scheduler.contexts must be 0..32, got $contexts" }
         require(backendConnectTimeoutMs in 100..60000) {
             "backend.connectTimeoutMs must be 100..60000, got $backendConnectTimeoutMs"
         }
@@ -174,7 +176,7 @@ public object ConfigLoader {
                 scheduledCoreSize = scheduledCoreSize,
                 asyncParallelism = asyncParallelism
             ),
-            scheduler = SchedulerConfig(tickRateMs = tickRateMs)
+            scheduler = SchedulerConfig(tickRateMs = tickRateMs, contexts = contexts)
         )
     }
 
@@ -236,5 +238,6 @@ public object ConfigLoader {
     [scheduler]
     # tick duration in ms (50ms = 20 tps, like Paper/Folia)
     tickRateMs = 50
+    contexts = 4
     """.trimIndent()
 }
