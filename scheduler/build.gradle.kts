@@ -5,10 +5,9 @@ plugins {
 
 dependencies {
     api(project(":config"))
-    api(project(":scheduler"))
-    api(project(":network"))
     implementation(libs.log4jApi)
     implementation(libs.guava)
+    implementation(libs.kotlinxCoroutines)
     compileOnly(libs.checkerQual)
     compileOnly(libs.spotbugsAnnotations)
 
@@ -16,6 +15,7 @@ dependencies {
     testImplementation(libs.junitParams)
     testImplementation(libs.assertj)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlinxCoroutinesTest)
     testRuntimeOnly(libs.junitEngine)
     testRuntimeOnly(libs.junitPlatformLauncher)
     testRuntimeOnly(libs.log4jCore)

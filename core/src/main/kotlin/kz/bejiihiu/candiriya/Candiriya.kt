@@ -5,6 +5,10 @@ import java.util.concurrent.atomic.AtomicReference
 import kz.bejiihiu.candiriya.config.ProxyConfig
 import kz.bejiihiu.candiriya.lifecycle.LifecycleState
 import kz.bejiihiu.candiriya.network.NetworkServer
+import kz.bejiihiu.candiriya.scheduler.DefaultScheduler
+import kz.bejiihiu.candiriya.scheduler.Scheduler
+import kz.bejiihiu.candiriya.scheduler.threads.ThreadController
+import kz.bejiihiu.candiriya.scheduler.tick.TickScheduler
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -18,8 +22,18 @@ public class Candiriya(
     private val state = AtomicReference(LifecycleState.STOPPED)
     private val shutdownLatch = CountDownLatch(1)
     private var networkServer: NetworkServer? = null
+    private val threadController: ThreadController = ThreadController(config)
+    private val scheduler: Scheduler = DefaultScheduler(threadController) { state.get() }
+    private val tickScheduler: TickScheduler =
+        TickScheduler(threadController, config.scheduler.tickRateMs)
 
     public fun getState(): LifecycleState = state.get()
+
+    public fun getScheduler(): Scheduler = scheduler
+
+    public fun getTickScheduler(): TickScheduler = tickScheduler
+
+    public fun getThreadController(): ThreadController = threadController
 
     public fun start() {
         // only STOPPED -> STARTING is valid
@@ -27,6 +41,8 @@ public class Candiriya(
             throw IllegalStateException("cannot start from ${state.get()}, expected STOPPED")
         }
         logger.info("Candiriya STARTING -> starting network on {}", config.network.bind)
+        threadController.start()
+        tickScheduler.start()
         // yep, create server lazily here xd
         val server = NetworkServer(config)
         networkServer = server
@@ -34,6 +50,13 @@ public class Candiriya(
             server.start().sync()
         } catch (e: Exception) {
             // failed to bind, rollback to STOPPED
+            try {
+                tickScheduler.close()
+                scheduler.close()
+                threadController.close()
+            } catch (closeEx: Exception) {
+                logger.warn("error during rollback close", closeEx)
+            }
             state.set(LifecycleState.STOPPED)
             throw e
         }
@@ -64,6 +87,21 @@ public class Candiriya(
             networkServer?.stop()
         } catch (e: Exception) {
             logger.error("error during network shutdown", e)
+        }
+        try {
+            tickScheduler.close()
+        } catch (e: Exception) {
+            logger.error("error closing tickScheduler", e)
+        }
+        try {
+            scheduler.close()
+        } catch (e: Exception) {
+            logger.error("error closing scheduler", e)
+        }
+        try {
+            threadController.close()
+        } catch (e: Exception) {
+            logger.error("error closing threadController", e)
         }
         state.set(LifecycleState.STOPPED)
         logger.info("Candiriya STOPPED")

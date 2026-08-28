@@ -6,7 +6,9 @@ package kz.bejiihiu.candiriya.config
 public data class ProxyConfig(
     val network: NetworkConfig = NetworkConfig(),
     val shutdown: ShutdownConfig = ShutdownConfig(),
-    val logging: LoggingConfig = LoggingConfig()
+    val logging: LoggingConfig = LoggingConfig(),
+    val threads: ThreadsConfig = ThreadsConfig(),
+    val scheduler: SchedulerConfig = SchedulerConfig()
 )
 
 public data class NetworkConfig(
@@ -25,4 +27,14 @@ public data class ShutdownConfig(
 
 public data class LoggingConfig(
     val level: String = "INFO"
+)
+
+public data class ThreadsConfig(
+    val virtual: Boolean = true,
+    val scheduledCoreSize: Int = 2,
+    val asyncParallelism: Int = 0
+)
+
+public data class SchedulerConfig(
+    val tickRateMs: Long = 50
 )

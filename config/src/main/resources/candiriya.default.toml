@@ -17,3 +17,15 @@ timeoutMs = 5000
 [logging]
 # log level: TRACE, DEBUG, INFO, WARN, ERROR
 level = "INFO"
+
+[threads]
+# use virtual threads for async pool (java 21+)
+virtual = true
+# core size for scheduled pool (platform threads)
+scheduledCoreSize = 2
+# parallelism for async pool when virtual=false, 0 = cpu count
+asyncParallelism = 0
+
+[scheduler]
+# tick duration in ms (50ms = 20 tps, like Paper/Folia)
+tickRateMs = 50

@@ -45,6 +45,10 @@ public object ConfigLoader {
         val quietPeriodMs = config.getOrElse<Number>("shutdown.quietPeriodMs", 200).toLong()
         val timeoutMs = config.getOrElse<Number>("shutdown.timeoutMs", 5000).toLong()
         val level = config.getOrElse<String>("logging.level", "INFO")
+        val virtual = config.getOrElse<Boolean>("threads.virtual", true)
+        val scheduledCoreSize = config.getOrElse<Number>("threads.scheduledCoreSize", 2).toInt()
+        val asyncParallelism = config.getOrElse<Number>("threads.asyncParallelism", 0).toInt()
+        val tickRateMs = config.getOrElse<Number>("scheduler.tickRateMs", 50).toLong()
 
         // validation
         val port = try {
@@ -56,11 +60,24 @@ public object ConfigLoader {
         require(workers >= 0) { "workers must be >=0, got $workers" }
         require(quietPeriodMs >= 0) { "quietPeriodMs must be >=0" }
         require(timeoutMs >= 0) { "timeoutMs must be >=0" }
+        require(
+            scheduledCoreSize >= 1
+        ) { "threads.scheduledCoreSize must be >=1, got $scheduledCoreSize" }
+        require(
+            asyncParallelism >= 0
+        ) { "threads.asyncParallelism must be >=0, got $asyncParallelism" }
+        require(tickRateMs in 10..1000) { "scheduler.tickRateMs must be 10..1000, got $tickRateMs" }
 
         return ProxyConfig(
             network = NetworkConfig(bind = bind, workers = workers),
             shutdown = ShutdownConfig(quietPeriodMs = quietPeriodMs, timeoutMs = timeoutMs),
-            logging = LoggingConfig(level = level)
+            logging = LoggingConfig(level = level),
+            threads = ThreadsConfig(
+                virtual = virtual,
+                scheduledCoreSize = scheduledCoreSize,
+                asyncParallelism = asyncParallelism
+            ),
+            scheduler = SchedulerConfig(tickRateMs = tickRateMs)
         )
     }
 
@@ -83,5 +100,17 @@ public object ConfigLoader {
     [logging]
     # log level: TRACE, DEBUG, INFO, WARN, ERROR
     level = "INFO"
+
+    [threads]
+    # use virtual threads for async pool (java 21+)
+    virtual = true
+    # core size for scheduled pool (platform threads)
+    scheduledCoreSize = 2
+    # parallelism for async pool when virtual=false, 0 = cpu count
+    asyncParallelism = 0
+
+    [scheduler]
+    # tick duration in ms (50ms = 20 tps, like Paper/Folia)
+    tickRateMs = 50
     """.trimIndent()
 }

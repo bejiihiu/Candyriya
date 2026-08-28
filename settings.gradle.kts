@@ -14,5 +14,6 @@ include(":config")
 include(":network")
 include(":protocol")
 include(":launcher")
+include(":scheduler")
 
 rootProject.name = "candiriya"

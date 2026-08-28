@@ -24,6 +24,10 @@ tasks.withType<SpotBugsTask>().configureEach {
         create("xml") { required.set(true) }
         create("html") { required.set(true) }
     }
+    // yep kotlin generates false positives for coroutines xd
+    if (name.contains("Test", ignoreCase = true)) {
+        enabled = false
+    }
 }
 
 // ktlint uses android style guide via .editorconfig
