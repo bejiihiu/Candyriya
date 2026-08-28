@@ -3,14 +3,16 @@ plugins {
     id("candiriya.quality")
 }
 
+spotbugs {
+    reportLevel.set(com.github.spotbugs.snom.Confidence.HIGH)
+}
+
 dependencies {
-    api(project(":config"))
-    api(project(":scheduler"))
-    api(project(":network"))
-    api(project(":permissions"))
-    api(project(":command"))
     implementation(libs.log4jApi)
     implementation(libs.guava)
+    implementation(libs.adventureApi)
+    implementation(libs.nightconfigCore)
+    implementation(libs.nightconfigToml)
     compileOnly(libs.checkerQual)
     compileOnly(libs.spotbugsAnnotations)
 

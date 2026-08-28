@@ -5,7 +5,10 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Locale
 import kz.bejiihiu.candiriya.Candiriya
+import kz.bejiihiu.candiriya.command.ConsoleSource
 import kz.bejiihiu.candiriya.config.ConfigLoader
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -55,6 +58,44 @@ public fun main(args: Array<String>) {
             candiriya.getTickScheduler().getCurrentTick()
         )
     }
+
+    // console input — distinguishable ConsoleSource with all perms
+    val consoleSource = ConsoleSource { msg ->
+        // use logger so it respects level + file
+        logger.info("[Console] {}", msg)
+        // also print to stdout for visibility
+        println(msg)
+    }
+    val consoleThread = Thread({
+        val reader = System.`in`.bufferedReader()
+        while (candiriya.getState() != kz.bejiihiu.candiriya.lifecycle.LifecycleState.STOPPED) {
+            val line = try {
+                reader.readLine()
+            } catch (_: Exception) {
+                null
+            } ?: break
+            val trimmed = line.trim()
+            if (trimmed.isEmpty()) continue
+            // handle stop separately
+            if (trimmed.equals("stop", ignoreCase = true) || trimmed.equals("end", ignoreCase = true)) {
+                consoleSource.sendMessage(Component.text("Stopping...", NamedTextColor.YELLOW))
+                candiriya.stop()
+                break
+            }
+            // dispatch via command manager — console is always allowed
+            try {
+                val dispatched = candiriya.getCommandManager().dispatch(consoleSource, trimmed)
+                if (!dispatched) {
+                    consoleSource.sendMessage(Component.text("Unknown command: $trimmed (try /candiriya help)", NamedTextColor.RED))
+                }
+            } catch (e: Exception) {
+                logger.error("console command error", e)
+                consoleSource.sendMessage(Component.text("Error: ${e.message}", NamedTextColor.RED))
+            }
+        }
+    }, "candiriya-console")
+    consoleThread.isDaemon = true
+    consoleThread.start()
 
     // block until shutdown
     candiriya.awaitShutdown()

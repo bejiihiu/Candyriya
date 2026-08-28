@@ -30,11 +30,7 @@ public object EncryptionUtil {
         return cipher
     }
 
-    public fun generateServerId(
-        serverId: String,
-        sharedSecret: ByteArray,
-        publicKey: PublicKey
-    ): String {
+    public fun generateServerId(serverId: String, sharedSecret: ByteArray, publicKey: PublicKey): String {
         val digest = MessageDigest.getInstance("SHA-1")
         digest.update(serverId.toByteArray(Charsets.ISO_8859_1))
         digest.update(sharedSecret)

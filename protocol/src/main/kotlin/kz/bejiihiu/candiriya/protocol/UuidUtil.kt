@@ -18,8 +18,7 @@ public object UuidUtil {
         buf.writeLong(uuid.leastSignificantBits)
     }
 
-    public fun offlineUuid(username: String): UUID =
-        UUID.nameUUIDFromBytes("OfflinePlayer:$username".toByteArray(StandardCharsets.UTF_8))
+    public fun offlineUuid(username: String): UUID = UUID.nameUUIDFromBytes("OfflinePlayer:$username".toByteArray(StandardCharsets.UTF_8))
 
     @SuppressFBWarnings(
         value = ["SA_LOCAL_SELF_ASSIGNMENT"],

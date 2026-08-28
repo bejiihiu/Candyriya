@@ -78,8 +78,7 @@ public data class EncryptionResponsePacket(
             verifyToken.contentEquals(other.verifyToken)
     }
 
-    override fun hashCode(): Int =
-        31 * sharedSecret.contentHashCode() + verifyToken.contentHashCode()
+    override fun hashCode(): Int = 31 * sharedSecret.contentHashCode() + verifyToken.contentHashCode()
 }
 
 public object LoginAcknowledgedPacket : Packet {
@@ -95,8 +94,7 @@ public data class DisconnectLoginPacket(val reasonJson: String) : Packet {
         StringUtil.writeString(buf, reasonJson)
     }
     public companion object : PacketDecoder<DisconnectLoginPacket> {
-        override fun decode(buf: ByteBuf): DisconnectLoginPacket =
-            DisconnectLoginPacket(StringUtil.readString(buf, 262144))
+        override fun decode(buf: ByteBuf): DisconnectLoginPacket = DisconnectLoginPacket(StringUtil.readString(buf, 262144))
     }
 }
 
@@ -150,8 +148,7 @@ public data class SetCompressionPacket(val threshold: Int) : Packet {
         VarInt.writeVarInt(buf, threshold)
     }
     public companion object : PacketDecoder<SetCompressionPacket> {
-        override fun decode(buf: ByteBuf): SetCompressionPacket =
-            SetCompressionPacket(VarInt.readVarInt(buf))
+        override fun decode(buf: ByteBuf): SetCompressionPacket = SetCompressionPacket(VarInt.readVarInt(buf))
     }
 }
 
@@ -224,6 +221,5 @@ public object FinishConfigurationPacket : Packet {
 public object AcknowledgeFinishConfigurationPacket : Packet {
     override fun getId(): Int = 0x03 // serverbound ack
     override fun encode(buf: ByteBuf) {}
-    public fun decode(buf: ByteBuf): AcknowledgeFinishConfigurationPacket =
-        AcknowledgeFinishConfigurationPacket
+    public fun decode(buf: ByteBuf): AcknowledgeFinishConfigurationPacket = AcknowledgeFinishConfigurationPacket
 }
