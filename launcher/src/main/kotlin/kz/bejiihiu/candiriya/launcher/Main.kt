@@ -1,5 +1,6 @@
 package kz.bejiihiu.candiriya.launcher
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import java.nio.file.Path
 import java.nio.file.Paths
 import kz.bejiihiu.candiriya.Candiriya
@@ -9,7 +10,12 @@ import org.apache.logging.log4j.LogManager
 /**
  * Entry point. Parses --config and boots [Candiriya].
  */
+@SuppressFBWarnings(
+    value = ["SA_LOCAL_SELF_ASSIGNMENT"],
+    justification = "kotlin try-catch generates self assignment"
+)
 public fun main(args: Array<String>) {
+    val startNs = System.nanoTime()
     val logger = LogManager.getLogger("Main")
     val configPath = parseConfigPath(args)
     logger.info("starting Candiriya with config {}", configPath)
@@ -26,8 +32,12 @@ public fun main(args: Array<String>) {
     candiriya.addShutdownHook()
     try {
         candiriya.start()
+        // startup timing xd
+        val elapsedSec = (System.nanoTime() - startNs) / 1_000_000_000.0
+        logger.info("Done ({}s)! For help, type \"help\"", String.format("%.3f", elapsedSec))
     } catch (e: Exception) {
-        logger.error("failed to start", e)
+        val elapsedSec = (System.nanoTime() - startNs) / 1_000_000_000.0
+        logger.error("Failed to start in {}s", String.format("%.3f", elapsedSec), e)
         System.exit(1)
         return
     }

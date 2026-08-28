@@ -15,6 +15,7 @@ dependencies {
     runtimeOnly(libs.disruptor)
     implementation(libs.guava)
     compileOnly(libs.checkerQual)
+    compileOnly(libs.spotbugsAnnotations)
 }
 
 application {
