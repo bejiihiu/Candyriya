@@ -4,12 +4,19 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelInitializer
+import io.netty.channel.ChannelOption
 import io.netty.channel.EventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
+import io.netty.handler.timeout.ReadTimeoutHandler
 import java.util.concurrent.TimeUnit
 import kz.bejiihiu.candiriya.config.ProxyConfig
+import kz.bejiihiu.candiriya.protocol.MinecraftPacketDecoder
+import kz.bejiihiu.candiriya.protocol.MinecraftVarintFrameDecoder
+import kz.bejiihiu.candiriya.protocol.MinecraftVarintLengthEncoder
+import kz.bejiihiu.candiriya.scheduler.Scheduler
 import kz.bejiihiu.candiriya.scheduler.threads.ThreadController
+import kz.bejiihiu.candiriya.scheduler.tick.TickScheduler
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -22,7 +29,9 @@ public class NetworkServer(
     private val config: ProxyConfig,
     private val threadController: ThreadController,
     private val bossGroup: EventLoopGroup = threadController.createBossGroup(),
-    private val workerGroup: EventLoopGroup = threadController.createWorkerGroup()
+    private val workerGroup: EventLoopGroup = threadController.createWorkerGroup(),
+    private val scheduler: Scheduler? = null,
+    private val tickScheduler: TickScheduler? = null
 ) {
     private val logger = LogManager.getLogger(NetworkServer::class.java)
     private var channel: Channel? = null
@@ -31,12 +40,29 @@ public class NetworkServer(
         val bootstrap = ServerBootstrap()
             .group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel::class.java)
+            .childOption(ChannelOption.SO_KEEPALIVE, true)
+            .childOption(ChannelOption.TCP_NODELAY, true)
             .childHandler(
                 object : ChannelInitializer<SocketChannel>() {
                     override fun initChannel(ch: SocketChannel) {
-                        // TODO: dispatch connection handling via scheduler
-                        // no-op handler, just log :p
-                        ch.pipeline().addLast(LoggingHandler())
+                        if (config.network.readTimeoutSeconds > 0) {
+                            ch.pipeline().addLast(
+                                "timeout",
+                                ReadTimeoutHandler(config.network.readTimeoutSeconds)
+                            )
+                        }
+                        ch.pipeline().addLast(
+                            "frameDecoder",
+                            MinecraftVarintFrameDecoder(config.protocol.maxPacketSize)
+                        )
+                        ch.pipeline().addLast("packetDecoder", MinecraftPacketDecoder())
+                        ch.pipeline().addLast("packetEncoder", MinecraftVarintLengthEncoder())
+                        ch.pipeline().addLast(
+                            "connection",
+                            ConnectionHandler(config, scheduler, tickScheduler)
+                        )
+                        // TODO: compression/encryption handlers here
+                        ch.pipeline().addLast("logger", LoggingHandler())
                     }
                 }
             )

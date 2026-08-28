@@ -45,7 +45,12 @@ public class Candiriya(
         threadController.start()
         tickScheduler.start()
         // yep, create server lazily here xd — groups come from ThreadController
-        val server = NetworkServer(config, threadController)
+        val server = NetworkServer(
+            config,
+            threadController,
+            scheduler = scheduler,
+            tickScheduler = tickScheduler
+        )
         networkServer = server
         try {
             server.start().sync()

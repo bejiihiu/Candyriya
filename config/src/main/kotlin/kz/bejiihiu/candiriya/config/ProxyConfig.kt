@@ -5,6 +5,8 @@ package kz.bejiihiu.candiriya.config
  */
 public data class ProxyConfig(
     val network: NetworkConfig = NetworkConfig(),
+    val protocol: ProtocolConfig = ProtocolConfig(),
+    val status: StatusConfig = StatusConfig(),
     val shutdown: ShutdownConfig = ShutdownConfig(),
     val logging: LoggingConfig = LoggingConfig(),
     val threads: ThreadsConfig = ThreadsConfig(),
@@ -13,11 +15,29 @@ public data class ProxyConfig(
 
 public data class NetworkConfig(
     val bind: String = "0.0.0.0:25577",
-    val workers: Int = 0
+    val workers: Int = 0,
+    val readTimeoutSeconds: Int = 30
 ) {
     public fun host(): String = bind.substringBefore(":")
 
     public fun port(): Int = bind.substringAfterLast(":").toInt()
+}
+
+public data class ProtocolConfig(
+    val maxPacketSize: Int = 2097152
+)
+
+public data class StatusConfig(
+    val motd: String = DEFAULT_MOTD,
+    val maxPlayers: Int = 100,
+    val versionName: String = "26.1",
+    val versionProtocol: Int = 775
+) {
+    public companion object {
+        public const val DEFAULT_MOTD: String =
+            "<gradient:#55FF55:#55FFFF>Candiriya 26.1</gradient>" +
+                " <gray>—</gray> <white>proxy</white>"
+    }
 }
 
 public data class ShutdownConfig(

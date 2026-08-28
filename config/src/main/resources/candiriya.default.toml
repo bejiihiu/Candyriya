@@ -7,6 +7,20 @@
 bind = "0.0.0.0:25577"
 # netty worker threads, 0 = 2 * cpu count
 workers = 0
+# read timeout in seconds, 0 = disabled
+readTimeoutSeconds = 30
+
+[protocol]
+# max packet size in bytes (1..8388608)
+maxPacketSize = 2097152
+
+[status]
+# MOTD shown in server list — MiniMessage format (<green>, <gradient:#55FF55:#55FFFF>, etc.)
+# see https://docs.advntr.dev/minimessage/format.html
+motd = "<gradient:#55FF55:#55FFFF>Candiriya 26.1</gradient> <gray>—</gray> <white>proxy</white>"
+maxPlayers = 100
+versionName = "26.1"
+versionProtocol = 775
 
 [shutdown]
 # quiet period for netty graceful shutdown (ms)

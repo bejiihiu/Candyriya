@@ -60,6 +60,15 @@ public object ConfigLoader {
     private fun parse(config: CommentedFileConfig): ProxyConfig {
         val bind = config.getOrElse<String>("network.bind", "0.0.0.0:25577")
         val workers = config.getOrElse<Number>("network.workers", 0).toInt()
+        val readTimeoutSeconds = config.getOrElse<Number>("network.readTimeoutSeconds", 30).toInt()
+        val maxPacketSize = config.getOrElse<Number>("protocol.maxPacketSize", 2097152).toInt()
+        val motd = config.getOrElse<String>(
+            "status.motd",
+            StatusConfig.DEFAULT_MOTD
+        )
+        val maxPlayers = config.getOrElse<Number>("status.maxPlayers", 100).toInt()
+        val versionName = config.getOrElse<String>("status.versionName", "26.1")
+        val versionProtocol = config.getOrElse<Number>("status.versionProtocol", 775).toInt()
         val quietPeriodMs = config.getOrElse<Number>("shutdown.quietPeriodMs", 200).toLong()
         val timeoutMs = config.getOrElse<Number>("shutdown.timeoutMs", 5000).toLong()
         val level = config.getOrElse<String>("logging.level", "INFO")
@@ -76,6 +85,13 @@ public object ConfigLoader {
         }
         require(port in 1..65535) { "port out of range 1-65535: $port" }
         require(workers >= 0) { "workers must be >=0, got $workers" }
+        require(readTimeoutSeconds >= 0) {
+            "network.readTimeoutSeconds must be >=0, got $readTimeoutSeconds"
+        }
+        require(maxPacketSize in 1..8388608) {
+            "protocol.maxPacketSize must be 1..8388608, got $maxPacketSize"
+        }
+        require(maxPlayers >= 0) { "status.maxPlayers must be >=0, got $maxPlayers" }
         require(quietPeriodMs >= 0) { "quietPeriodMs must be >=0" }
         require(timeoutMs >= 0) { "timeoutMs must be >=0" }
         require(
@@ -87,7 +103,18 @@ public object ConfigLoader {
         require(tickRateMs in 10..1000) { "scheduler.tickRateMs must be 10..1000, got $tickRateMs" }
 
         return ProxyConfig(
-            network = NetworkConfig(bind = bind, workers = workers),
+            network = NetworkConfig(
+                bind = bind,
+                workers = workers,
+                readTimeoutSeconds = readTimeoutSeconds
+            ),
+            protocol = ProtocolConfig(maxPacketSize = maxPacketSize),
+            status = StatusConfig(
+                motd = motd,
+                maxPlayers = maxPlayers,
+                versionName = versionName,
+                versionProtocol = versionProtocol
+            ),
             shutdown = ShutdownConfig(quietPeriodMs = quietPeriodMs, timeoutMs = timeoutMs),
             logging = LoggingConfig(level = level),
             threads = ThreadsConfig(
@@ -108,6 +135,19 @@ public object ConfigLoader {
     bind = "0.0.0.0:25577"
     # netty worker threads, 0 = 2 * cpu count
     workers = 0
+    # read timeout in seconds, 0 = disabled
+    readTimeoutSeconds = 30
+
+    [protocol]
+    # max packet size in bytes
+    maxPacketSize = 2097152
+
+    [status]
+    # MOTD shown in server list — MiniMessage format (<green>, <gradient>, etc.)
+    motd = "<gradient:#55FF55:#55FFFF>Candiriya 26.1</gradient> <gray>—</gray> <white>proxy</white>"
+    maxPlayers = 100
+    versionName = "26.1"
+    versionProtocol = 775
 
     [shutdown]
     # quiet period for netty graceful shutdown

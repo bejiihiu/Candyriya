@@ -24,6 +24,7 @@ junitPlatform = "1.11.3"
 mockk = "1.13.13"
 assertj = "3.27.3"
 shadow = "8.1.1"
+adventure = "4.24.0"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -51,6 +52,9 @@ junitEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref =
 junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+adventureApi = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventureGson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure" }
+adventureMiniMessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
 
 # Libraries can be bundled together for easier import
 [bundles]
