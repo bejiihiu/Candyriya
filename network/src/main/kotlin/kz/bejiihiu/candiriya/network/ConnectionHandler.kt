@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager
 
 /**
  * Handles client→proxy Minecraft packets.
- * Supports handshake→status/login flow, without backend forward yet.
+ * Supports handshake→status/login + backend proxy forwarding.
  */
 public class ConnectionHandler(
     private val config: ProxyConfig,
@@ -35,10 +35,19 @@ public class ConnectionHandler(
     public var state: ConnectionState = ConnectionState.HANDSHAKE
         private set
 
+    public fun setState(newState: ConnectionState) {
+        state = newState
+        session.state = newState
+    }
+
     private var packetCounter: Long = 0
+
+    private val session = kz.bejiihiu.candiriya.network.session.ProxySession(config)
 
     override fun channelActive(ctx: ChannelHandlerContext) {
         state = ConnectionState.HANDSHAKE
+        session.state = ConnectionState.HANDSHAKE
+        session.setClient(ctx)
         logger.info("client {} connected", ctx.channel().remoteAddress())
         super.channelActive(ctx)
     }
@@ -59,8 +68,9 @@ public class ConnectionHandler(
         when (state) {
             ConnectionState.HANDSHAKE -> handleHandshake(ctx, packet)
             ConnectionState.STATUS -> handleStatus(ctx, packet)
-            ConnectionState.LOGIN -> handleLoginDisconnect(ctx, packet)
-            ConnectionState.PLAY -> logger.warn("unexpected play packet id={}", packet.id)
+            ConnectionState.LOGIN -> handleLogin(ctx, packet)
+            ConnectionState.CONFIGURATION -> handleConfiguration(ctx, packet)
+            ConnectionState.PLAY -> handlePlay(ctx, packet)
             ConnectionState.CLOSED -> logger.warn("packet in closed state id={}", packet.id)
         }
     }
@@ -104,6 +114,10 @@ public class ConnectionHandler(
                     return
                 }
             }
+            session.state = state
+            session.protocolVersion = proto
+            session.serverAddress = addr
+            session.serverPort = port
         } catch (e: Exception) {
             logger.warn("bad handshake from {}", ctx.channel().remoteAddress(), e)
             ctx.close()
@@ -167,8 +181,140 @@ public class ConnectionHandler(
         }
     }
 
+    private fun handleLogin(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
+        // LoginStart is 0x00 with username (+ optional uuid)
+        try {
+            when (packet.id) {
+                0x00 -> {
+                    val username = StringUtil.readString(packet.data, 16)
+                    // try read uuid if present (16 bytes)
+                    var uuid: java.util.UUID? = null
+                    if (packet.data.readableBytes() >= 16) {
+                        val most = packet.data.readLong()
+                        val least = packet.data.readLong()
+                        uuid = java.util.UUID(most, least)
+                    }
+                    logger.info(
+                        "login start username={} uuid={} from {}",
+                        username,
+                        uuid,
+                        ctx.channel().remoteAddress()
+                    )
+                    session.username = username
+                    session.uuid = uuid
+                        ?: kz.bejiihiu.candiriya.protocol.UuidUtil.offlineUuid(
+                            username
+                        )
+                    // connect to backend
+                    connectToBackend(ctx)
+                }
+                else -> {
+                    // encryption / plugin responses — forward to backend if connected
+                    forwardToBackend(packet)
+                }
+            }
+        } catch (e: Exception) {
+            logger.warn("bad login packet from {}", ctx.channel().remoteAddress(), e)
+            ctx.close()
+        }
+    }
+
+    private fun handleConfiguration(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
+        // client is in CONFIGURATION (1.21.5); forward to backend
+        // if packet is FinishConfiguration ack (0x03), transition to PLAY
+        if (packet.id == 0x03) {
+            logger.info("client {} finish configuration -> PLAY", ctx.channel().remoteAddress())
+            state = ConnectionState.PLAY
+            session.state = ConnectionState.PLAY
+        }
+        forwardToBackend(packet)
+    }
+
+    private fun handlePlay(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
+        forwardToBackend(packet)
+    }
+
+    private fun forwardToBackend(packet: MinecraftPacket) {
+        val backend = session.backendChannel
+        if (backend == null || !backend.isActive) {
+            logger.warn("no backend for packet id={} from {}", packet.id, session.username)
+            return
+        }
+        val dup = packet.data.retainedDuplicate()
+        val fwd = MinecraftPacket(packet.id, dup)
+        backend.writeAndFlush(fwd).addListener { fut ->
+            dup.release()
+            if (!fut.isSuccess) logger.warn("failed forward to backend", fut.cause())
+        }
+    }
+
+    private fun connectToBackend(ctx: ChannelHandlerContext) {
+        val host = config.backend.host
+        val port = config.backend.port
+        logger.info("connecting {} to backend {}:{}", session.username, host, port)
+        val bootstrap = io.netty.bootstrap.Bootstrap()
+            .group(ctx.channel().eventLoop())
+            .channel(io.netty.channel.socket.nio.NioSocketChannel::class.java)
+            .option(io.netty.channel.ChannelOption.SO_KEEPALIVE, true)
+            .option(io.netty.channel.ChannelOption.TCP_NODELAY, true)
+            .handler(
+                object : io.netty.channel.ChannelInitializer<
+                    io.netty.channel.socket.SocketChannel
+                    >() {
+                    override fun initChannel(ch: io.netty.channel.socket.SocketChannel) {
+                        ch.pipeline().addLast(
+                            "frameDecoder",
+                            kz.bejiihiu.candiriya.protocol.MinecraftVarintFrameDecoder(
+                                config.protocol.maxPacketSize
+                            )
+                        )
+                        ch.pipeline().addLast(
+                            "packetDecoder",
+                            kz.bejiihiu.candiriya.protocol.MinecraftPacketDecoder()
+                        )
+                        ch.pipeline().addLast(
+                            "packetEncoder",
+                            kz.bejiihiu.candiriya.protocol.MinecraftVarintLengthEncoder()
+                        )
+                        ch.pipeline().addLast(
+                            "backendHandler",
+                            BackendHandler(session)
+                        )
+                    }
+                }
+            )
+        bootstrap.connect(host, port).addListener { fut ->
+            if (!fut.isSuccess) {
+                logger.warn(
+                    "failed to connect {} to backend {}:{}",
+                    session.username,
+                    host,
+                    port,
+                    fut.cause()
+                )
+                val reason = Component.text(
+                    "Could not connect to backend: ${fut.cause()?.message ?: "unknown"}"
+                )
+                    .color(NamedTextColor.RED)
+                val disc = createDisconnectPacket(reason)
+                ctx.writeAndFlush(disc).addListener {
+                    disc.data.release()
+                    ctx.close()
+                }
+            } else {
+                val ch = (fut as io.netty.channel.ChannelFuture).channel()
+                session.setBackend(ch)
+                logger.info("backend connected for {}", session.username)
+            }
+        }
+    }
+
+    @SuppressFBWarnings(
+        value = ["UPM_UNCALLED_PRIVATE_METHOD"],
+        justification = "kept for future fallback"
+    )
     private fun handleLoginDisconnect(ctx: ChannelHandlerContext, packet: MinecraftPacket) {
-        // any login packet → disconnect with reason
+        // fallback disconnect (unused)
         logger.info(
             "login packet id={} from {} — disconnecting (login not implemented)",
             packet.id,
@@ -178,7 +324,6 @@ public class ConnectionHandler(
             .color(NamedTextColor.RED)
         val disconnect = createDisconnectPacket(reason)
         ctx.writeAndFlush(disconnect).addListener { _ ->
-            // release after encode copied
             disconnect.data.release()
             ctx.close()
         }
@@ -226,12 +371,14 @@ public class ConnectionHandler(
             )
             else -> logger.warn("exception on {}", ctx.channel().remoteAddress(), cause)
         }
+        session.closeBoth("exception")
         ctx.close()
     }
 
     override fun channelInactive(ctx: ChannelHandlerContext) {
         logger.info("client {} disconnected", ctx.channel().remoteAddress())
         state = ConnectionState.CLOSED
+        session.closeBoth()
         super.channelInactive(ctx)
     }
 }

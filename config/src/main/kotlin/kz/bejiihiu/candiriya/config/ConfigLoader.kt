@@ -62,6 +62,14 @@ public object ConfigLoader {
         val workers = config.getOrElse<Number>("network.workers", 0).toInt()
         val readTimeoutSeconds = config.getOrElse<Number>("network.readTimeoutSeconds", 30).toInt()
         val maxPacketSize = config.getOrElse<Number>("protocol.maxPacketSize", 2097152).toInt()
+        val compressionThreshold = config.getOrElse<Number>(
+            "protocol.compressionThreshold",
+            256
+        ).toInt()
+        val backendHost = config.getOrElse<String>("backend.host", "127.0.0.1")
+        val backendPort = config.getOrElse<Number>("backend.port", 25565).toInt()
+        val onlineMode = config.getOrElse<Boolean>("security.onlineMode", false)
+        val forwardingSecret = config.getOrElse<String>("security.forwardingSecret", "")
         val motd = config.getOrElse<String>(
             "status.motd",
             StatusConfig.DEFAULT_MOTD
@@ -108,7 +116,12 @@ public object ConfigLoader {
                 workers = workers,
                 readTimeoutSeconds = readTimeoutSeconds
             ),
-            protocol = ProtocolConfig(maxPacketSize = maxPacketSize),
+            protocol = ProtocolConfig(
+                maxPacketSize = maxPacketSize,
+                compressionThreshold = compressionThreshold
+            ),
+            backend = BackendConfig(host = backendHost, port = backendPort),
+            security = SecurityConfig(onlineMode = onlineMode, forwardingSecret = forwardingSecret),
             status = StatusConfig(
                 motd = motd,
                 maxPlayers = maxPlayers,
@@ -141,6 +154,16 @@ public object ConfigLoader {
     [protocol]
     # max packet size in bytes
     maxPacketSize = 2097152
+    # compression threshold, -1 to disable, 256 is velocity default
+    compressionThreshold = 256
+
+    [backend]
+    host = "127.0.0.1"
+    port = 25565
+
+    [security]
+    onlineMode = false
+    forwardingSecret = ""
 
     [status]
     # MOTD shown in server list — MiniMessage format (<green>, <gradient>, etc.)

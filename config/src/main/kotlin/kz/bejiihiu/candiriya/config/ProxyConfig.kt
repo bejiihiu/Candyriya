@@ -7,6 +7,8 @@ public data class ProxyConfig(
     val network: NetworkConfig = NetworkConfig(),
     val protocol: ProtocolConfig = ProtocolConfig(),
     val status: StatusConfig = StatusConfig(),
+    val backend: BackendConfig = BackendConfig(),
+    val security: SecurityConfig = SecurityConfig(),
     val shutdown: ShutdownConfig = ShutdownConfig(),
     val logging: LoggingConfig = LoggingConfig(),
     val threads: ThreadsConfig = ThreadsConfig(),
@@ -24,7 +26,18 @@ public data class NetworkConfig(
 }
 
 public data class ProtocolConfig(
-    val maxPacketSize: Int = 2097152
+    val maxPacketSize: Int = 2097152,
+    val compressionThreshold: Int = 256
+)
+
+public data class BackendConfig(
+    val host: String = "127.0.0.1",
+    val port: Int = 25565
+)
+
+public data class SecurityConfig(
+    val onlineMode: Boolean = false,
+    val forwardingSecret: String = ""
 )
 
 public data class StatusConfig(
