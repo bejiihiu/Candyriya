@@ -4,6 +4,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kz.bejiihiu.candiriya.scheduler.context.ContextRegistry
+import kz.bejiihiu.candiriya.server.RegisteredServer
+import kz.bejiihiu.candiriya.server.ServerRegistry
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -15,7 +17,8 @@ import org.apache.logging.log4j.LogManager
     justification = "registry intentional xd"
 )
 public class PlayerManager(
-    private val registry: ContextRegistry
+    private val registry: ContextRegistry,
+    private var serverRegistry: ServerRegistry? = null
 ) {
     private val logger = LogManager.getLogger(PlayerManager::class.java)
 
@@ -34,6 +37,7 @@ public class PlayerManager(
             AssignStrategy.ROUND_ROBIN -> registry.assignRoundRobin(uuid)
         }
         val player = Player(uuid = uuid, username = username, connection = connection, context = ctx, server = server)
+        serverRegistry?.let { player.setServerRegistry(it) }
         val prev = byUuid.putIfAbsent(uuid, player)
         check(prev == null) { "player $uuid already exists" }
         byName[username.lowercase()] = player
@@ -75,6 +79,14 @@ public class PlayerManager(
         logger.info("player {} migrated ctx {} -> {}", player.username, player.context.id, targetContextId)
         return player
     }
+
+    public fun setServerRegistry(registry: ServerRegistry) {
+        serverRegistry = registry
+        // propagate to existing players
+        for (p in byUuid.values) p.setServerRegistry(registry)
+    }
+
+    public fun getServerRegistry(): ServerRegistry? = serverRegistry
 
     public enum class AssignStrategy { HASH, ROUND_ROBIN }
 }

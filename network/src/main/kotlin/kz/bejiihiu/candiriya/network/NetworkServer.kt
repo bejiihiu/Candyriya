@@ -20,6 +20,7 @@ import kz.bejiihiu.candiriya.scheduler.Scheduler
 import kz.bejiihiu.candiriya.scheduler.context.ContextRegistry
 import kz.bejiihiu.candiriya.scheduler.threads.ThreadController
 import kz.bejiihiu.candiriya.scheduler.tick.TickScheduler
+import kz.bejiihiu.candiriya.server.ServerRegistry
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -37,7 +38,8 @@ public class NetworkServer(
     private val scheduler: Scheduler? = null,
     private val tickScheduler: TickScheduler? = null,
     private val contextRegistry: ContextRegistry? = null,
-    private val playerManager: PlayerManager? = null
+    private val playerManager: PlayerManager? = null,
+    private val serverRegistry: ServerRegistry? = null
 ) {
     private val logger = LogManager.getLogger(NetworkServer::class.java)
     private var channel: Channel? = null
@@ -74,7 +76,7 @@ public class NetworkServer(
                         ch.pipeline().addLast("packetEncoder", MinecraftVarintLengthEncoder())
                         ch.pipeline().addLast(
                             "connection",
-                            ConnectionHandler(config, scheduler, tickScheduler, contextRegistry, playerManager)
+                            ConnectionHandler(config, scheduler, tickScheduler, contextRegistry, playerManager, serverRegistry)
                         )
                         ch.pipeline().addLast("logger", LoggingHandler())
                     }

@@ -1,13 +1,16 @@
 package kz.bejiihiu.candiriya.config
 
+import kz.bejiihiu.candiriya.server.RegisteredServer
+
 /**
  * Root proxy config. Mirrors the TOML structure.
  */
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = ["EI_EXPOSE_REP", "EI_EXPOSE_REP2"], justification = "config data holder xd")
 public data class ProxyConfig(
     val network: NetworkConfig = NetworkConfig(),
     val protocol: ProtocolConfig = ProtocolConfig(),
     val status: StatusConfig = StatusConfig(),
-    val backend: BackendConfig = BackendConfig(),
+    val servers: ServersConfig = ServersConfig(),
     val security: SecurityConfig = SecurityConfig(),
     val shutdown: ShutdownConfig = ShutdownConfig(),
     val logging: LoggingConfig = LoggingConfig(),
@@ -30,16 +33,20 @@ public data class ProtocolConfig(
     val compressionThreshold: Int = 256
 )
 
-public data class BackendConfig(
-    val host: String = "127.0.0.1",
-    val port: Int = 25565,
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = ["EI_EXPOSE_REP", "EI_EXPOSE_REP2"], justification = "config holder")
+public data class ServersConfig(
+    val servers: Map<String, RegisteredServer> = mapOf(
+        "lobby" to RegisteredServer("lobby", "127.0.0.1", 30066),
+        "factions" to RegisteredServer("factions", "127.0.0.1", 30067),
+        "minigames" to RegisteredServer("minigames", "127.0.0.1", 30068)
+    ),
+    val tryOrder: List<String> = listOf("lobby"),
     val connectTimeoutMs: Int = 5000,
     val retryAttempts: Int = 0,
-    val retryDelayMs: Long = 500
-) {
-    // TODO: picks up when we add multi-backend like velocity's [servers] map
-    // for now single backend, but structure is ready for Map<String, BackendConfig> xd
-}
+    val retryDelayMs: Long = 500,
+    val failoverOnUnexpectedDisconnect: Boolean = true,
+    val unavailableCooldownMs: Long = 5000
+)
 
 public enum class ForwardingMode {
     NONE,

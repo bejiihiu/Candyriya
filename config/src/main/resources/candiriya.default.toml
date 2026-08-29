@@ -16,17 +16,16 @@ maxPacketSize = 2097152
 # compression threshold, -1 to disable
 compressionThreshold = 256
 
-[backend]
-# single backend for now — like velocity's [servers] but simplified xd
-# TODO: future Map<String, BackendConfig> when we add multi-backend support
-host = "127.0.0.1"
-port = 25565
-# how long to wait for backend connect before giving up
+[servers]
+lobby = "127.0.0.1:30066"
+factions = "127.0.0.1:30067"
+minigames = "127.0.0.1:30068"
+try = ["lobby"]
 connectTimeoutMs = 5000
-# retry attempts on failure (0 = kick immediately, like you wanted xd)
 retryAttempts = 0
-# delay between retries
 retryDelayMs = 500
+failoverOnUnexpectedDisconnect = true
+unavailableCooldownMs = 5000
 
 [security]
 onlineMode = false

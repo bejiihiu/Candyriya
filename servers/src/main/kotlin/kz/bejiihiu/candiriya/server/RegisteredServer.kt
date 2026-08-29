@@ -1,8 +1,8 @@
-package kz.bejiihiu.candiriya.player
+package kz.bejiihiu.candiriya.server
 
 /**
  * Backend server descriptor — like Velocity's RegisteredServer / ServerInfo.
- * For now single backend, but structure ready for Map<String, RegisteredServer>.
+ * Lives in :servers module now, not :network.
  */
 public data class RegisteredServer(
     val name: String,

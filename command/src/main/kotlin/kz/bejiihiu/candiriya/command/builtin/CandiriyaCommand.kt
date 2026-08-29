@@ -12,8 +12,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.apache.logging.log4j.LogManager
 
 /**
- * Root `/candyriya` command — mirrors Velocity's `/velocity` but renamed.
- * Subcommands: plugins, info, reload, dump, heap (from velocity spec)
+ * Root `/candyriya` command.
+ * Subcommands: plugins, info, reload, dump, heap
  * plus help/perms/op kept for internal use.
  *
  * Permissions: candyriya.command.<sub> or candyriya.* for op.
@@ -22,6 +22,8 @@ public class CandiriyaCommand(
     private val commandManager: CommandManager,
     private val permissionManager: PermissionManager,
     private val permissionsFile: Path? = null,
+    private val configPath: Path? = null,
+    private val candiriya: Any? = null,
     private val version: String = "26.1"
 ) : Command {
     override val permission: String? = null // root open, subcommands check own perms
@@ -43,7 +45,6 @@ public class CandiriyaCommand(
             "reload" -> handleReload(source)
             "dump" -> handleDump(source)
             "heap" -> handleHeap(source)
-            // keep extra internals
             "perms" -> handlePerms(source, args.drop(1).toTypedArray())
             "op" -> handleOp(source, args.drop(1).toTypedArray())
             else -> {
@@ -75,10 +76,8 @@ public class CandiriyaCommand(
         if (source.hasPermission("candiriya.command.reload")) all.add("reload")
         if (source.hasPermission("candiriya.command.dump")) all.add("dump")
         if (source.hasPermission("candiriya.command.heap")) all.add("heap")
-        // extra
         if (source.hasPermission("candiriya.command.perms")) all.add("perms")
         if (source.hasPermission("candiriya.command.op") || source.isConsole) all.add("op")
-        // info is open to those with perm, but we also allow everyone to see it
         if (!all.contains("info") && source.hasPermission("candiriya.command.info")) all.add("info")
         return all.distinct().sorted()
     }
@@ -102,12 +101,18 @@ public class CandiriyaCommand(
         source.sendMessage(Component.text("/candyriya plugins - list plugins", NamedTextColor.GRAY))
         source.sendMessage(Component.text("/candyriya info - proxy info", NamedTextColor.GRAY))
         if (source.hasPermission("candiriya.command.reload")) {
-            source.sendMessage(Component.text("/candyriya reload - reload config/permissions", NamedTextColor.GRAY))
+            source.sendMessage(Component.text("/candyriya reload - reload config/permissions + servers", NamedTextColor.GRAY))
         }
-        if (source.hasPermission("candiriya.command.dump")) {
+        if (source.hasPermission(
+                "candiriya.command.dump"
+            )
+        ) {
             source.sendMessage(Component.text("/candyriya dump - anonymized dump", NamedTextColor.GRAY))
         }
-        if (source.hasPermission("candiriya.command.heap")) {
+        if (source.hasPermission(
+                "candiriya.command.heap"
+            )
+        ) {
             source.sendMessage(Component.text("/candyriya heap - heap dump", NamedTextColor.GRAY))
         }
         source.sendMessage(Component.text("/server [name] - switch server", NamedTextColor.GRAY))
@@ -118,14 +123,11 @@ public class CandiriyaCommand(
     }
 
     private fun sendInfo(source: CommandSource) {
-        // per spec: requires candyriya.command.info, but we also allow everyone to see basic info
         if (!source.hasPermission("candiriya.command.info") && !source.isConsole) {
-            // still show but hint about perm
             source.sendMessage(Component.text("No permission: candyriya.command.info", NamedTextColor.RED))
             return
         }
         source.sendMessage(mini.deserialize("<gradient:#55FF55:#55FFFF>Candiriya $version</gradient> <gray>— proxy</gray>"))
-        source.sendMessage(Component.text("Velocity API: 3.x (candyriya fork)", NamedTextColor.GRAY))
         source.sendMessage(Component.text("Source: ${source.name} (console=${source.isConsole})", NamedTextColor.GRAY))
         source.sendMessage(Component.text("Try /candyriya help", NamedTextColor.DARK_GRAY))
     }
@@ -137,7 +139,6 @@ public class CandiriyaCommand(
             source.sendMessage(Component.text("No permission: candyriya.command.plugins", NamedTextColor.RED))
             return
         }
-        // no plugin system yet — show placeholder like Velocity does
         source.sendMessage(Component.text("Plugins (0): ", NamedTextColor.YELLOW))
         source.sendMessage(Component.text("No plugins installed (plugin API coming soon)", NamedTextColor.GRAY))
     }
@@ -147,6 +148,24 @@ public class CandiriyaCommand(
             source.sendMessage(Component.text("No permission: candiriya.command.reload", NamedTextColor.RED))
             return
         }
+        // try full candiriya reload if available
+        val c = candiriya
+        if (c != null) {
+            try {
+                val method = c.javaClass.getMethod("reload")
+
+                @Suppress("UNCHECKED_CAST")
+                val result = method.invoke(c) as Result<String>
+                if (result.isSuccess) {
+                    source.sendMessage(Component.text(result.getOrNull() ?: "Reloaded", NamedTextColor.GREEN))
+                } else {
+                    source.sendMessage(Component.text("Reload failed: ${result.exceptionOrNull()?.message}", NamedTextColor.RED))
+                }
+                return
+            } catch (e: Exception) {
+                logger.debug("full reload not available, fallback to perms only", e)
+            }
+        }
         try {
             if (permissionsFile != null) {
                 permissionManager.loadFromFile(permissionsFile)
@@ -154,8 +173,7 @@ public class CandiriyaCommand(
             } else {
                 source.sendMessage(Component.text("Permissions reloaded (no file)", NamedTextColor.GREEN))
             }
-            // TODO: reload velocity.toml equivalent — candiriya.toml
-            source.sendMessage(Component.text("Proxy config reload not yet implemented (restart for now)", NamedTextColor.YELLOW))
+            source.sendMessage(Component.text("Proxy config reload not available (inject Candiriya instance)", NamedTextColor.YELLOW))
         } catch (e: Exception) {
             logger.warn("reload failed", e)
             source.sendMessage(Component.text("Reload failed: ${e.message}", NamedTextColor.RED))
@@ -175,7 +193,7 @@ public class CandiriyaCommand(
                 appendLine("Candiriya dump")
                 appendLine("version: $version")
                 appendLine("groups: ${permissionManager.getGroups().keys}")
-                appendLine("ops: ${permissionManager.getGroups()}") // anonymized
+                appendLine("ops: ${permissionManager.getGroups()}")
                 appendLine("commands: ${commandManager.allCommands().keys}")
             }
             Files.writeString(file, content)
@@ -198,7 +216,6 @@ public class CandiriyaCommand(
             val dumpDir = Path.of("dumps")
             Files.createDirectories(dumpDir)
             val file = dumpDir.resolve("candyriya-heap-${System.currentTimeMillis()}.hprof")
-            // try to trigger via HotSpotDiagnosticMXBean if available
             try {
                 val server = java.lang.management.ManagementFactory.getPlatformMBeanServer()
                 val objName = javax.management.ObjectName.getInstance("com.sun.management:type=HotSpotDiagnostic")

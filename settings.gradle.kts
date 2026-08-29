@@ -11,6 +11,7 @@ plugins {
 
 include(":core")
 include(":config")
+include(":servers")
 include(":network")
 include(":protocol")
 include(":launcher")

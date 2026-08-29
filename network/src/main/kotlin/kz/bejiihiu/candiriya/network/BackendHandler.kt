@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import kz.bejiihiu.candiriya.config.ForwardingMode
-import kz.bejiihiu.candiriya.network.forwarding.VelocityModernForwarder
+import kz.bejiihiu.candiriya.network.forwarding.ModernForwarder
 import kz.bejiihiu.candiriya.network.session.ProxySession
 import kz.bejiihiu.candiriya.protocol.ConnectionState
 import kz.bejiihiu.candiriya.protocol.MinecraftPacket
@@ -56,17 +56,16 @@ public class BackendHandler(
         val secret = session.config.security.forwardingSecret
 
         if (fwdMode == ForwardingMode.LEGACY && secret.isNotEmpty()) {
-            // legacy: inject into handshake like Velocity does
             val playerAddr = session.clientChannel?.remoteAddress()?.toString() ?: "127.0.0.1"
             val cleanAddr = playerAddr.substringAfter("/").substringBefore(":")
-            serverAddr = VelocityModernForwarder.createLegacyForwardingAddress(
+            serverAddr = ModernForwarder.createLegacyForwardingAddress(
                 session.serverAddress, cleanAddr, session.uuid ?: java.util.UUID.randomUUID()
             )
             logger.debug("using LEGACY forwarding addr for {}", session.username)
         } else if (fwdMode == ForwardingMode.BUNGEEGUARD && secret.isNotEmpty()) {
             val playerAddr = session.clientChannel?.remoteAddress()?.toString() ?: "127.0.0.1"
             val cleanAddr = playerAddr.substringAfter("/").substringBefore(":")
-            serverAddr = VelocityModernForwarder.createBungeeGuardForwardingAddress(
+            serverAddr = ModernForwarder.createBungeeGuardForwardingAddress(
                 session.serverAddress, cleanAddr, session.uuid ?: java.util.UUID.randomUUID(), secret
             )
             logger.debug("using BUNGEEGUARD forwarding addr for {}", session.username)
@@ -143,8 +142,9 @@ public class BackendHandler(
     @SuppressFBWarnings(value = ["REC_CATCH_EXCEPTION"], justification = "VarInt parsing")
     private fun handleLoginBackend(ctx: ChannelHandlerContext, packet: MinecraftPacket, client: io.netty.channel.Channel) {
         when (packet.id) {
-            0x00 -> { // Disconnect login
+            0x00 -> { // Disconnect login — try fallback before kicking
                 logger.info("backend disconnect for {}", session.username)
+                if (tryFallback(client, ctx, "backend kicked during login")) return
                 forwardToClient(packet, client, ctx)
                 ctx.close()
             }
@@ -199,7 +199,7 @@ public class BackendHandler(
     }
 
     /**
-     * Velocity modern forwarding — see VelocityModernForwarder for details.
+     * Velocity modern forwarding — see ModernForwarder for details.
      * Returns true if we handled the packet (don't forward to client).
      *
      * Big ups to PaperMC Velocity for this design:
@@ -239,18 +239,15 @@ public class BackendHandler(
                 buf.resetReaderIndex()
                 return false
             }
-            if (channel != VelocityModernForwarder.CHANNEL) {
+            if (channel != ModernForwarder.CHANNEL) {
                 buf.resetReaderIndex()
                 return false
             }
-            // remaining bytes: content (should be 0 or 1 byte version)
-            var requestedVersion = VelocityModernForwarder.MODERN_DEFAULT
+            var requestedVersion = ModernForwarder.MODERN_DEFAULT
             if (buf.isReadable) {
-                // velocity checks if readableBytes == 1 then readByte, else default
                 if (buf.readableBytes() == 1) {
                     requestedVersion = buf.readByte().toInt()
                 } else if (buf.readableBytes() > 0) {
-                    // weird but try to read first byte
                     requestedVersion = buf.readByte().toInt()
                 }
             }
@@ -260,11 +257,10 @@ public class BackendHandler(
                 session.username
             )
 
-            // build forwarding data — uses HMAC like velocity does
             val playerAddr = session.clientChannel?.remoteAddress()?.toString() ?: "127.0.0.1"
             val cleanAddr = playerAddr.substringAfter("/").substringBefore(":")
             val uuid = session.uuid ?: return false
-            val forwardingData = VelocityModernForwarder.createForwardingData(
+            val forwardingData = ModernForwarder.createForwardingData(
                 secret,
                 cleanAddr,
                 uuid,
@@ -363,18 +359,42 @@ public class BackendHandler(
         }
     }
 
+    private fun tryFallback(client: io.netty.channel.Channel, backendCtx: ChannelHandlerContext, reason: String): Boolean {
+        if (session.isClosed()) return false
+        if (!session.config.servers.failoverOnUnexpectedDisconnect) return false
+        try {
+            val handler = client.pipeline().get("connection") as? ConnectionHandler ?: return false
+            handler.handleBackendDisconnect(reason)
+            try {
+                backendCtx.close()
+            } catch (_: Exception) {}
+            return true
+        } catch (e: Exception) {
+            logger.debug("fallback check failed for {}", session.username, e)
+            return false
+        }
+    }
+
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
         logger.warn("backend exception for {}", session.username, cause)
+        val client = session.clientChannel
+        if (client != null && client.isActive && tryFallback(client, ctx, "exception: ${cause.message}")) return
         session.closeBoth("backend exception: ${cause.message}")
         ctx.close()
     }
 
     override fun channelInactive(ctx: ChannelHandlerContext) {
         logger.info("backend disconnected for {}", session.username)
-        // only close client if session not already closed — idempotent
-        if (!session.isClosed()) {
-            session.closeBoth("backend inactive")
+        if (session.isClosed()) {
+            super.channelInactive(ctx)
+            return
         }
+        val client = session.clientChannel
+        if (client != null && client.isActive && tryFallback(client, ctx, "backend inactive")) {
+            super.channelInactive(ctx)
+            return
+        }
+        if (!session.isClosed()) session.closeBoth("backend inactive")
         super.channelInactive(ctx)
     }
 

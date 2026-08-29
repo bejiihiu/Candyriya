@@ -8,7 +8,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 
 /**
  * `/glist` — view number of players on proxy.
- * Per velocity spec: `candiriya.command.glist` granted to nobody by default.
  * - `/glist` — total count
  * - `/glist all` — per-server listing
  */

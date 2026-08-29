@@ -4,11 +4,10 @@ plugins {
 }
 
 dependencies {
-    api(project(":servers"))
-    implementation(libs.nightconfigToml)
-    implementation(libs.nightconfigCore)
-    implementation(libs.log4jApi)
-    implementation(libs.guava)
+    api(libs.adventureApi)
+    api(libs.adventureGson)
+    api(libs.log4jApi)
+    api(libs.guava)
     compileOnly(libs.checkerQual)
     compileOnly(libs.spotbugsAnnotations)
 
