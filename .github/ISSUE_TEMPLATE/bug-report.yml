@@ -1,0 +1,76 @@
+name: Bug Report
+description: Report a bug in Candyriya
+labels: ["type: bug"]
+body:
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: What you expected to work and how.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Actual Behavior
+      description: What actually happens (logs, kick message, stacktrace).
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: How we can reproduce this — config, commands, backend version, minimal repro.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Plugin List
+      description: |
+        Plugins on proxy (`candyriya plugins`) and backend (`/plugins`). Put `none` if vanilla.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Candyriya Version
+      description: |
+        Output of `candyriya info` or `java -jar candyriya.jar --version`.
+        *Latest* is not a version. Paste text, not screenshot.
+        <details><summary>Example</summary>
+
+        ```
+        [12:00:00 INFO]: Candyriya 26.1 (git-abc123)
+        ```
+        </details>
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: candyriya.toml
+      description: Your config (redact `forwardingSecret`).
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Logs
+      description: Relevant `logs/candyriya.log` snippet (use https://mclo.gs/ for long logs).
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Anything else helpful.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, please ensure:
+        1. You are on the latest `dev` or latest release.
+        2. You searched for existing open issues.
+        3. If unsure, ask in [Discord](https://discord.gg/yJk5qdR7wn) first.

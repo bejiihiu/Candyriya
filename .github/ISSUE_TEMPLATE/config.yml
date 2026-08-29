@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discord Support
+    url: https://discord.gg/yJk5qdR7wn
+    about: Questions, help with setup, or "is this a bug?" — ask on Discord first.
+  - name: Security Report
+    url: https://github.com/bejiihiu/Candyriya/security/advisories/new
+    about: Do not open a public issue for exploits. Use a private security advisory or Discord DM.

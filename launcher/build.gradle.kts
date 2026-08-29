@@ -1,6 +1,6 @@
 plugins {
     id("buildsrc.convention.kotlin-jvm")
-    id("candiriya.quality")
+    id("candyriya.quality")
     application
     alias(libs.plugins.shadow)
 }
@@ -23,12 +23,12 @@ dependencies {
 }
 
 application {
-    mainClass.set("kz.bejiihiu.candiriya.launcher.MainKt")
+    mainClass.set("kz.bejiihiu.candyriya.launcher.MainKt")
 }
 
 tasks.named("shadowJar") {
     (this as com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).apply {
-        archiveBaseName.set("candiriya")
+        archiveBaseName.set("candyriya")
         archiveClassifier.set("")
         archiveVersion.set("")
         mergeServiceFiles()

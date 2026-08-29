@@ -1,0 +1,40 @@
+name: Feature Request
+description: Request a feature for Candyriya
+labels: ["type: feature"]
+body:
+  - type: textarea
+    attributes:
+      label: Requested Feature
+      description: Describe what you'd like added.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Why is this needed?
+      description: Why do you need it? What problem does it solve? Is it proxy-side or backend-side?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Alternative Solutions
+      description: What have you tried? Any workarounds or other proxies that do this?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Links, references (e.g. Velocity PR), mockups.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting:
+        1. You are on the latest `dev` / release.
+        2. You searched for existing requests.
+        3. Feature must be proxy-side (not backend plugin).
+        Unsure? Ask in [Discord](https://discord.gg/yJk5qdR7wn).
