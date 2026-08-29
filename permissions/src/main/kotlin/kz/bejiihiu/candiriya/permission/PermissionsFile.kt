@@ -115,7 +115,16 @@ public object PermissionsFile {
         if (Files.exists(path)) return
         val defaults = PermissionsFileData(
             groups = mapOf(
-                "default" to PermissionGroup("default", setOf("candiriya.command.help", "candiriya.command.info"), emptySet(), true),
+                "default" to PermissionGroup(
+                    "default",
+                    setOf(
+                        "candiriya.command.help",
+                        "candiriya.command.info",
+                        "candiriya.command.server"
+                    ),
+                    emptySet(),
+                    true
+                ),
                 "op" to PermissionGroup("op", setOf("candiriya.*"), setOf("default"), false)
             ),
             ops = emptySet(),

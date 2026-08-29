@@ -7,6 +7,10 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
 import kz.bejiihiu.candiriya.command.CommandManager
 import kz.bejiihiu.candiriya.command.builtin.CandiriyaCommand
+import kz.bejiihiu.candiriya.command.builtin.GlistCommand
+import kz.bejiihiu.candiriya.command.builtin.SendCommand
+import kz.bejiihiu.candiriya.command.builtin.ServerCommand
+import kz.bejiihiu.candiriya.command.builtin.ShutdownCommand
 import kz.bejiihiu.candiriya.config.ProxyConfig
 import kz.bejiihiu.candiriya.lifecycle.LifecycleState
 import kz.bejiihiu.candiriya.network.NetworkServer
@@ -73,11 +77,15 @@ public class Candiriya(
         } catch (e: Exception) {
             logger.warn("failed to init permissions", e)
         }
-        // register builtin command (only candiriya for now, per requirement)
+        // register builtin commands — mirrors Velocity's built-ins but with candyriya name
         try {
             val candiriyaCmd = CandiriyaCommand(commandManager, permissionManager, permissionsFile)
-            commandManager.register("candiriya", candiriyaCmd, "candyriya", "candirya")
-            logger.info("registered /candiriya command")
+            commandManager.register("candiriya", candiriyaCmd, "candyriya", "candirya", "velocity")
+            commandManager.register("server", ServerCommand(playerManager, config))
+            commandManager.register("glist", GlistCommand(playerManager))
+            commandManager.register("send", SendCommand(playerManager, config))
+            commandManager.register("shutdown", ShutdownCommand { stop() })
+            logger.info("registered builtin commands: candyriya, server, glist, send, shutdown")
         } catch (e: Exception) {
             logger.warn("failed to register builtin commands", e)
         }

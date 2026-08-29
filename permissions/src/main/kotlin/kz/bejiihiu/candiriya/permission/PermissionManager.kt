@@ -182,7 +182,12 @@ public class PermissionManager(
     private fun defaultGroups(): Map<String, PermissionGroup> = mapOf(
         "default" to PermissionGroup(
             name = "default",
-            permissions = setOf("candiriya.command.help", "candiriya.command.info"),
+            // server is granted to all by default per velocity spec; help/info also open
+            permissions = setOf(
+                "candiriya.command.help",
+                "candiriya.command.info",
+                "candiriya.command.server"
+            ),
             parents = emptySet(),
             isDefault = true
         ),

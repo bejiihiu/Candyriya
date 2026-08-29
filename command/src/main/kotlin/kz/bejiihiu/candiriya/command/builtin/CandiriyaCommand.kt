@@ -1,5 +1,7 @@
 package kz.bejiihiu.candiriya.command.builtin
 
+import java.nio.file.Files
+import java.nio.file.Path
 import kz.bejiihiu.candiriya.command.Command
 import kz.bejiihiu.candiriya.command.CommandManager
 import kz.bejiihiu.candiriya.command.CommandSource
@@ -7,23 +9,27 @@ import kz.bejiihiu.candiriya.permission.PermissionManager
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.apache.logging.log4j.LogManager
 
 /**
- * Root `candiriya` command — the only builtin for now.
- * Subcommands: help, info, reload, perms, op
- * Permission: candiriya.command.<sub> or candiriya.* for op.
+ * Root `/candyriya` command — mirrors Velocity's `/velocity` but renamed.
+ * Subcommands: plugins, info, reload, dump, heap (from velocity spec)
+ * plus help/perms/op kept for internal use.
+ *
+ * Permissions: candyriya.command.<sub> or candyriya.* for op.
  */
 public class CandiriyaCommand(
     private val commandManager: CommandManager,
     private val permissionManager: PermissionManager,
-    private val permissionsFile: java.nio.file.Path? = null,
+    private val permissionsFile: Path? = null,
     private val version: String = "26.1"
 ) : Command {
-    override val permission: String? = null // root allows help for everyone, subcommands check own perms
+    override val permission: String? = null // root open, subcommands check own perms
     override val description: String = "Candiriya proxy main command"
-    override val usage: String = "<help|info|reload|perms|op>"
+    override val usage: String = "<plugins|info|reload|dump|heap|help>"
 
     private val mini = MiniMessage.miniMessage()
+    private val logger = LogManager.getLogger(CandiriyaCommand::class.java)
 
     override fun execute(source: CommandSource, args: Array<String>) {
         if (args.isEmpty()) {
@@ -32,8 +38,12 @@ public class CandiriyaCommand(
         }
         when (args[0].lowercase()) {
             "help" -> handleHelp(source, args.drop(1).toTypedArray())
-            "info" -> sendInfo(source)
+            "info" -> handleInfo(source)
+            "plugins" -> handlePlugins(source)
             "reload" -> handleReload(source)
+            "dump" -> handleDump(source)
+            "heap" -> handleHeap(source)
+            // keep extra internals
             "perms" -> handlePerms(source, args.drop(1).toTypedArray())
             "op" -> handleOp(source, args.drop(1).toTypedArray())
             else -> {
@@ -49,21 +59,28 @@ public class CandiriyaCommand(
             val prefix = args[0].lowercase()
             return suggestRoot(source).filter { it.startsWith(prefix) }
         }
-        // sub suggestions
         return when (args[0].lowercase()) {
             "help" -> commandManager.suggest(source, args.drop(1).joinToString(" "))
-            "perms" -> suggestPerms(source, args.drop(1).toTypedArray())
-            "op" -> suggestOp(args.drop(1).toTypedArray())
+            "perms" -> emptyList()
+            "op" -> emptyList()
             else -> emptyList()
         }
     }
 
     private fun suggestRoot(source: CommandSource): List<String> {
-        val all = mutableListOf("help", "info")
+        val all = mutableListOf<String>()
+        all.add("help")
+        all.add("info")
+        if (source.hasPermission("candiriya.command.plugins")) all.add("plugins")
         if (source.hasPermission("candiriya.command.reload")) all.add("reload")
+        if (source.hasPermission("candiriya.command.dump")) all.add("dump")
+        if (source.hasPermission("candiriya.command.heap")) all.add("heap")
+        // extra
         if (source.hasPermission("candiriya.command.perms")) all.add("perms")
         if (source.hasPermission("candiriya.command.op") || source.isConsole) all.add("op")
-        return all
+        // info is open to those with perm, but we also allow everyone to see it
+        if (!all.contains("info") && source.hasPermission("candiriya.command.info")) all.add("info")
+        return all.distinct().sorted()
     }
 
     private fun handleHelp(source: CommandSource, args: Array<String>) {
@@ -71,7 +88,6 @@ public class CandiriyaCommand(
             sendHelp(source)
             return
         }
-        // delegate to command manager help for alias
         val alias = args[0]
         val cmd = commandManager.getCommand(alias)
         if (cmd == null) {
@@ -82,26 +98,48 @@ public class CandiriyaCommand(
     }
 
     private fun sendHelp(source: CommandSource) {
-        source.sendMessage(mini.deserialize("<yellow>Candiriya help:"))
-        source.sendMessage(Component.text("/candiriya help - show this help", NamedTextColor.GRAY))
-        source.sendMessage(Component.text("/candiriya info - proxy info", NamedTextColor.GRAY))
+        source.sendMessage(mini.deserialize("<yellow>Candiriya help:</yellow>"))
+        source.sendMessage(Component.text("/candyriya plugins - list plugins", NamedTextColor.GRAY))
+        source.sendMessage(Component.text("/candyriya info - proxy info", NamedTextColor.GRAY))
         if (source.hasPermission("candiriya.command.reload")) {
-            source.sendMessage(Component.text("/candiriya reload - reload permissions", NamedTextColor.GRAY))
+            source.sendMessage(Component.text("/candyriya reload - reload config/permissions", NamedTextColor.GRAY))
         }
-        if (source.hasPermission("candiriya.command.perms")) {
-            source.sendMessage(Component.text("/candiriya perms <user> - show perms", NamedTextColor.GRAY))
+        if (source.hasPermission("candiriya.command.dump")) {
+            source.sendMessage(Component.text("/candyriya dump - anonymized dump", NamedTextColor.GRAY))
         }
-        if (source.hasPermission("candiriya.command.op") || source.isConsole) {
-            source.sendMessage(Component.text("/candiriya op <player> - toggle op", NamedTextColor.GRAY))
+        if (source.hasPermission("candiriya.command.heap")) {
+            source.sendMessage(Component.text("/candyriya heap - heap dump", NamedTextColor.GRAY))
         }
-        // also show all commands user can see
+        source.sendMessage(Component.text("/server [name] - switch server", NamedTextColor.GRAY))
+        source.sendMessage(Component.text("/glist [all] - list players", NamedTextColor.GRAY))
+        source.sendMessage(Component.text("/send <player|all> <server> - send player", NamedTextColor.GRAY))
+        source.sendMessage(Component.text("/shutdown [reason] - console only", NamedTextColor.GRAY))
         commandManager.sendHelp(source)
     }
 
     private fun sendInfo(source: CommandSource) {
+        // per spec: requires candyriya.command.info, but we also allow everyone to see basic info
+        if (!source.hasPermission("candiriya.command.info") && !source.isConsole) {
+            // still show but hint about perm
+            source.sendMessage(Component.text("No permission: candyriya.command.info", NamedTextColor.RED))
+            return
+        }
         source.sendMessage(mini.deserialize("<gradient:#55FF55:#55FFFF>Candiriya $version</gradient> <gray>— proxy</gray>"))
+        source.sendMessage(Component.text("Velocity API: 3.x (candyriya fork)", NamedTextColor.GRAY))
         source.sendMessage(Component.text("Source: ${source.name} (console=${source.isConsole})", NamedTextColor.GRAY))
-        source.sendMessage(Component.text("Try /candiriya help", NamedTextColor.DARK_GRAY))
+        source.sendMessage(Component.text("Try /candyriya help", NamedTextColor.DARK_GRAY))
+    }
+
+    private fun handleInfo(source: CommandSource) = sendInfo(source)
+
+    private fun handlePlugins(source: CommandSource) {
+        if (!source.hasPermission("candiriya.command.plugins")) {
+            source.sendMessage(Component.text("No permission: candyriya.command.plugins", NamedTextColor.RED))
+            return
+        }
+        // no plugin system yet — show placeholder like Velocity does
+        source.sendMessage(Component.text("Plugins (0): ", NamedTextColor.YELLOW))
+        source.sendMessage(Component.text("No plugins installed (plugin API coming soon)", NamedTextColor.GRAY))
     }
 
     private fun handleReload(source: CommandSource) {
@@ -116,8 +154,68 @@ public class CandiriyaCommand(
             } else {
                 source.sendMessage(Component.text("Permissions reloaded (no file)", NamedTextColor.GREEN))
             }
+            // TODO: reload velocity.toml equivalent — candiriya.toml
+            source.sendMessage(Component.text("Proxy config reload not yet implemented (restart for now)", NamedTextColor.YELLOW))
         } catch (e: Exception) {
+            logger.warn("reload failed", e)
             source.sendMessage(Component.text("Reload failed: ${e.message}", NamedTextColor.RED))
+        }
+    }
+
+    private fun handleDump(source: CommandSource) {
+        if (!source.hasPermission("candiriya.command.dump")) {
+            source.sendMessage(Component.text("No permission: candiriya.command.dump", NamedTextColor.RED))
+            return
+        }
+        try {
+            val dumpDir = Path.of("dumps")
+            Files.createDirectories(dumpDir)
+            val file = dumpDir.resolve("candyriya-dump-${System.currentTimeMillis()}.txt")
+            val content = buildString {
+                appendLine("Candiriya dump")
+                appendLine("version: $version")
+                appendLine("groups: ${permissionManager.getGroups().keys}")
+                appendLine("ops: ${permissionManager.getGroups()}") // anonymized
+                appendLine("commands: ${commandManager.allCommands().keys}")
+            }
+            Files.writeString(file, content)
+            source.sendMessage(Component.text("Dump written to $file (anonymized)", NamedTextColor.GREEN))
+            source.sendMessage(Component.text("Share it in Discord for support", NamedTextColor.GRAY))
+        } catch (e: Exception) {
+            logger.warn("dump failed", e)
+            source.sendMessage(Component.text("Dump failed: ${e.message}", NamedTextColor.RED))
+        }
+    }
+
+    private fun handleHeap(source: CommandSource) {
+        if (!source.hasPermission("candiriya.command.heap")) {
+            source.sendMessage(Component.text("No permission: candiriya.command.heap", NamedTextColor.RED))
+            return
+        }
+        source.sendMessage(Component.text("Heap dump: use jcmd <pid> GC.heap_dump <path> or jmap", NamedTextColor.YELLOW))
+        source.sendMessage(Component.text("Sensitive data — share carefully!", NamedTextColor.RED))
+        try {
+            val dumpDir = Path.of("dumps")
+            Files.createDirectories(dumpDir)
+            val file = dumpDir.resolve("candyriya-heap-${System.currentTimeMillis()}.hprof")
+            // try to trigger via HotSpotDiagnosticMXBean if available
+            try {
+                val server = java.lang.management.ManagementFactory.getPlatformMBeanServer()
+                val objName = javax.management.ObjectName.getInstance("com.sun.management:type=HotSpotDiagnostic")
+                server.invoke(
+                    objName,
+                    "dumpHeap",
+                    arrayOf<Any>(file.toAbsolutePath().toString(), true),
+                    arrayOf(String::class.java.name, Boolean::class.java.name)
+                )
+                source.sendMessage(Component.text("Heap dump written to $file", NamedTextColor.GREEN))
+            } catch (ex: Exception) {
+                source.sendMessage(Component.text("Auto dump failed: ${ex.message}", NamedTextColor.RED))
+                source.sendMessage(Component.text("Manual: jcmd ${ProcessHandle.current().pid()} GC.heap_dump $file", NamedTextColor.GRAY))
+            }
+        } catch (e: Exception) {
+            logger.warn("heap dump failed", e)
+            source.sendMessage(Component.text("Heap dump failed: ${e.message}", NamedTextColor.RED))
         }
     }
 
@@ -127,7 +225,7 @@ public class CandiriyaCommand(
             return
         }
         if (args.isEmpty()) {
-            source.sendMessage(Component.text("Usage: /candiriya perms <player>", NamedTextColor.RED))
+            source.sendMessage(Component.text("Usage: /candyriya perms <player>", NamedTextColor.RED))
             return
         }
         source.sendMessage(Component.text("Perms for ${args[0]}: (lookup by UUID not wired yet)", NamedTextColor.YELLOW))
@@ -140,12 +238,9 @@ public class CandiriyaCommand(
             return
         }
         if (args.isEmpty()) {
-            source.sendMessage(Component.text("Usage: /candiriya op <player>", NamedTextColor.RED))
+            source.sendMessage(Component.text("Usage: /candyriya op <player>", NamedTextColor.RED))
             return
         }
         source.sendMessage(Component.text("Op toggle for ${args[0]} — wire to PlayerManager lookup in next step", NamedTextColor.YELLOW))
     }
-
-    private fun suggestPerms(source: CommandSource, args: Array<String>): List<String> = emptyList()
-    private fun suggestOp(args: Array<String>): List<String> = emptyList()
 }

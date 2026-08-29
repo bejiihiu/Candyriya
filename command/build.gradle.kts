@@ -10,10 +10,12 @@ spotbugs {
 dependencies {
     api(project(":permissions"))
     implementation(project(":config"))
+    implementation(project(":network"))
     implementation(libs.log4jApi)
     implementation(libs.guava)
     implementation(libs.adventureApi)
     implementation(libs.adventureMiniMessage)
+    implementation(libs.adventureGson)
     compileOnly(libs.checkerQual)
     compileOnly(libs.spotbugsAnnotations)
 
