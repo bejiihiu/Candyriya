@@ -1,4 +1,4 @@
-package kz.bejiihiu.candyriya.network
+﻿package kz.bejiihiu.candyriya.network
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import io.netty.bootstrap.Bootstrap
@@ -15,38 +15,28 @@ import kz.bejiihiu.candyriya.network.session.ProxySession
 import kz.bejiihiu.candyriya.protocol.MinecraftPacketDecoder
 import kz.bejiihiu.candyriya.protocol.MinecraftVarintFrameDecoder
 import kz.bejiihiu.candyriya.protocol.MinecraftVarintLengthEncoder
+import kz.bejiihiu.candyriya.server.RegisteredServer
 import org.apache.logging.log4j.LogManager
 
 /**
- * Owns the outbound connection to the backend (mc server).
- * One instance per ProxySession — think of it as Velocity's VelocityServerConnection but tiny xd
- *
- * Does:
- * - bootstrap with same eventLoop as client (no thread hop)
- * - AUTO_READ=false, AUTO_CLOSE=false, waterMark, connectTimeout
- * - retry logic from config
- * - idempotent close via ProxySession
+ * Owns the outbound connection to a specific backend server.
+ * One instance per connect attempt.
  */
-@SuppressFBWarnings(
-    value = ["EI_EXPOSE_REP2", "DE_MIGHT_IGNORE", "REC_CATCH_EXCEPTION"],
-    justification = "session is intentionally shared, close ignore is fine xd"
-)
+@SuppressFBWarnings(value = ["EI_EXPOSE_REP2", "DE_MIGHT_IGNORE", "REC_CATCH_EXCEPTION"], justification = "session shared")
 public class BackendConnection(
     private val session: ProxySession,
-    private val config: ProxyConfig
+    private val config: ProxyConfig,
+    private val target: RegisteredServer
 ) {
     private val logger = LogManager.getLogger(BackendConnection::class.java)
 
     @Volatile
     private var currentFuture: ChannelFuture? = null
 
-    /**
-     * Connect to backend host:port. Retries per config.backend.retryAttempts.
-     * Calls [onConnected] on success with backend channel.
-     */
     public fun connect(clientChannel: Channel, onConnected: (Channel) -> Unit, onFailed: (Throwable) -> Unit) {
         session.backendState = BackendState.CONNECTING
-        attemptConnect(clientChannel, config.backend.retryAttempts, onConnected, onFailed)
+        session.currentServer = target
+        attemptConnect(clientChannel, config.servers.retryAttempts, onConnected, onFailed)
     }
 
     private fun attemptConnect(clientChannel: Channel, retriesLeft: Int, onConnected: (Channel) -> Unit, onFailed: (Throwable) -> Unit) {
@@ -62,36 +52,22 @@ public class BackendConnection(
             .channel(NioSocketChannel::class.java)
             .option(ChannelOption.SO_KEEPALIVE, true)
             .option(ChannelOption.TCP_NODELAY, true)
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.backend.connectTimeoutMs)
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.servers.connectTimeoutMs)
             .option(ChannelOption.AUTO_READ, false)
             .option(ChannelOption.AUTO_CLOSE, false)
-            .option(
-                ChannelOption.WRITE_BUFFER_WATER_MARK,
-                WriteBufferWaterMark(32 * 1024, 64 * 1024)
-            )
+            .option(ChannelOption.WRITE_BUFFER_WATER_MARK, WriteBufferWaterMark(32 * 1024, 64 * 1024))
             .handler(object : ChannelInitializer<SocketChannel>() {
                 override fun initChannel(ch: SocketChannel) {
-                    ch.pipeline().addLast(
-                        "frameDecoder",
-                        MinecraftVarintFrameDecoder(config.protocol.maxPacketSize)
-                    )
+                    ch.pipeline().addLast("frameDecoder", MinecraftVarintFrameDecoder(config.protocol.maxPacketSize))
                     ch.pipeline().addLast("packetDecoder", MinecraftPacketDecoder())
                     ch.pipeline().addLast("packetEncoder", MinecraftVarintLengthEncoder())
                     ch.pipeline().addLast("backendHandler", BackendHandler(session))
                 }
             })
 
-        val host = config.backend.host
-        val port = config.backend.port
-        logger.info(
-            "connecting {} to backend {}:{} (retries left={})",
-            session.username,
-            host,
-            port,
-            retriesLeft
-        )
+        logger.info("connecting {} to backend {}:{} (retries left={})", session.username, target.host, target.port, retriesLeft)
 
-        val future = bootstrap.connect(host, port)
+        val future = bootstrap.connect(target.host, target.port)
         currentFuture = future
 
         future.addListener { fut ->
@@ -99,9 +75,7 @@ public class BackendConnection(
             if (cf.isSuccess) {
                 val backendCh = cf.channel()
                 session.setBackend(backendCh)
-                logger.info("backend connected for {} -> {}:{}", session.username, host, port)
-                // kick read on both sides — the backpressure dance starts here
-                // without this, StackOverflow 78088619 bug hits: tiny 4-byte packet stuck forever xd
+                logger.info("backend connected for {} -> {}:{}", session.username, target.host, target.port)
                 try {
                     backendCh.config().isAutoRead = false
                     backendCh.read()
@@ -110,24 +84,13 @@ public class BackendConnection(
                 onConnected(backendCh)
             } else {
                 val cause = cf.cause()
-                logger.warn(
-                    "failed to connect {} to {}:{} — {}",
-                    session.username,
-                    host,
-                    port,
-                    cause?.message,
-                    cause
-                )
+                logger.warn("failed to connect {} to {}:{} — {}", session.username, target.host, target.port, cause?.message, cause)
                 if (retriesLeft > 0) {
-                    val delay = config.backend.retryDelayMs
+                    val delay = config.servers.retryDelayMs
                     logger.info("retrying in {}ms for {}", delay, session.username)
-                    clientChannel.eventLoop().schedule(
-                        {
-                            attemptConnect(clientChannel, retriesLeft - 1, onConnected, onFailed)
-                        },
-                        delay,
-                        java.util.concurrent.TimeUnit.MILLISECONDS
-                    )
+                    clientChannel.eventLoop().schedule({
+                        attemptConnect(clientChannel, retriesLeft - 1, onConnected, onFailed)
+                    }, delay, java.util.concurrent.TimeUnit.MILLISECONDS)
                 } else {
                     session.failBackend(cause)
                     onFailed(cause ?: RuntimeException("unknown connect failure"))
@@ -142,3 +105,5 @@ public class BackendConnection(
         } catch (_: Exception) {}
     }
 }
+
+

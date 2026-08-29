@@ -1,4 +1,4 @@
-package kz.bejiihiu.candiriya.plugin
+﻿package kz.bejiihiu.candyriya.plugin
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -75,3 +75,4 @@ public data class PluginDescription(
         require(sharedLibraries.size <= 32) { "too many sharedLibraries" }
     }
 }
+

@@ -1,12 +1,12 @@
-package kz.bejiihiu.candiriya.plugin.loader
+﻿package kz.bejiihiu.candyriya.plugin.loader
 
 import java.util.Optional
 import java.util.UUID
-import kz.bejiihiu.candiriya.config.ProxyConfig
-import kz.bejiihiu.candiriya.player.PlayerManager
-import kz.bejiihiu.candiriya.plugin.ProxyPlayer
-import kz.bejiihiu.candiriya.plugin.ProxyServer
-import kz.bejiihiu.candiriya.plugin.RegisteredBackend
+import kz.bejiihiu.candyriya.config.ProxyConfig
+import kz.bejiihiu.candyriya.player.PlayerManager
+import kz.bejiihiu.candyriya.plugin.ProxyPlayer
+import kz.bejiihiu.candyriya.plugin.ProxyServer
+import kz.bejiihiu.candyriya.plugin.RegisteredBackend
 import net.kyori.adventure.text.Component
 
 /**
@@ -49,7 +49,7 @@ internal class ProxyServerImpl(
 
     override fun isOnlineMode(): Boolean = config.security.onlineMode
 
-    private fun wrap(player: kz.bejiihiu.candiriya.player.Player): ProxyPlayer = PlayerAdapter(player)
+    private fun wrap(player: kz.bejiihiu.candyriya.player.Player): ProxyPlayer = PlayerAdapter(player)
 
     private class SimpleBackend(
         override val name: String,
@@ -63,14 +63,14 @@ internal class ProxyServerImpl(
     }
 
     private class PlayerAdapter(
-        private val handle: kz.bejiihiu.candiriya.player.Player
+        private val handle: kz.bejiihiu.candyriya.player.Player
     ) : ProxyPlayer {
         override val uuid: UUID get() = handle.uuid
         override val username: String get() = handle.username
         override val currentServer: RegisteredBackend? get() = handle.server?.let {
             SimpleBackend(it.name, it.host, it.port)
         }
-        override val isOnline: Boolean get() = handle.state != kz.bejiihiu.candiriya.player.PlayerState.DISCONNECTED
+        override val isOnline: Boolean get() = handle.state != kz.bejiihiu.candyriya.player.PlayerState.DISCONNECTED
 
         override fun sendMessage(component: Component) {
             // stub: connection has no chat delivery yet, keep as no-op but log
@@ -95,3 +95,4 @@ internal class ProxyServerImpl(
         override fun getRawHandle(): Any = handle
     }
 }
+

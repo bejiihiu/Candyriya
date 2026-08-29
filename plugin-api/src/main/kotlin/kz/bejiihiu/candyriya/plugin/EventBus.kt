@@ -1,4 +1,4 @@
-package kz.bejiihiu.candiriya.plugin
+﻿package kz.bejiihiu.candyriya.plugin
 
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -167,3 +167,4 @@ public class DefaultEventBus : EventBus {
 
     override fun <T : Event> fireAsync(event: T): CompletableFuture<T> = CompletableFuture.supplyAsync { fire(event) }
 }
+

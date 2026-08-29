@@ -4,11 +4,13 @@ plugins {
 }
 
 dependencies {
+    api(project(":servers"))
     implementation(libs.nightconfigToml)
     implementation(libs.nightconfigCore)
     implementation(libs.log4jApi)
     implementation(libs.guava)
     compileOnly(libs.checkerQual)
+    compileOnly(libs.spotbugsAnnotations)
 
     testImplementation(libs.junitApi)
     testImplementation(libs.junitParams)

@@ -1,11 +1,11 @@
-package kz.bejiihiu.candiriya.plugin.loader
+﻿package kz.bejiihiu.candyriya.plugin.loader
 
 import java.nio.file.Path
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kz.bejiihiu.candiriya.plugin.DefaultPluginScheduler
-import kz.bejiihiu.candiriya.plugin.Plugin
-import kz.bejiihiu.candiriya.plugin.PluginDescription
+import kz.bejiihiu.candyriya.plugin.DefaultPluginScheduler
+import kz.bejiihiu.candyriya.plugin.Plugin
+import kz.bejiihiu.candyriya.plugin.PluginDescription
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -78,3 +78,4 @@ public class PluginContainer(
         } catch (_: Exception) {}
     }
 }
+

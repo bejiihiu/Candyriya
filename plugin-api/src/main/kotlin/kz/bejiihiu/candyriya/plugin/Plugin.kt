@@ -1,4 +1,4 @@
-package kz.bejiihiu.candiriya.plugin
+﻿package kz.bejiihiu.candyriya.plugin
 
 import java.nio.file.Path
 import org.apache.logging.log4j.Logger
@@ -78,3 +78,4 @@ public interface PluginContext {
     /** Messaging channels (plugin messages `candiriya:channel`) */
     public val messaging: PluginMessaging
 }
+

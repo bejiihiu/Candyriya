@@ -1,4 +1,4 @@
-package kz.bejiihiu.candiriya.plugin.loader
+﻿package kz.bejiihiu.candyriya.plugin.loader
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -7,23 +7,23 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.jar.JarFile
-import kz.bejiihiu.candiriya.command.CommandManager
-import kz.bejiihiu.candiriya.config.ProxyConfig
-import kz.bejiihiu.candiriya.permission.PermissionManager
-import kz.bejiihiu.candiriya.player.PlayerManager
-import kz.bejiihiu.candiriya.plugin.DefaultEventBus
-import kz.bejiihiu.candiriya.plugin.DefaultPluginScheduler
-import kz.bejiihiu.candiriya.plugin.EventBus
-import kz.bejiihiu.candiriya.plugin.Plugin
-import kz.bejiihiu.candiriya.plugin.PluginCommand
-import kz.bejiihiu.candiriya.plugin.PluginCommandManager
-import kz.bejiihiu.candiriya.plugin.PluginCommandSource
-import kz.bejiihiu.candiriya.plugin.PluginContext
-import kz.bejiihiu.candiriya.plugin.PluginDescription
-import kz.bejiihiu.candiriya.plugin.PluginMessaging
-import kz.bejiihiu.candiriya.plugin.ProxyPlayer
-import kz.bejiihiu.candiriya.plugin.ProxyServer
-import kz.bejiihiu.candiriya.scheduler.threads.ThreadController
+import kz.bejiihiu.candyriya.command.CommandManager
+import kz.bejiihiu.candyriya.config.ProxyConfig
+import kz.bejiihiu.candyriya.permission.PermissionManager
+import kz.bejiihiu.candyriya.player.PlayerManager
+import kz.bejiihiu.candyriya.plugin.DefaultEventBus
+import kz.bejiihiu.candyriya.plugin.DefaultPluginScheduler
+import kz.bejiihiu.candyriya.plugin.EventBus
+import kz.bejiihiu.candyriya.plugin.Plugin
+import kz.bejiihiu.candyriya.plugin.PluginCommand
+import kz.bejiihiu.candyriya.plugin.PluginCommandManager
+import kz.bejiihiu.candyriya.plugin.PluginCommandSource
+import kz.bejiihiu.candyriya.plugin.PluginContext
+import kz.bejiihiu.candyriya.plugin.PluginDescription
+import kz.bejiihiu.candyriya.plugin.PluginMessaging
+import kz.bejiihiu.candyriya.plugin.ProxyPlayer
+import kz.bejiihiu.candyriya.plugin.ProxyServer
+import kz.bejiihiu.candyriya.scheduler.threads.ThreadController
 import net.kyori.adventure.text.Component
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -209,7 +209,7 @@ public class PluginManager(
         }
         // fire proxy init after all enabled
         try {
-            eventBus.fire(kz.bejiihiu.candiriya.plugin.ProxyInitializeEvent())
+            eventBus.fire(kz.bejiihiu.candyriya.plugin.ProxyInitializeEvent())
         } catch (_: Exception) {}
     }
 
@@ -220,7 +220,7 @@ public class PluginManager(
         if (containers.isEmpty()) return
         logger.info("disabling {} plugins", containers.size)
         try {
-            eventBus.fire(kz.bejiihiu.candiriya.plugin.ProxyShutdownEvent())
+            eventBus.fire(kz.bejiihiu.candyriya.plugin.ProxyShutdownEvent())
         } catch (_: Exception) {}
         for (c in containers.values.sortedByDescending { it.description.id }) {
             try {
@@ -273,7 +273,7 @@ public class PluginManager(
             override val events: EventBus = eventBus
             override val scheduler = container.scheduler
             override val commands: PluginCommandManager = ContextCommandManager(id)
-            override val permissions: kz.bejiihiu.candiriya.plugin.PermissionRegistry = ContextPermissions()
+            override val permissions: kz.bejiihiu.candyriya.plugin.PermissionRegistry = ContextPermissions()
             override val messaging: PluginMessaging = ContextMessaging(id)
         }
     }
@@ -320,11 +320,11 @@ public class PluginManager(
 
     private inner class ContextCommandManager(private val pluginId: String) : PluginCommandManager {
         override fun register(alias: String, command: PluginCommand, vararg extraAliases: String) {
-            val wrapped = object : kz.bejiihiu.candiriya.command.Command {
+            val wrapped = object : kz.bejiihiu.candyriya.command.Command {
                 override val permission: String? = command.permission
                 override val description: String = command.description
                 override val usage: String = command.usage
-                override fun execute(source: kz.bejiihiu.candiriya.command.CommandSource, args: Array<String>) {
+                override fun execute(source: kz.bejiihiu.candyriya.command.CommandSource, args: Array<String>) {
                     val ps = wrapSource(source)
                     // dispatch on plugin thread to keep threading contract
                     val container = containers[pluginId.lowercase()]
@@ -342,7 +342,7 @@ public class PluginManager(
                         } catch (_: Exception) {}
                     }
                 }
-                override fun suggest(source: kz.bejiihiu.candiriya.command.CommandSource, args: Array<String>): List<String> {
+                override fun suggest(source: kz.bejiihiu.candyriya.command.CommandSource, args: Array<String>): List<String> {
                     return try {
                         command.suggest(wrapSource(source), args)
                     } catch (_: Exception) {
@@ -363,7 +363,7 @@ public class PluginManager(
 
         override fun ownedAliases(): Set<String> = ownedCommands[pluginId.lowercase()]?.toSet() ?: emptySet()
 
-        private fun wrapSource(source: kz.bejiihiu.candiriya.command.CommandSource): PluginCommandSource = object : PluginCommandSource {
+        private fun wrapSource(source: kz.bejiihiu.candyriya.command.CommandSource): PluginCommandSource = object : PluginCommandSource {
             override val name: String = source.name
             override val isConsole: Boolean = source.isConsole
             override fun hasPermission(permission: String): Boolean = source.hasPermission(permission)
@@ -381,10 +381,10 @@ public class PluginManager(
         }
     }
 
-    private inner class ContextPermissions : kz.bejiihiu.candiriya.plugin.PermissionRegistry {
+    private inner class ContextPermissions : kz.bejiihiu.candyriya.plugin.PermissionRegistry {
         override fun has(player: ProxyPlayer, permission: String): Boolean {
-            val subject = kz.bejiihiu.candiriya.permission.PlayerSubject(player.uuid, player.username, permissionManager)
-            return permissionManager.permissionValue(subject, permission) == kz.bejiihiu.candiriya.permission.Tristate.TRUE
+            val subject = kz.bejiihiu.candyriya.permission.PlayerSubject(player.uuid, player.username, permissionManager)
+            return permissionManager.permissionValue(subject, permission) == kz.bejiihiu.candyriya.permission.Tristate.TRUE
         }
         override fun has(source: PluginCommandSource, permission: String): Boolean =
             if (source.isConsole) true else source.hasPermission(permission)
@@ -407,3 +407,4 @@ public class PluginManager(
         override fun channels(): Set<String> = globalChannels.toSet()
     }
 }
+

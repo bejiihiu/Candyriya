@@ -1,4 +1,4 @@
-package kz.bejiihiu.candiriya.plugin.loader
+﻿package kz.bejiihiu.candyriya.plugin.loader
 
 import java.net.URL
 import java.net.URLClassLoader
@@ -30,7 +30,7 @@ public class PluginClassLoader(
             "com.google.common.",
             "org.apache.logging.log4j.",
             "org.slf4j.",
-            "kz.bejiihiu.candiriya.plugin.",
+            "kz.bejiihiu.candyriya.plugin.",
             "java.",
             "jdk.",
             "sun."
@@ -71,3 +71,4 @@ public class PluginClassLoader(
         }
     }
 }
+

@@ -1,4 +1,4 @@
-package kz.bejiihiu.candiriya.plugin
+﻿package kz.bejiihiu.candyriya.plugin
 
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
@@ -148,3 +148,4 @@ public class DefaultPluginScheduler(
         }
     }
 }
+

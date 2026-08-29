@@ -10,6 +10,7 @@ spotbugs {
 dependencies {
     api(project(":permissions"))
     implementation(project(":config"))
+    implementation(project(":servers"))
     implementation(project(":network"))
     implementation(libs.log4jApi)
     implementation(libs.guava)

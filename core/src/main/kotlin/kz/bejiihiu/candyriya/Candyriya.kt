@@ -1,4 +1,4 @@
-package kz.bejiihiu.candyriya
+﻿package kz.bejiihiu.candyriya
 
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -12,28 +12,27 @@ import kz.bejiihiu.candyriya.command.builtin.PluginInfo
 import kz.bejiihiu.candyriya.command.builtin.SendCommand
 import kz.bejiihiu.candyriya.command.builtin.ServerCommand
 import kz.bejiihiu.candyriya.command.builtin.ShutdownCommand
+import kz.bejiihiu.candyriya.config.ConfigLoader
 import kz.bejiihiu.candyriya.config.ProxyConfig
 import kz.bejiihiu.candyriya.lifecycle.LifecycleState
 import kz.bejiihiu.candyriya.network.NetworkServer
 import kz.bejiihiu.candyriya.permission.PermissionManager
 import kz.bejiihiu.candyriya.permission.PermissionsFile
 import kz.bejiihiu.candyriya.player.PlayerManager
-import kz.bejiihiu.candiriya.plugin.loader.PluginManager
+import kz.bejiihiu.candyriya.plugin.loader.PluginManager
 import kz.bejiihiu.candyriya.scheduler.DefaultScheduler
 import kz.bejiihiu.candyriya.scheduler.Scheduler
 import kz.bejiihiu.candyriya.scheduler.context.ContextRegistry
 import kz.bejiihiu.candyriya.scheduler.threads.ThreadController
 import kz.bejiihiu.candyriya.scheduler.tick.TickScheduler
+import kz.bejiihiu.candyriya.server.ServerRegistry
 import org.apache.logging.log4j.LogManager
 
-/**
- * Main orchestrator that coordinates config and network.
- * State machine is guarded by [AtomicReference].
- */
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = ["EI_EXPOSE_REP"], justification = "exposed for tests xd")
 public class Candyriya(
-    private val config: ProxyConfig,
-    private val permissionsFile: Path = Paths.get("permissions.toml")
+    private var config: ProxyConfig,
+    private val permissionsFile: Path = Paths.get("permissions.toml"),
+    private val configPath: Path = Paths.get("candyriya.toml")
 ) {
     private val logger = LogManager.getLogger(Candyriya::class.java)
     private val state = AtomicReference(LifecycleState.STOPPED)
@@ -41,10 +40,14 @@ public class Candyriya(
     private var networkServer: NetworkServer? = null
     private val threadController: ThreadController = ThreadController(config)
     private val scheduler: Scheduler = DefaultScheduler(threadController) { state.get() }
-    private val tickScheduler: TickScheduler =
-        TickScheduler(threadController, config.scheduler.tickRateMs)
+    private val tickScheduler: TickScheduler = TickScheduler(threadController, config.scheduler.tickRateMs)
     private val contextRegistry: ContextRegistry = ContextRegistry(config, threadController)
-    private val playerManager: PlayerManager = PlayerManager(contextRegistry)
+    private val serverRegistry: ServerRegistry = ServerRegistry(
+        servers = config.servers.servers,
+        tryOrder = config.servers.tryOrder,
+        unavailableCooldownMs = config.servers.unavailableCooldownMs
+    )
+    private val playerManager: PlayerManager = PlayerManager(contextRegistry, serverRegistry)
     private val permissionManager: PermissionManager = PermissionManager(permissionsFile)
     private val commandManager: CommandManager = CommandManager()
     private val pluginManager: PluginManager = PluginManager(
@@ -57,29 +60,44 @@ public class Candyriya(
     )
 
     public fun getState(): LifecycleState = state.get()
-
     public fun getScheduler(): Scheduler = scheduler
-
     public fun getTickScheduler(): TickScheduler = tickScheduler
-
     public fun getThreadController(): ThreadController = threadController
-
     public fun getContextRegistry(): ContextRegistry = contextRegistry
-
     public fun getPlayerManager(): PlayerManager = playerManager
-
     public fun getPermissionManager(): PermissionManager = permissionManager
-
     public fun getCommandManager(): CommandManager = commandManager
-
     public fun getPermissionsFile(): Path = permissionsFile
+    public fun getServerRegistry(): ServerRegistry = serverRegistry
+    public fun getConfig(): ProxyConfig = config
+    public fun getConfigPath(): Path = configPath
+
+    /** Full reload: candyriya.toml + permissions.toml + server registry. */
+    public fun reload(): Result<String> {
+        return try {
+            val newConfig = ConfigLoader.load(configPath)
+            config = newConfig
+            serverRegistry.update(newConfig.servers.servers, newConfig.servers.tryOrder)
+            playerManager.setServerRegistry(serverRegistry)
+            try {
+                PermissionsFile.ensureExists(permissionsFile)
+                permissionManager.loadFromFile(permissionsFile)
+            } catch (e: Exception) {
+                logger.warn("failed to reload permissions", e)
+            }
+            logger.info("reload complete: servers={} try={}", serverRegistry.names(), newConfig.servers.tryOrder)
+            Result.success("Reloaded: ${serverRegistry.count()} servers, try=${newConfig.servers.tryOrder}")
+        } catch (e: Exception) {
+            logger.warn("reload failed", e)
+            Result.failure(e)
+        }
+    }
 
     public fun getPluginManager(): PluginManager = pluginManager
 
-    public fun getEventBus(): kz.bejiihiu.candiriya.plugin.EventBus = pluginManager.getEventBus()
+    public fun getEventBus(): kz.bejiihiu.candyriya.plugin.EventBus = pluginManager.getEventBus()
 
     public fun start() {
-        // only STOPPED -> STARTING is valid
         if (!state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
             throw IllegalStateException("cannot start from ${state.get()}, expected STOPPED")
         }
@@ -91,7 +109,6 @@ public class Candyriya(
         } catch (e: Exception) {
             logger.warn("failed to init permissions", e)
         }
-        // register builtin commands — mirrors Velocity's built-ins but with candyriya name
         try {
             val candyriyaCmd = CandyriyaCommand(
                 commandManager = commandManager,
@@ -106,12 +123,14 @@ public class Candyriya(
                             state = it.state.name
                         )
                     }
-                }
+                },
+                configPath = configPath,
+                candyriya = this
             )
-            commandManager.register("candyriya", candyriyaCmd, "candiriya", "candirya", "velocity")
-            commandManager.register("server", ServerCommand(playerManager, config))
+            commandManager.register("candyriya", candyriyaCmd, "candyriya", "candirya", "velocity")
+            commandManager.register("server", ServerCommand(playerManager, serverRegistry))
             commandManager.register("glist", GlistCommand(playerManager))
-            commandManager.register("send", SendCommand(playerManager, config))
+            commandManager.register("send", SendCommand(playerManager, serverRegistry))
             commandManager.register("shutdown", ShutdownCommand { stop() })
             logger.info("registered builtin commands: candyriya, server, glist, send, shutdown")
         } catch (e: Exception) {
@@ -127,7 +146,7 @@ public class Candyriya(
             logger.info(
                 "enabled {} plugins",
                 pluginManager.getPlugins().count {
-                    it.state == kz.bejiihiu.candiriya.plugin.loader.PluginContainer.State.ENABLED
+                    it.state == kz.bejiihiu.candyriya.plugin.loader.PluginContainer.State.ENABLED
                 }
             )
         } catch (e: Exception) {
@@ -140,13 +159,13 @@ public class Candyriya(
             scheduler = scheduler,
             tickScheduler = tickScheduler,
             contextRegistry = contextRegistry,
-            playerManager = playerManager
+            playerManager = playerManager,
+            serverRegistry = serverRegistry
         )
         networkServer = server
         try {
             server.start().sync()
         } catch (e: Exception) {
-            // failed to bind, rollback to STOPPED
             try {
                 tickScheduler.close()
                 scheduler.close()
@@ -158,29 +177,28 @@ public class Candyriya(
             throw e
         }
         if (!state.compareAndSet(LifecycleState.STARTING, LifecycleState.RUNNING)) {
-            // this is cursed, fix later :(
             logger.warn("unexpected state during start: {}", state.get())
         }
-        logger.info("Candyriya RUNNING on {}", config.network.bind)
+        logger.info("Candyriya RUNNING on {} servers={} try={}", config.network.bind, serverRegistry.names(), config.servers.tryOrder)
         logger.info("contexts={} players={}", contextRegistry.size(), playerManager.count())
         // show that scheduler is actually used, not just exists xd
         scheduler.execute { logger.info("Candyriya ready tick={} contexts={}", tickScheduler.getCurrentTick(), contextRegistry.size()) }
         scheduler.scheduleAtFixedRate(Duration.ofSeconds(5), Duration.ofSeconds(5)) {
-            logger.debug("tick={} players={} ctxStats={}", tickScheduler.getCurrentTick(), playerManager.count(), contextRegistry.stats())
+            logger.debug(
+                "tick={} players={} ctxStats={} servers={}",
+                tickScheduler.getCurrentTick(),
+                playerManager.count(),
+                contextRegistry.stats(),
+                serverRegistry.count()
+            )
         }
     }
 
     public fun stop() {
         val current = state.get()
-        if (current == LifecycleState.STOPPING || current == LifecycleState.STOPPED) {
-            // already stopping, ignore
-            return
-        }
-        // try STARTING->STOPPING or RUNNING->STOPPING
+        if (current == LifecycleState.STOPPING || current == LifecycleState.STOPPED) return
         var transitioned = state.compareAndSet(LifecycleState.RUNNING, LifecycleState.STOPPING)
-        if (!transitioned) {
-            transitioned = state.compareAndSet(LifecycleState.STARTING, LifecycleState.STOPPING)
-        }
+        if (!transitioned) transitioned = state.compareAndSet(LifecycleState.STARTING, LifecycleState.STOPPING)
         if (!transitioned) {
             logger.warn("stop() called in state {}, ignoring", current)
             return
@@ -224,15 +242,12 @@ public class Candyriya(
     }
 
     public fun addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(
-            Thread {
-                // shutdown hook runs in separate thread, just call stop
-                stop()
-            }
-        )
+        Runtime.getRuntime().addShutdownHook(Thread { stop() })
     }
 
     public fun awaitShutdown() {
         shutdownLatch.await()
     }
 }
+
+

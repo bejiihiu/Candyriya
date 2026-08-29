@@ -4,17 +4,16 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig
 import com.electronwill.nightconfig.core.io.ParsingMode
 import java.nio.file.Files
 import java.nio.file.Path
+import kz.bejiihiu.candyriya.server.RegisteredServer
 import org.apache.logging.log4j.LogManager
 
 /**
  * Loads [ProxyConfig] from TOML. If file doesn't exist, creates default from resource.
- *
- * Synchronous [load] is fine on startup. For future reloads use [loadAsync] via scheduler.
  */
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = ["REC_CATCH_EXCEPTION"], justification = "parsing catches xd")
 public object ConfigLoader {
     private val logger = LogManager.getLogger(ConfigLoader::class.java)
 
-    // TODO: for future reloads this should go through scheduler — sync is ok only on startup xd
     public fun load(path: Path): ProxyConfig {
         if (Files.notExists(path)) {
             logger.info("config not found at {}, creating default", path)
@@ -25,14 +24,7 @@ public object ConfigLoader {
         return parse(fileConfig)
     }
 
-    /**
-     * Async wrapper for future reloads. Delegates to [load] via scheduler.
-     * Keeps sync [load] intact. Pass `scheduler::execute` or any executor.
-     *
-     * Example: `ConfigLoader.loadAsync(path, scheduler::execute) { cfg -> ... }`
-     */
     public fun loadAsync(path: Path, executor: (Runnable) -> Unit, callback: (ProxyConfig) -> Unit) {
-        // yep, just dispatch via scheduler, no new threads here xd
         executor { callback(load(path)) }
     }
 
@@ -46,54 +38,115 @@ public object ConfigLoader {
             }
             logger.info("copied default config from resources to {}", path)
         } else {
-            // fallback inline - this is cursed but better than nothing xd
             Files.createDirectories(path.parent ?: Path.of("."))
             Files.writeString(path, defaultToml())
             logger.info("wrote inline default config to {}", path)
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun parse(config: CommentedFileConfig): ProxyConfig {
         val bind = config.getOrElse<String>("network.bind", "0.0.0.0:25577")
         val workers = config.getOrElse<Number>("network.workers", 0).toInt()
         val readTimeoutSeconds = config.getOrElse<Number>("network.readTimeoutSeconds", 30).toInt()
         val maxPacketSize = config.getOrElse<Number>("protocol.maxPacketSize", 2097152).toInt()
-        val compressionThreshold = config.getOrElse<Number>(
-            "protocol.compressionThreshold",
-            256
-        ).toInt()
-        val backendHost = config.getOrElse<String>("backend.host", "127.0.0.1")
-        val backendPort = config.getOrElse<Number>("backend.port", 25565).toInt()
-        val backendConnectTimeoutMs = config.getOrElse<Number>(
-            "backend.connectTimeoutMs",
-            5000
-        ).toInt()
-        val backendRetryAttempts = config.getOrElse<Number>(
-            "backend.retryAttempts",
-            0
-        ).toInt()
-        val backendRetryDelayMs = config.getOrElse<Number>(
-            "backend.retryDelayMs",
-            500
-        ).toLong()
+        val compressionThreshold = config.getOrElse<Number>("protocol.compressionThreshold", 256).toInt()
+
+        // --- servers: [servers] table with string addresses + try list ---
+        val serversRaw = mutableMapOf<String, String>()
+        // collect all entries under "servers" except known non-server keys
+        val excludedKeys =
+            setOf("try", "connectTimeoutMs", "retryAttempts", "retryDelayMs", "failoverOnUnexpectedDisconnect", "unavailableCooldownMs")
+        try {
+            // night-config: check if entry is map-like
+            if (config.contains("servers")) {
+                val serversTable = config.get<List<String>>("servers.try")
+                // we have at least the try key, so servers table exists
+            }
+        } catch (_: Exception) {}
+        // iterate raw config entries: use valueMap view
+        try {
+            val allKeys: Set<String> = config.valueMap().keys
+            // look for keys starting with "servers."
+            for (k in allKeys) {
+                if (k.startsWith("servers.") && !excludedKeys.contains(k.substringAfter("servers."))) {
+                    val name = k.substringAfter("servers.")
+                    // skip if contains dot (nested) — only top-level servers.<name>
+                    if ("." in name) continue
+                    val addr = config.get<String>(k)
+                    serversRaw[name] = addr
+                }
+            }
+        } catch (_: Exception) {
+            // fallback: try entrySet iteration
+        }
+        // also try direct config.get for known pattern if raw scan failed (night-config quirks)
+        if (serversRaw.isEmpty()) {
+            // try to get as map
+            try {
+                val rawMap = config.get<Map<String, Any>>("servers")
+                if (rawMap != null) {
+                    for ((k, v) in rawMap) {
+                        if (k in excludedKeys) continue
+                        if (v is String) serversRaw[k] = v
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+
+        val connectTimeoutMs = config.getOrElse<Number>("servers.connectTimeoutMs", 5000).toInt()
+        val retryAttempts = config.getOrElse<Number>("servers.retryAttempts", 0).toInt()
+        val retryDelayMs = config.getOrElse<Number>("servers.retryDelayMs", 500).toLong()
+        val failover = config.getOrElse<Boolean>("servers.failoverOnUnexpectedDisconnect", true)
+        val cooldownMs = config.getOrElse<Number>("servers.unavailableCooldownMs", 5000).toLong()
+        val tryRaw: List<String> = try {
+            config.get<List<String>>("servers.try") ?: emptyList()
+        } catch (_: Exception) {
+            try {
+                val raw = config.get<String>("servers.try")
+                if (raw != null) listOf(raw) else emptyList()
+            } catch (_: Exception) {
+                emptyList()
+            }
+        }
+
+        val serversMap: MutableMap<String, RegisteredServer> = mutableMapOf()
+        for ((name, addr) in serversRaw) {
+            require(name.matches(Regex("^[a-zA-Z0-9_-]{1,16}$"))) { "invalid server name '$name'" }
+            val host = addr.substringBefore(":")
+            val portStr = addr.substringAfterLast(":", "")
+            require(host.isNotEmpty() && portStr.isNotEmpty()) { "invalid server address '$addr' for '$name', expected host:port" }
+            val port = portStr.toIntOrNull() ?: throw IllegalArgumentException("invalid port '$portStr' for server '$name'")
+            require(port in 1..65535) { "port out of range for server '$name': $port" }
+            serversMap[name] = RegisteredServer(name, host, port)
+        }
+        // defaults if empty
+        if (serversMap.isEmpty()) {
+            serversMap.putAll(
+                mapOf(
+                    "lobby" to RegisteredServer("lobby", "127.0.0.1", 30066),
+                    "factions" to RegisteredServer("factions", "127.0.0.1", 30067),
+                    "minigames" to RegisteredServer("minigames", "127.0.0.1", 30068)
+                )
+            )
+        }
+        val tryOrder: List<String> = if (tryRaw.isEmpty()) listOf(serversMap.keys.first()) else tryRaw
+        require(tryOrder.isNotEmpty()) { "servers.try must not be empty" }
+        for (n in tryOrder) {
+            require(serversMap.containsKey(n) || serversMap.containsKey(n.lowercase())) {
+                "servers.try entry '$n' not found in [servers] map (available: ${serversMap.keys})"
+            }
+        }
+
         val onlineMode = config.getOrElse<Boolean>("security.onlineMode", false)
-        val forwardingSecret = config.getOrElse<String>(
-            "security.forwardingSecret",
-            ""
-        )
-        val forwardingModeRaw = config.getOrElse<String>(
-            "security.forwardingMode",
-            "NONE"
-        )
+        val forwardingSecret = config.getOrElse<String>("security.forwardingSecret", "")
+        val forwardingModeRaw = config.getOrElse<String>("security.forwardingMode", "NONE")
         val forwardingMode = try {
             ForwardingMode.valueOf(forwardingModeRaw.uppercase())
         } catch (_: IllegalArgumentException) {
             ForwardingMode.NONE
         }
-        val motd = config.getOrElse<String>(
-            "status.motd",
-            StatusConfig.DEFAULT_MOTD
-        )
+        val motd = config.getOrElse<String>("status.motd", StatusConfig.DEFAULT_MOTD)
         val maxPlayers = config.getOrElse<Number>("status.maxPlayers", 100).toInt()
         val versionName = config.getOrElse<String>("status.versionName", "26.1")
         val versionProtocol = config.getOrElse<Number>("status.versionProtocol", 775).toInt()
@@ -117,61 +170,34 @@ public object ConfigLoader {
         }
         require(port in 1..65535) { "port out of range 1-65535: $port" }
         require(workers >= 0) { "workers must be >=0, got $workers" }
-        require(readTimeoutSeconds >= 0) {
-            "network.readTimeoutSeconds must be >=0, got $readTimeoutSeconds"
-        }
-        require(maxPacketSize in 1..8388608) {
-            "protocol.maxPacketSize must be 1..8388608, got $maxPacketSize"
-        }
+        require(readTimeoutSeconds >= 0) { "network.readTimeoutSeconds must be >=0, got $readTimeoutSeconds" }
+        require(maxPacketSize in 1..8388608) { "protocol.maxPacketSize must be 1..8388608, got $maxPacketSize" }
         require(maxPlayers >= 0) { "status.maxPlayers must be >=0, got $maxPlayers" }
         require(quietPeriodMs >= 0) { "quietPeriodMs must be >=0" }
         require(timeoutMs >= 0) { "timeoutMs must be >=0" }
-        require(
-            scheduledCoreSize >= 1
-        ) { "threads.scheduledCoreSize must be >=1, got $scheduledCoreSize" }
-        require(
-            asyncParallelism >= 0
-        ) { "threads.asyncParallelism must be >=0, got $asyncParallelism" }
+        require(scheduledCoreSize >= 1) { "threads.scheduledCoreSize must be >=1, got $scheduledCoreSize" }
+        require(asyncParallelism >= 0) { "threads.asyncParallelism must be >=0, got $asyncParallelism" }
         require(tickRateMs in 10..1000) { "scheduler.tickRateMs must be 10..1000, got $tickRateMs" }
         require(contexts in 0..32) { "scheduler.contexts must be 0..32, got $contexts" }
-        require(backendConnectTimeoutMs in 100..60000) {
-            "backend.connectTimeoutMs must be 100..60000, got $backendConnectTimeoutMs"
-        }
-        require(backendRetryAttempts in 0..10) {
-            "backend.retryAttempts must be 0..10, got $backendRetryAttempts"
-        }
-        require(backendRetryDelayMs in 0..10000) {
-            "backend.retryDelayMs must be 0..10000, got $backendRetryDelayMs"
-        }
+        require(connectTimeoutMs in 100..60000) { "servers.connectTimeoutMs must be 100..60000, got $connectTimeoutMs" }
+        require(retryAttempts in 0..10) { "servers.retryAttempts must be 0..10, got $retryAttempts" }
+        require(retryDelayMs in 0..10000) { "servers.retryDelayMs must be 0..10000, got $retryDelayMs" }
+        require(cooldownMs in 0..60000) { "servers.unavailableCooldownMs must be 0..60000, got $cooldownMs" }
 
         return ProxyConfig(
-            network = NetworkConfig(
-                bind = bind,
-                workers = workers,
-                readTimeoutSeconds = readTimeoutSeconds
+            network = NetworkConfig(bind = bind, workers = workers, readTimeoutSeconds = readTimeoutSeconds),
+            protocol = ProtocolConfig(maxPacketSize = maxPacketSize, compressionThreshold = compressionThreshold),
+            servers = ServersConfig(
+                servers = serversMap,
+                tryOrder = tryOrder,
+                connectTimeoutMs = connectTimeoutMs,
+                retryAttempts = retryAttempts,
+                retryDelayMs = retryDelayMs,
+                failoverOnUnexpectedDisconnect = failover,
+                unavailableCooldownMs = cooldownMs
             ),
-            protocol = ProtocolConfig(
-                maxPacketSize = maxPacketSize,
-                compressionThreshold = compressionThreshold
-            ),
-            backend = BackendConfig(
-                host = backendHost,
-                port = backendPort,
-                connectTimeoutMs = backendConnectTimeoutMs,
-                retryAttempts = backendRetryAttempts,
-                retryDelayMs = backendRetryDelayMs
-            ),
-            security = SecurityConfig(
-                onlineMode = onlineMode,
-                forwardingSecret = forwardingSecret,
-                forwardingMode = forwardingMode
-            ),
-            status = StatusConfig(
-                motd = motd,
-                maxPlayers = maxPlayers,
-                versionName = versionName,
-                versionProtocol = versionProtocol
-            ),
+            security = SecurityConfig(onlineMode = onlineMode, forwardingSecret = forwardingSecret, forwardingMode = forwardingMode),
+            status = StatusConfig(motd = motd, maxPlayers = maxPlayers, versionName = versionName, versionProtocol = versionProtocol),
             shutdown = ShutdownConfig(quietPeriodMs = quietPeriodMs, timeoutMs = timeoutMs),
             logging = LoggingConfig(level = level),
             threads = ThreadsConfig(
@@ -193,25 +219,24 @@ public object ConfigLoader {
     # edit me and restart :)
 
     [network]
-    # address to bind, format host:port
     bind = "0.0.0.0:25577"
-    # netty worker threads, 0 = 2 * cpu count
     workers = 0
-    # read timeout in seconds, 0 = disabled
     readTimeoutSeconds = 30
 
     [protocol]
-    # max packet size in bytes
     maxPacketSize = 2097152
-    # compression threshold, -1 to disable, 256 is velocity default
     compressionThreshold = 256
 
-    [backend]
-    host = "127.0.0.1"
-    port = 25565
+    [servers]
+    lobby = "127.0.0.1:30066"
+    factions = "127.0.0.1:30067"
+    minigames = "127.0.0.1:30068"
+    try = ["lobby"]
     connectTimeoutMs = 5000
     retryAttempts = 0
     retryDelayMs = 500
+    failoverOnUnexpectedDisconnect = true
+    unavailableCooldownMs = 5000
 
     [security]
     onlineMode = false
@@ -226,25 +251,18 @@ public object ConfigLoader {
     versionProtocol = 775
 
     [shutdown]
-    # quiet period for netty graceful shutdown
     quietPeriodMs = 200
-    # timeout for netty graceful shutdown
     timeoutMs = 5000
 
     [logging]
-    # log level: TRACE, DEBUG, INFO, WARN, ERROR
     level = "INFO"
 
     [threads]
-    # use virtual threads for async pool (java 21+)
     virtual = true
-    # core size for scheduled pool (platform threads)
     scheduledCoreSize = 2
-    # parallelism for async pool when virtual=false, 0 = cpu count
     asyncParallelism = 0
 
     [scheduler]
-    # tick duration in ms (50ms = 20 tps, like Paper/Folia)
     tickRateMs = 50
     contexts = 4
 

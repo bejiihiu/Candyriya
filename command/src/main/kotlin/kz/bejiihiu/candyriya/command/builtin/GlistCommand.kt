@@ -1,4 +1,4 @@
-package kz.bejiihiu.candyriya.command.builtin
+﻿package kz.bejiihiu.candyriya.command.builtin
 
 import kz.bejiihiu.candyriya.command.Command
 import kz.bejiihiu.candyriya.command.CommandSource
@@ -8,14 +8,13 @@ import net.kyori.adventure.text.format.NamedTextColor
 
 /**
  * `/glist` — view number of players on proxy.
- * Per velocity spec: `Candyriya.command.glist` granted to nobody by default.
  * - `/glist` — total count
  * - `/glist all` — per-server listing
  */
 public class GlistCommand(
     private val playerManager: PlayerManager
 ) : Command {
-    override val permission: String = "Candyriya.command.glist"
+    override val permission: String = "candyriya.command.glist"
     override val description: String = "List proxy players"
     override val usage: String = "[all]"
 
@@ -58,3 +57,5 @@ public class GlistCommand(
         return emptyList()
     }
 }
+
+

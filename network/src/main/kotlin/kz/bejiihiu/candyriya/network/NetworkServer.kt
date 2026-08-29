@@ -1,4 +1,4 @@
-package kz.bejiihiu.candyriya.network
+﻿package kz.bejiihiu.candyriya.network
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import io.netty.bootstrap.ServerBootstrap
@@ -20,6 +20,7 @@ import kz.bejiihiu.candyriya.scheduler.Scheduler
 import kz.bejiihiu.candyriya.scheduler.context.ContextRegistry
 import kz.bejiihiu.candyriya.scheduler.threads.ThreadController
 import kz.bejiihiu.candyriya.scheduler.tick.TickScheduler
+import kz.bejiihiu.candyriya.server.ServerRegistry
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -37,7 +38,8 @@ public class NetworkServer(
     private val scheduler: Scheduler? = null,
     private val tickScheduler: TickScheduler? = null,
     private val contextRegistry: ContextRegistry? = null,
-    private val playerManager: PlayerManager? = null
+    private val playerManager: PlayerManager? = null,
+    private val serverRegistry: ServerRegistry? = null
 ) {
     private val logger = LogManager.getLogger(NetworkServer::class.java)
     private var channel: Channel? = null
@@ -74,7 +76,7 @@ public class NetworkServer(
                         ch.pipeline().addLast("packetEncoder", MinecraftVarintLengthEncoder())
                         ch.pipeline().addLast(
                             "connection",
-                            ConnectionHandler(config, scheduler, tickScheduler, contextRegistry, playerManager)
+                            ConnectionHandler(config, scheduler, tickScheduler, contextRegistry, playerManager, serverRegistry)
                         )
                         ch.pipeline().addLast("logger", LoggingHandler())
                     }
@@ -106,3 +108,5 @@ public class NetworkServer(
         logger.info("event loops terminated")
     }
 }
+
+

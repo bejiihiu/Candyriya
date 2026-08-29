@@ -1,4 +1,4 @@
-package kz.bejiihiu.candiriya.plugin
+﻿package kz.bejiihiu.candyriya.plugin
 
 import java.nio.file.Path
 import net.kyori.adventure.text.Component
@@ -62,3 +62,4 @@ public interface PluginConfig {
     /** Load TOML as map, or create default from classpath resource. */
     public fun loadOrCreate(fileName: String = "config.toml", defaultResource: String? = null): Path
 }
+

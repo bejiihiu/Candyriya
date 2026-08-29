@@ -1,8 +1,8 @@
-package kz.bejiihiu.candiriya.plugin
+﻿package kz.bejiihiu.candyriya.plugin
 
 import java.util.Optional
 import java.util.UUID
-import kz.bejiihiu.candiriya.config.ProxyConfig
+import kz.bejiihiu.candyriya.config.ProxyConfig
 import net.kyori.adventure.text.Component
 
 /**
@@ -72,3 +72,4 @@ public interface RegisteredBackend {
     public val port: Int
     public fun sendPlayer(player: ProxyPlayer): Boolean
 }
+
