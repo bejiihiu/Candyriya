@@ -17,6 +17,7 @@ import kz.bejiihiu.candiriya.network.NetworkServer
 import kz.bejiihiu.candiriya.permission.PermissionManager
 import kz.bejiihiu.candiriya.permission.PermissionsFile
 import kz.bejiihiu.candiriya.player.PlayerManager
+import kz.bejiihiu.candiriya.plugin.loader.PluginManager
 import kz.bejiihiu.candiriya.scheduler.DefaultScheduler
 import kz.bejiihiu.candiriya.scheduler.Scheduler
 import kz.bejiihiu.candiriya.scheduler.context.ContextRegistry
@@ -45,6 +46,14 @@ public class Candiriya(
     private val playerManager: PlayerManager = PlayerManager(contextRegistry)
     private val permissionManager: PermissionManager = PermissionManager(permissionsFile)
     private val commandManager: CommandManager = CommandManager()
+    private val pluginManager: PluginManager = PluginManager(
+        pluginsDir = Paths.get(config.plugins.directory),
+        threadController = threadController,
+        config = config,
+        playerManager = playerManager,
+        permissionManager = permissionManager,
+        commandManager = commandManager
+    )
 
     public fun getState(): LifecycleState = state.get()
 
@@ -64,6 +73,10 @@ public class Candiriya(
 
     public fun getPermissionsFile(): Path = permissionsFile
 
+    public fun getPluginManager(): PluginManager = pluginManager
+
+    public fun getEventBus(): kz.bejiihiu.candiriya.plugin.EventBus = pluginManager.getEventBus()
+
     public fun start() {
         // only STOPPED -> STARTING is valid
         if (!state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
@@ -79,7 +92,21 @@ public class Candiriya(
         }
         // register builtin commands — mirrors Velocity's built-ins but with candyriya name
         try {
-            val candiriyaCmd = CandiriyaCommand(commandManager, permissionManager, permissionsFile)
+            val candiriyaCmd = CandiriyaCommand(
+                commandManager = commandManager,
+                permissionManager = permissionManager,
+                permissionsFile = permissionsFile,
+                pluginsProvider = {
+                    pluginManager.getPlugins().map {
+                        kz.bejiihiu.candiriya.command.builtin.PluginInfo(
+                            id = it.description.id,
+                            name = it.description.name,
+                            version = it.description.version,
+                            state = it.state.name
+                        )
+                    }
+                }
+            )
             commandManager.register("candiriya", candiriyaCmd, "candyriya", "candirya", "velocity")
             commandManager.register("server", ServerCommand(playerManager, config))
             commandManager.register("glist", GlistCommand(playerManager))
@@ -91,6 +118,20 @@ public class Candiriya(
         }
         threadController.start()
         tickScheduler.start()
+        // load + enable plugins before binding — so they can register commands/listeners
+        try {
+            val loaded = pluginManager.loadAll()
+            logger.info("loaded {} plugins", loaded.size)
+            pluginManager.enableAll()
+            logger.info(
+                "enabled {} plugins",
+                pluginManager.getPlugins().count {
+                    it.state == kz.bejiihiu.candiriya.plugin.loader.PluginContainer.State.ENABLED
+                }
+            )
+        } catch (e: Exception) {
+            logger.error("failed to load plugins", e)
+        }
         // yep, create server lazily here xd — groups come from ThreadController
         val server = NetworkServer(
             config,
@@ -148,6 +189,13 @@ public class Candiriya(
             networkServer?.stop()
         } catch (e: Exception) {
             logger.error("error during network shutdown", e)
+        }
+        // disable plugins before closing schedulers so they can finish tasks
+        try {
+            pluginManager.disableAll()
+            pluginManager.closeAll()
+        } catch (e: Exception) {
+            logger.error("error during plugin shutdown", e)
         }
         try {
             tickScheduler.close()

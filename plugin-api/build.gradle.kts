@@ -10,14 +10,13 @@ spotbugs {
 
 dependencies {
     api(project(":config"))
-    api(project(":scheduler"))
-    api(project(":network"))
-    api(project(":permissions"))
-    api(project(":command"))
-    api(project(":plugin-api"))
-    api(project(":plugin-loader"))
+    api(libs.adventureApi)
+    api(libs.adventureMiniMessage)
+    api(libs.adventureGson)
+    api(libs.guava)
+    api(libs.kotlinxSerialization)
+    api(libs.kotlinxCoroutines)
     implementation(libs.log4jApi)
-    implementation(libs.guava)
     compileOnly(libs.checkerQual)
     compileOnly(libs.spotbugsAnnotations)
 

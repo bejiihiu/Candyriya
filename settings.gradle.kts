@@ -17,5 +17,7 @@ include(":launcher")
 include(":scheduler")
 include(":permissions")
 include(":command")
+include(":plugin-api")
+include(":plugin-loader")
 
 rootProject.name = "candiriya"

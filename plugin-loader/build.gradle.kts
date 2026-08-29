@@ -9,15 +9,16 @@ spotbugs {
 }
 
 dependencies {
-    api(project(":config"))
-    api(project(":scheduler"))
-    api(project(":network"))
-    api(project(":permissions"))
-    api(project(":command"))
     api(project(":plugin-api"))
-    api(project(":plugin-loader"))
+    api(project(":scheduler"))
+    api(project(":config"))
+    implementation(project(":command"))
+    implementation(project(":permissions"))
+    implementation(project(":network"))
     implementation(libs.log4jApi)
     implementation(libs.guava)
+    implementation(libs.adventureApi)
+    implementation(libs.adventureMiniMessage)
     compileOnly(libs.checkerQual)
     compileOnly(libs.spotbugsAnnotations)
 

@@ -12,7 +12,8 @@ public data class ProxyConfig(
     val shutdown: ShutdownConfig = ShutdownConfig(),
     val logging: LoggingConfig = LoggingConfig(),
     val threads: ThreadsConfig = ThreadsConfig(),
-    val scheduler: SchedulerConfig = SchedulerConfig()
+    val scheduler: SchedulerConfig = SchedulerConfig(),
+    val plugins: PluginsConfig = PluginsConfig()
 )
 
 public data class NetworkConfig(
@@ -85,4 +86,10 @@ public data class ThreadsConfig(
 public data class SchedulerConfig(
     val tickRateMs: Long = 50,
     val contexts: Int = 4
+)
+
+public data class PluginsConfig(
+    val directory: String = "plugins",
+    val enableTimeoutMs: Long = 10000,
+    val disableTimeoutMs: Long = 5000
 )

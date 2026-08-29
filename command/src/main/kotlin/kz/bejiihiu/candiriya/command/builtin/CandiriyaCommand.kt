@@ -18,11 +18,23 @@ import org.apache.logging.log4j.LogManager
  *
  * Permissions: candyriya.command.<sub> or candyriya.* for op.
  */
+/**
+ * Simple DTO for plugin info without pulling `:plugin-loader` into `:command`.
+ * Core passes a lambda that returns this from PluginManager.
+ */
+public data class PluginInfo(
+    val id: String,
+    val name: String,
+    val version: String,
+    val state: String
+)
+
 public class CandiriyaCommand(
     private val commandManager: CommandManager,
     private val permissionManager: PermissionManager,
     private val permissionsFile: Path? = null,
-    private val version: String = "26.1"
+    private val version: String = "26.1",
+    private val pluginsProvider: (() -> List<PluginInfo>)? = null
 ) : Command {
     override val permission: String? = null // root open, subcommands check own perms
     override val description: String = "Candiriya proxy main command"
@@ -137,9 +149,30 @@ public class CandiriyaCommand(
             source.sendMessage(Component.text("No permission: candyriya.command.plugins", NamedTextColor.RED))
             return
         }
-        // no plugin system yet — show placeholder like Velocity does
-        source.sendMessage(Component.text("Plugins (0): ", NamedTextColor.YELLOW))
-        source.sendMessage(Component.text("No plugins installed (plugin API coming soon)", NamedTextColor.GRAY))
+        val plugins = try {
+            pluginsProvider?.invoke()
+        } catch (_: Exception) {
+            null
+        }
+        if (plugins == null) {
+            source.sendMessage(Component.text("Plugins (0): ", NamedTextColor.YELLOW))
+            source.sendMessage(Component.text("No plugins installed (plugin API coming soon)", NamedTextColor.GRAY))
+            return
+        }
+        if (plugins.isEmpty()) {
+            source.sendMessage(Component.text("Plugins (0): ", NamedTextColor.YELLOW))
+            source.sendMessage(Component.text("No plugins installed", NamedTextColor.GRAY))
+            return
+        }
+        source.sendMessage(Component.text("Plugins (${plugins.size}): ", NamedTextColor.YELLOW))
+        for (p in plugins.sortedBy { it.id }) {
+            val color = when (p.state) {
+                "ENABLED" -> NamedTextColor.GREEN
+                "FAILED" -> NamedTextColor.RED
+                else -> NamedTextColor.GRAY
+            }
+            source.sendMessage(Component.text("- ${p.name} (${p.id}) v${p.version} [${p.state}]", color))
+        }
     }
 
     private fun handleReload(source: CommandSource) {
