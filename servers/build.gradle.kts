@@ -1,6 +1,6 @@
-plugins {
+﻿plugins {
     id("buildsrc.convention.kotlin-jvm")
-    id("candiriya.quality")
+    id("candyriya.quality")
 }
 
 dependencies {
@@ -19,3 +19,4 @@ dependencies {
     testRuntimeOnly(libs.junitPlatformLauncher)
     testRuntimeOnly(libs.log4jCore)
 }
+

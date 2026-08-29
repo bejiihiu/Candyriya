@@ -4,7 +4,7 @@ import java.nio.file.Path
 import org.apache.logging.log4j.Logger
 
 /**
- * Base contract for every Candiriya plugin.
+ * Base contract for every candyriya plugin.
  *
  * Implement this in your `main` class pointed by `plugin.json#main`.
  * Lifecycle is single-threaded per plugin (its own executor), so you
@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger
  * }
  * ```
  *
- * Future Velocity bridge: a single Candiriya plugin can embed a
+ * Future Velocity bridge: a single candyriya plugin can embed a
  * `VelocityPluginManager` — just add `velocity-api` as `compileOnly`
  * and delegate inside `onEnable`. Core does NOT know about Velocity
  * types, so you can do it without forking proxy.
@@ -54,7 +54,7 @@ public interface PluginContext {
     /** Parsed `plugin.json` */
     public val description: PluginDescription
 
-    /** Dedicated logger `candiriya-plugin-<id>` */
+    /** Dedicated logger `candyriya-plugin-<id>` */
     public val logger: Logger
 
     /** Folder `plugins/<id>/` — created on load */
@@ -75,7 +75,8 @@ public interface PluginContext {
     /** Permission manager passthrough */
     public val permissions: PermissionRegistry
 
-    /** Messaging channels (plugin messages `candiriya:channel`) */
+    /** Messaging channels (plugin messages `candyriya:channel`) */
     public val messaging: PluginMessaging
 }
+
 

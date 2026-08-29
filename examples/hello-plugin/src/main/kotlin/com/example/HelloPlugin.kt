@@ -1,16 +1,16 @@
-package com.example
+﻿package com.example
 
 import java.time.Duration
-import kz.bejiihiu.candiriya.plugin.EventBus
-import kz.bejiihiu.candiriya.plugin.Plugin
-import kz.bejiihiu.candiriya.plugin.PluginContext
-import kz.bejiihiu.candiriya.plugin.PlayerJoinEvent
-import kz.bejiihiu.candiriya.plugin.Subscribe
+import kz.bejiihiu.candyriya.plugin.EventBus
+import kz.bejiihiu.candyriya.plugin.Plugin
+import kz.bejiihiu.candyriya.plugin.PluginContext
+import kz.bejiihiu.candyriya.plugin.PlayerJoinEvent
+import kz.bejiihiu.candyriya.plugin.Subscribe
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 
 /**
- * Minimal example showing every part of the Candiriya Plugin API.
+ * Minimal example showing every part of the candyriya Plugin API.
  *
  * Drop the built jar into `plugins/` and restart the proxy.
  */
@@ -38,13 +38,13 @@ public class HelloPlugin : Plugin {
         // 2. commands — runs on plugin thread automatically
         ctx.commands.register(
             "hello",
-            object : kz.bejiihiu.candiriya.plugin.PluginCommand {
+            object : kz.bejiihiu.candyriya.plugin.PluginCommand {
                 override val permission: String? = "hello.use"
                 override val description: String = "says hello"
                 override val usage: String = "[name]"
 
                 override fun execute(
-                    source: kz.bejiihiu.candiriya.plugin.PluginCommandSource,
+                    source: kz.bejiihiu.candyriya.plugin.PluginCommandSource,
                     args: Array<String>,
                 ) {
                     val target = args.firstOrNull() ?: source.name
@@ -70,7 +70,7 @@ public class HelloPlugin : Plugin {
         ctx.messaging.registerChannel("hello:data")
 
         // 5. how to talk about Velocity bridge (future):
-        // A single Candiriya plugin can embed Velocity's api as compileOnly and
+        // A single candyriya plugin can embed Velocity's api as compileOnly and
         // start its own Velocity PluginManager inside onEnable:
         //   val velocityLoader = VelocityBridge(ctx) // your class
         //   velocityLoader.loadJars(ctx.dataDirectory.resolve("velocity-plugins"))
@@ -91,3 +91,4 @@ public class HelloPlugin : Plugin {
         }
     }
 }
+

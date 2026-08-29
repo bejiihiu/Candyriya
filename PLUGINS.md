@@ -1,14 +1,14 @@
-# Candiriya Plugin System — Full Documentation
+﻿# candyriya Plugin System — Full Documentation
 
 > **Status:** implemented in `feature/plugin-system`. Plugins load at `STARTING`, enable before `NetworkServer` binds, disable at `STOPPING`. No hot-reload (restart required).  
-> **Modules:** `:plugin-api` (public contracts), `:plugin-loader` (private loader/manager), `:core` (integration), `:command` ( updated `/candiriya plugins`).
+> **Modules:** `:plugin-api` (public contracts), `:plugin-loader` (private loader/manager), `:core` (integration), `:command` ( updated `/candyriya plugins`).
 
 ---
 
 ## Table of Contents
 
 1. [Quick Start (5 minutes)](#1-quick-start)
-2. [Mental Model — How Candiriya differs from Velocity/Bungee](#2-mental-model)
+2. [Mental Model — How candyriya differs from Velocity/Bungee](#2-mental-model)
 3. [Project Layout & Modules](#3-project-layout)
 4. [plugin.json — The Descriptor](#4-pluginjson)
 5. [Lifecycle — load → enable → disable](#5-lifecycle)
@@ -23,7 +23,7 @@
 14. [Scheduler — PluginScheduler in Depth](#14-scheduler)
 15. [Building a Plugin — Gradle (Kotlin & Java)](#15-building-a-plugin)
 16. [Installing, Logs, Debugging](#16-installing-logs-debugging)
-17. [Velocity Bridge — Running Velocity Plugins Inside Candiriya](#17-velocity-bridge)
+17. [Velocity Bridge — Running Velocity Plugins Inside candyriya](#17-velocity-bridge)
 18. [Best Practices & Pitfalls](#18-best-practices--pitfalls)
 19. [API Stability & Versioning](#19-api-stability)
 20. [FAQ](#20-faq)
@@ -52,8 +52,8 @@
 ```kotlin
 package com.example
 
-import kz.bejiihiu.candiriya.plugin.Plugin
-import kz.bejiihiu.candiriya.plugin.PluginContext
+import kz.bejiihiu.candyriya.plugin.Plugin
+import kz.bejiihiu.candyriya.plugin.PluginContext
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 
@@ -61,11 +61,11 @@ class HelloPlugin : Plugin {
     override fun onEnable(ctx: PluginContext) {
         ctx.logger.info("Hello from {}!", ctx.description.id)
 
-        ctx.commands.register("hello", object : kz.bejiihiu.candiriya.plugin.PluginCommand {
+        ctx.commands.register("hello", object : kz.bejiihiu.candyriya.plugin.PluginCommand {
             override val permission: String? = null
             override val description = "says hi"
             override val usage = ""
-            override fun execute(source: kz.bejiihiu.candiriya.plugin.PluginCommandSource, args: Array<String>) {
+            override fun execute(source: kz.bejiihiu.candyriya.plugin.PluginCommandSource, args: Array<String>) {
                 source.sendMessage(Component.text("hi ${source.name}", NamedTextColor.GREEN))
             }
         })
@@ -97,10 +97,10 @@ tasks.jar {
 
 ```bash
 ./gradlew jar
-cp build/libs/hello-plugin-1.0.0.jar /path/to/candiriya/plugins/
-./gradlew :launcher:run   # or java -jar candiriya.jar
-# logs: [candiriya-plugin-hello] INFO Hello from hello!
-# in game / console: /hello, /candiriya plugins -> HelloPlugin v1.0.0 [ENABLED]
+cp build/libs/hello-plugin-1.0.0.jar /path/to/candyriya/plugins/
+./gradlew :launcher:run   # or java -jar candyriya.jar
+# logs: [candyriya-plugin-hello] INFO Hello from hello!
+# in game / console: /hello, /candyriya plugins -> HelloPlugin v1.0.0 [ENABLED]
 ```
 
 Full working example lives in `examples/hello-plugin/` in this repo.
@@ -109,7 +109,7 @@ Full working example lives in `examples/hello-plugin/` in this repo.
 
 ## 2. Mental Model
 
-| Concept | Velocity/Bungee | Candiriya |
+| Concept | Velocity/Bungee | candyriya |
 |---|---|---|
 | Descriptor | `velocity-plugin.json` / `plugin.yml` | `plugin.json` inside jar root (TOML not used here to keep plugin jars zero-dependency) |
 | Main class | annotated `@Plugin` or `extends Plugin` | `implements Plugin` (interface with `onLoad/onEnable/onDisable`) |
@@ -121,21 +121,21 @@ Full working example lives in `examples/hello-plugin/` in this repo.
 | Messaging | `ChannelIdentifier` | `ctx.messaging: PluginMessaging` — `namespace:name` channels |
 | Player | `Player` mutable from any thread | `ProxyPlayer` handle + `player.execute {}` to hop to player's context |
 
-**Goal:** you write a normal Jar, Candiriya gives you a `PluginContext` with everything scoped to your `id`. When your plugin disables, its tasks/listeners/commands vanish automatically — you don't leak.
+**Goal:** you write a normal Jar, candyriya gives you a `PluginContext` with everything scoped to your `id`. When your plugin disables, its tasks/listeners/commands vanish automatically — you don't leak.
 
-**Velocity bridge:** because `Plugin` is just an interface and `PluginManager` never imports Velocity types, a *single* Candiriya plugin can *host* an entire Velocity `PluginManager` inside its own ClassLoader. See §17.
+**Velocity bridge:** because `Plugin` is just an interface and `PluginManager` never imports Velocity types, a *single* candyriya plugin can *host* an entire Velocity `PluginManager` inside its own ClassLoader. See §17.
 
 ---
 
 ## 3. Project Layout
 
 ```
-candiriya/
+candyriya/
   settings.gradle.kts          // includes :plugin-api, :plugin-loader
   config/
-    src/main/resources/candiriya.default.toml // [plugins] directory = "plugins"
+    src/main/resources/candyriya.default.toml // [plugins] directory = "plugins"
   plugin-api/                  // PUBLIC, explicitApi(), no core deps
-    src/main/kotlin/kz/bejiihiu/candiriya/plugin/
+    src/main/kotlin/kz/bejiihiu/candyriya/plugin/
       Plugin.kt                // Plugin + PluginContext
       PluginDescription.kt     // plugin.json parser
       ProxyServer.kt           // ProxyServer / ProxyPlayer / RegisteredBackend
@@ -143,15 +143,15 @@ candiriya/
       PluginScheduler.kt       // PluginScheduler / PluginTask / DefaultPluginScheduler
       PluginExtras.kt          // PluginCommandManager, PermissionRegistry, PluginMessaging
   plugin-loader/               // PRIVATE, depends on plugin-api + scheduler + config + network
-    src/main/kotlin/kz/bejiihiu/candiriya/plugin/loader/
+    src/main/kotlin/kz/bejiihiu/candyriya/plugin/loader/
       PluginClassLoader.kt     // hybrid child-first
       PluginContainer.kt       // holder + per-plugin executor
       ProxyServerImpl.kt       // PlayerManager → ProxyServer adapter
       PluginManager.kt         // scan, load, enable, disable, command/messaging wiring
   core/
-    src/main/kotlin/kz/bejiihiu/candiriya/Candiriya.kt // creates PluginManager, loadAll -> enableAll -> disableAll
+    src/main/kotlin/kz/bejiihiu/candyriya/candyriya.kt // creates PluginManager, loadAll -> enableAll -> disableAll
   command/
-    src/main/kotlin/kz/bejiihiu/candiriya/command/builtin/CandiriyaCommand.kt // /candiriya plugins now lists real plugins
+    src/main/kotlin/kz/bejiihiu/candyriya/command/builtin/candyriyaCommand.kt // /candyriya plugins now lists real plugins
   examples/
     hello-plugin/              // copy-paste starter
     velocity-bridge/           // sketch for hosting Velocity jars
@@ -170,7 +170,7 @@ Must sit at **jar root** (`src/main/resources/plugin.json` → jar entry `plugin
 ```json
 {
   "id": "myplugin",                 // required, ^[a-z0-9_-]{3,32}$  lowercase
-  "name": "MyPlugin",               // required, 1..64 chars, display name for /candiriya plugins
+  "name": "MyPlugin",               // required, 1..64 chars, display name for /candyriya plugins
   "version": "1.0.0",               // required, ^[0-9A-Za-z._-]{1,32}$  (semver-ish, no spaces)
   "main": "com.example.MyPlugin",  // required, fully qualified class name with no-arg constructor
   "apiVersion": "1",                // optional, default "1". Bump when we break API.
@@ -221,7 +221,7 @@ File scan          plugin.onLoad()          plugin.onEnable(ctx)          proxy 
                                       \-> [FAILED] if exception/timeout
 ```
 
-**Timings:** each phase runs on the plugin's **own thread** with a timeout (`plugins.enableTimeoutMs` default 10s, `disableTimeoutMs` 5s from `candiriya.toml [plugins]`). If your `onEnable` blocks longer, the proxy logs `plugin X timed out` and marks `FAILED` (won't receive events/commands).
+**Timings:** each phase runs on the plugin's **own thread** with a timeout (`plugins.enableTimeoutMs` default 10s, `disableTimeoutMs` 5s from `candyriya.toml [plugins]`). If your `onEnable` blocks longer, the proxy logs `plugin X timed out` and marks `FAILED` (won't receive events/commands).
 
 **Order:** `depends` guarantees topological enable order; disable is reverse. Events `ProxyInitializeEvent` and `ProxyShutdownEvent` fire on the `EventBus` after all enables / before any disables.
 
@@ -250,7 +250,7 @@ DEFAULT_SHARED = [
   "net.kyori.",                     // adventure
   "com.google.common.",             // guava
   "org.apache.logging.log4j.", "org.slf4j.",
-  "kz.bejiihiu.candiriya.plugin.",  // plugin-api itself
+  "kz.bejiihiu.candyriya.plugin.",  // plugin-api itself
   "java.", "jdk.", "sun."
 ]
 ```
@@ -277,7 +277,7 @@ Then `com.example.sharedlib.Foo` will be parent-first (all plugins see the proxy
 ### 7.1 The rule
 
 - **Never block Netty or Tick threads.** If you do I/O, sleep, or heavy compute, use `ctx.scheduler`.
-- Every plugin gets **one dedicated thread** (`candiriya-plugin-<id>-#`) backed by virtual threads when `threads.virtual=true` (default). It behaves like a single-threaded `Executor` — tasks queue, run sequentially. So you can use non-concurrent collections inside your plugin without locking *if you stay on your thread*.
+- Every plugin gets **one dedicated thread** (`candyriya-plugin-<id>-#`) backed by virtual threads when `threads.virtual=true` (default). It behaves like a single-threaded `Executor` — tasks queue, run sequentially. So you can use non-concurrent collections inside your plugin without locking *if you stay on your thread*.
 - `ctx.events` dispatches on **caller thread** (usually network thread). If your listener touches mutable plugin state, either make it thread-safe or hop: `ctx.scheduler.execute { /* mutate */ }`.
 - `ProxyPlayer.execute {}` hops to the player's **context thread** (Folia-like region). Use it when you mutate player state (e.g., after async DB fetch, hop back to modify player).
 
@@ -286,8 +286,8 @@ Then `com.example.sharedlib.Foo` will be parent-first (all plugins see the proxy
 `PluginContainer.createExecutor(id, useVirtual)`:
 
 ```kotlin
-if (useVirtual) Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("candiriya-plugin-$id-",0).factory())
-else Executors.newSingleThreadExecutor { Thread(it, "candiriya-plugin-$id").apply { isDaemon=true } }
+if (useVirtual) Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("candyriya-plugin-$id-",0).factory())
+else Executors.newSingleThreadExecutor { Thread(it, "candyriya-plugin-$id").apply { isDaemon=true } }
 ```
 
 `ctx.scheduler: DefaultPluginScheduler` delegates to that executor + the proxy's shared `scheduledPool` (platform threads, 2 threads) for timers.
@@ -434,7 +434,7 @@ interface RegisteredBackend {
 }
 ```
 
-Currently single `default` backend from `candiriya.toml [backend]`. Map-shaped so future `[servers]` doesn't break API.
+Currently single `default` backend from `candyriya.toml [backend]`. Map-shaped so future `[servers]` doesn't break API.
 
 ---
 
@@ -478,16 +478,16 @@ When a player runs `/mycmd`, core `CommandManager` finds the wrapped command and
 - checks `hasPermission` synchronously
 - then **dispatches `execute` on your plugin thread** (`container.executor.submit { command.execute(...) }`)
 
-So `execute` always runs on `candiriya-plugin-<id>` — you can touch plugin state without locking.
+So `execute` always runs on `candyriya-plugin-<id>` — you can touch plugin state without locking.
 
 `suggest` (tab-complete) runs on caller thread (no hop) — keep it fast & side-effect-free.
 
-### 10.4 Built-in `/candiriya plugins`
+### 10.4 Built-in `/candyriya plugins`
 
-`CandiriyaCommand` now takes `pluginsProvider: (() -> List<PluginInfo>)?` from core and shows:
+`candyriyaCommand` now takes `pluginsProvider: (() -> List<PluginInfo>)?` from core and shows:
 
 ```
-> candiriya plugins
+> candyriya plugins
 Plugins (2):
 - HelloPlugin (hello) v1.0.0 [ENABLED]
 - ChatFilter (chatfilter) v2.3.1 [FAILED]
@@ -510,7 +510,7 @@ interface PermissionRegistry {
 
 Access: `ctx.permissions`.
 
-Impl delegates to core `PermissionManager.permissionValue(PlayerSubject, perm) == Tristate.TRUE`, which honors groups, wildcards (`candiriya.*`), ops, and external `PermissionProvider` (e.g., LuckPerms bridge you write).
+Impl delegates to core `PermissionManager.permissionValue(PlayerSubject, perm) == Tristate.TRUE`, which honors groups, wildcards (`candyriya.*`), ops, and external `PermissionProvider` (e.g., LuckPerms bridge you write).
 
 **Pattern:** give your command a permission node:
 
@@ -578,7 +578,7 @@ val greeting = cfg.get<String>("greeting")
 
 Or use `kotlinx.serialization` for JSON.
 
-**Tip:** never hardcode `Paths.get("plugins/...")` — always use `ctx.dataDirectory`. Isolates tests and respects `candiriya.toml [plugins] directory`.
+**Tip:** never hardcode `Paths.get("plugins/...")` — always use `ctx.dataDirectory`. Isolates tests and respects `candyriya.toml [plugins] directory`.
 
 ---
 
@@ -645,7 +645,7 @@ repositories { mavenCentral() }
 
 dependencies {
     compileOnly(project(":plugin-api")) // within monorepo
-    // or out-of-repo: compileOnly("kz.bejiihiu:candiriya-plugin-api:26.1")
+    // or out-of-repo: compileOnly("kz.bejiihiu:candyriya-plugin-api:26.1")
     compileOnly("org.apache.logging.log4j:log4j-api:2.24.3")
     compileOnly("net.kyori:adventure-api:4.24.0")
 }
@@ -661,14 +661,14 @@ tasks.jar {
 `settings.gradle.kts` for out-of-repo plugin:
 
 ```kotlin
-includeBuild("/path/to/candiriya") // or publish plugin-api to mavenLocal
+includeBuild("/path/to/candyriya") // or publish plugin-api to mavenLocal
 ```
 
 ### 15.2 Java — minimal `pom.xml` snippet
 
 ```xml
 <dependency>
-  <groupId>kz.bejiihiu.candiriya</groupId>
+  <groupId>kz.bejiihiu.candyriya</groupId>
   <artifactId>plugin-api</artifactId>
   <version>26.1</version>
   <scope>provided</scope>
@@ -678,8 +678,8 @@ includeBuild("/path/to/candiriya") // or publish plugin-api to mavenLocal
 ```java
 package com.example;
 
-import kz.bejiihiu.candiriya.plugin.Plugin;
-import kz.bejiihiu.candiriya.plugin.PluginContext;
+import kz.bejiihiu.candyriya.plugin.Plugin;
+import kz.bejiihiu.candyriya.plugin.PluginContext;
 import org.jetbrains.annotations.NotNull;
 
 public class MyJavaPlugin implements Plugin {
@@ -718,54 +718,54 @@ If `plugin.json` is missing, `PluginManager` logs `skipping X — no plugin.json
 ### 16.1 Installing
 
 1. Copy jar to `plugins/` (or `config [plugins] directory` value).
-2. Restart proxy (`./gradlew :launcher:run` or `java -jar candiriya.jar`).
+2. Restart proxy (`./gradlew :launcher:run` or `java -jar candyriya.jar`).
 3. Look for:
 
 ```
 INFO  PluginManager - scanning 1 jars in /.../plugins
 INFO  PluginManager - loaded plugin hello 1.0.0 from hello-plugin-1.0.0.jar
 INFO  PluginManager - enabling 1 plugins
-INFO  candiriya-plugin-hello - Hello from Hello v1.0.0!
+INFO  candyriya-plugin-hello - Hello from Hello v1.0.0!
 INFO  PluginManager - enabled plugin hello 1.0.0
-INFO  Candiriya RUNNING on 0.0.0.0:25577
+INFO  candyriya RUNNING on 0.0.0.0:25577
 ```
 
 ### 16.2 Logs
 
-- Each plugin gets `Logger getLogger("candiriya-plugin-<id>")` via `ctx.logger`. Its output goes through `log4j2` same as proxy (console + `logs/candiriya.log` shaped by `[logging] level`).
+- Each plugin gets `Logger getLogger("candyriya-plugin-<id>")` via `ctx.logger`. Its output goes through `log4j2` same as proxy (console + `logs/candyriya.log` shaped by `[logging] level`).
 - Core `PluginManager` logs at `INFO` for load/enable/disable, `ERROR` for timeouts/duplicate ids/missing deps.
-- Chatty `debug` for broadcasts/messaging goes to `org.apache.logging.log4j.LogManager.getLogger("candiriya-messaging")` — enable with `level=DEBUG` or `<Logger name="candiriya-messaging" level="debug"/>` in `log4j2.xml`.
+- Chatty `debug` for broadcasts/messaging goes to `org.apache.logging.log4j.LogManager.getLogger("candyriya-messaging")` — enable with `level=DEBUG` or `<Logger name="candyriya-messaging" level="debug"/>` in `log4j2.xml`.
 
-### 16.3 /candiriya plugins
+### 16.3 /candyriya plugins
 
 ```
-> candiriya plugins
+> candyriya plugins
 Plugins (1):
 - HelloPlugin (hello) v1.0.0 [ENABLED]
 
-> candiriya plugins (failed dep)
+> candyriya plugins (failed dep)
 Plugins (2):
 - Database (database) v1.0 [ENABLED]
 - ChatFilter (chatfilter) v2.3.1 [FAILED]
 ```
 
-Permission: `candiriya.command.plugins` (default `op` group + console).
+Permission: `candyriya.command.plugins` (default `op` group + console).
 
 ### 16.4 Debugging checklist
 
 - **Jar not loaded:** check `plugins/` path, ensure file ends `.jar`, contains `plugin.json` at root, logs for `skipping`.
 - **Main class not found:** `main` must be fully qualified, jar must contain that class, no `isolated:false` hiding it. Check `java -cp my.jar com.example.MyPlugin` manually.
 - **NoSuchMethodException:** plugin class needs public no-arg constructor (`class Foo : Plugin` Kotlin gives it by default; Java must have `public Foo() {}`).
-- **ClassCastException `cannot be cast to Plugin`:** your `main` doesn't implement `kz.bejiihiu.candiriya.plugin.Plugin` — import the right `Plugin`, not `org.bukkit.plugin.Plugin`.
+- **ClassCastException `cannot be cast to Plugin`:** your `main` doesn't implement `kz.bejiihiu.candyriya.plugin.Plugin` — import the right `Plugin`, not `org.bukkit.plugin.Plugin`.
 - **`onEnable` not called:** look for `plugin X timed out (10s)` — you blocked without using scheduler.
 - **Commands not showing:** check `ownedAliases()` after `register`; verify you didn't typo alias that already exists (core throws `alias already registered`).
 - **Events not firing:** did you `register` with correct `pluginId`? Using `ctx.events.fire` from core's `ProxyInitializeEvent` only fires after all enables — listeners registered in `onEnable` will catch it.
 
 ---
 
-## 17. Velocity Bridge — Running Velocity Plugins Inside Candiriya
+## 17. Velocity Bridge — Running Velocity Plugins Inside candyriya
 
-You asked: *"good api so I can write a plugin that in the future can run Velocity plugins"*. The API is designed for exactly that — you don't need core to vendor Velocity. Write **one** Candiriya plugin that acts as a **Velocity host**.
+You asked: *"good api so I can write a plugin that in the future can run Velocity plugins"*. The API is designed for exactly that — you don't need core to vendor Velocity. Write **one** candyriya plugin that acts as a **Velocity host**.
 
 ### 17.1 Why it works
 
@@ -786,11 +786,11 @@ class VelocityBridgePlugin : Plugin {
             val velocityDesc = readVelocityPluginJson(jar) // com.velocitypowered.api.plugin.PluginDescription
             val cl = PluginClassLoader(arrayOf(jar.toUri().toURL()), this::class.java.classLoader)
             val instance = cl.loadClass(velocityDesc.main).getDeclaredConstructor().newInstance()
-            // adapt Candiriya events to Velocity events
+            // adapt candyriya events to Velocity events
             ctx.events.on(ctx.description.id, PlayerJoinEvent::class.java) { e ->
                 velocityEventManager.fire(PostLoginEvent(adaptPlayer(e.player)))
             }
-            // adapt Candiriya commands to Velocity commands
+            // adapt candyriya commands to Velocity commands
             // ...
         }
     }
@@ -809,7 +809,7 @@ You own the mapping — core stays agnostic. Start with one Velocity plugin you 
 
 ### 17.3 What not to do
 
-- Don't try to put Velocity jars directly into `plugins/` and expect Candiriya to load them — Candiriya only understands `plugin.json`, not `velocity-plugin.json`. They must go into `plugins/velocity-bridge/velocity-plugins/` and be loaded by your bridge plugin.
+- Don't try to put Velocity jars directly into `plugins/` and expect candyriya to load them — candyriya only understands `plugin.json`, not `velocity-plugin.json`. They must go into `plugins/velocity-bridge/velocity-plugins/` and be loaded by your bridge plugin.
 
 ---
 
@@ -850,7 +850,7 @@ Changelog for future `apiVersion 2` candidates (not yet): multi-backend `getServ
 **Q: Can I use Java instead of Kotlin?**  
 Yes — `Plugin` is a vanilla JVM interface. Java plugins compile and load identically. See §15.2. Use Kotlin only for the build file if you like.
 
-**Q: Can I hot-reload with `/candiriya reload`?**  
+**Q: Can I hot-reload with `/candyriya reload`?**  
 No — `reload` currently only reloads `permissions.toml`. Plugins require restart (close ClassLoader + executor). Hot-reload causes `LinkageError` and resource leaks in Netty.
 
 **Q: How many plugins can I load?**  
@@ -873,7 +873,7 @@ Run with `-Dlog4j.configurationFile=...` and set `level=DEBUG`. `PluginManager` 
 ## 21. Reference — All Interfaces at a Glance
 
 ```kotlin
-// plugin-api/src/main/kotlin/kz/bejiihiu/candiriya/plugin/
+// plugin-api/src/main/kotlin/kz/bejiihiu/candyriya/plugin/
 
 interface Plugin { fun onLoad(); fun onEnable(ctx: PluginContext); fun onDisable() }
 
@@ -946,7 +946,7 @@ interface PluginMessaging {
 }
 ```
 
-Config (`candiriya.toml`):
+Config (`candyriya.toml`):
 
 ```toml
 [plugins]
@@ -956,3 +956,4 @@ disableTimeoutMs = 5000
 ```
 
 That's it — happy plugging. If something is unclear, ping `examples/hello-plugin/` and `PluginManager.kt:38` for the ground truth.
+

@@ -1,4 +1,4 @@
-package kz.bejiihiu.candyriya.command
+﻿package kz.bejiihiu.candyriya.command
 
 import kz.bejiihiu.candyriya.permission.PermissionManager
 import org.assertj.core.api.Assertions.assertThat
@@ -93,9 +93,9 @@ public class CommandManagerTest {
     public fun `alias works`() {
         val cm = CommandManager()
         val cmd = TestCommand()
-        cm.register("candyriya", cmd, "candiriya")
+        cm.register("candyriya", cmd, "candyriya")
         val src = console()
-        cm.dispatch(src, "candiriya")
+        cm.dispatch(src, "candyriya")
         assertThat(cmd.executed).isTrue
     }
 
@@ -109,3 +109,4 @@ public class CommandManagerTest {
         assertThat(player.name).isEqualTo("player")
     }
 }
+

@@ -1,4 +1,4 @@
-# Contributing to Candyriya
+﻿# Contributing to Candyriya
 
 Thanks for taking the time to contribute! Your support is appreciated.
 
@@ -101,7 +101,7 @@ Checklist:
 - [ ] Docs updated (`README.md`, `docs/` if config changes)
 - [ ] Commit messages follow Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`)
 - [ ] Branch from `dev` — `feature/*` or `fix/*`
-- [ ] No `candiriya` typos (it's `candyriya` :))
+- [ ] No `candyriya` typos (it's `candyriya` :))
 
 ## Pull Requests
 
@@ -126,3 +126,4 @@ Checklist:
 ## License
 
 By contributing, you agree your contributions are licensed under GPL-3.0 (see `LICENSE`).
+

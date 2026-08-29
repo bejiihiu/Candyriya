@@ -1,4 +1,4 @@
-<!--- Provide a general summary of your changes in the Title above -->
+﻿<!--- Provide a general summary of your changes in the Title above -->
 
 ## Description
 
@@ -22,9 +22,10 @@
 - [ ] Follows style (ktlint android / google_checks.xml)
 - [ ] Commits are Conventional Commits (`feat:`, `fix:` …)
 - [ ] Docs updated (`README.md`, `CHANGELOG.md`, `docs/` if needed)
-- [ ] No `candiriya` typos — it's `candyriya` :)
+- [ ] No `candyriya` typos — it's `candyriya` :)
 - [ ] Target is `dev` (we merge `dev` → `main` on release)
 
 ## Screenshots / Logs (if UI or behavior change)
 
 <!-- paste -->
+

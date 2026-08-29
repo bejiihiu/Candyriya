@@ -39,7 +39,7 @@ public interface PermissionRegistry {
     public fun has(source: PluginCommandSource, permission: String): Boolean
 }
 
-/** Plugin messaging — `candiriya:channel` style, mirrors Velocity's channel API but minimal. */
+/** Plugin messaging — `candyriya:channel` style, mirrors Velocity's channel API but minimal. */
 public interface PluginMessaging {
     /** Register channel `id:channel` (e.g. `myplugin:data`). Must be lowercase `namespace:name`. */
     public fun registerChannel(channel: String): Boolean
@@ -62,4 +62,5 @@ public interface PluginConfig {
     /** Load TOML as map, or create default from classpath resource. */
     public fun loadOrCreate(fileName: String = "config.toml", defaultResource: String? = null): Path
 }
+
 

@@ -21,7 +21,7 @@ public class PluginContainer(
     public val dataDirectory: Path,
     public val executor: ExecutorService,
     public val scheduler: DefaultPluginScheduler,
-    public val logger: Logger = LogManager.getLogger("candiriya-plugin-${description.id}")
+    public val logger: Logger = LogManager.getLogger("candyriya-plugin-${description.id}")
 ) : AutoCloseable {
 
     public enum class State { LOADED, ENABLED, DISABLED, FAILED }
@@ -38,17 +38,17 @@ public class PluginContainer(
         public fun createExecutor(pluginId: String, useVirtual: Boolean): ExecutorService {
             return if (useVirtual) {
                 try {
-                    val factory = Thread.ofVirtual().name("candiriya-plugin-$pluginId-", 0).factory()
+                    val factory = Thread.ofVirtual().name("candyriya-plugin-$pluginId-", 0).factory()
                     Executors.newThreadPerTaskExecutor(factory)
                 } catch (_: Exception) {
                     // fallback — shouldn't happen on Java 21
                     Executors.newSingleThreadExecutor { r ->
-                        Thread(r, "candiriya-plugin-$pluginId").apply { isDaemon = true }
+                        Thread(r, "candyriya-plugin-$pluginId").apply { isDaemon = true }
                     }
                 }
             } else {
                 Executors.newSingleThreadExecutor { r ->
-                    Thread(r, "candiriya-plugin-$pluginId").apply { isDaemon = true }
+                    Thread(r, "candyriya-plugin-$pluginId").apply { isDaemon = true }
                 }
             }
         }
@@ -78,4 +78,5 @@ public class PluginContainer(
         } catch (_: Exception) {}
     }
 }
+
 

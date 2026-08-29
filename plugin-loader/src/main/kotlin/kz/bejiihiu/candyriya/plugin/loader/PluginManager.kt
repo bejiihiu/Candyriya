@@ -400,11 +400,12 @@ public class PluginManager(
             if (!globalChannels.contains(channel.lowercase())) return false
             // real send will go through player's connection — stub logs for now
             LogManager.getLogger(
-                "candiriya-messaging"
+                "candyriya-messaging"
             ).debug("plugin {} -> {} channel {} {} bytes", pluginId, player.username, channel, data.size)
             return true
         }
         override fun channels(): Set<String> = globalChannels.toSet()
     }
 }
+
 

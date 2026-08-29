@@ -93,12 +93,9 @@ public object ModernForwarder {
     )
 
     private fun findForwardingVersion(requested: Int): Int {
-<<<<<<<< HEAD:network/src/main/kotlin/kz/bejiihiu/candyriya/network/forwarding/VelocityModernForwarder.kt
         // velocity clamps to max, then downgrades based on protocol/key
         // we don't have protocol version here in Candyriya (we accept all like a proper slut xd)
         // so just clamp and return default if >1
-========
->>>>>>>> feature/servers:network/src/main/kotlin/kz/bejiihiu/candyriya/network/forwarding/ModernForwarder.kt
         val clamped = requested.coerceAtMost(MODERN_MAX_VERSION)
         return if (clamped > MODERN_DEFAULT) MODERN_DEFAULT else MODERN_DEFAULT
     }

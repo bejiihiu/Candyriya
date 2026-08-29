@@ -1,6 +1,6 @@
-package kz.bejiihiu.candyriya.config
+﻿package kz.bejiihiu.candyriya.config
 
-import kz.bejiihiu.candiriya.server.RegisteredServer
+import kz.bejiihiu.candyriya.server.RegisteredServer
 
 /**
  * Root proxy config. Mirrors the TOML structure.
@@ -100,3 +100,4 @@ public data class PluginsConfig(
     val enableTimeoutMs: Long = 10000,
     val disableTimeoutMs: Long = 5000
 )
+

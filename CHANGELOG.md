@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Startup timing logs, i18n-ready startup locale fix
 
 ### Changed
-- Renamed `candiriya` → `candyriya` everywhere (package `kz.bejiihiu.candyriya`, config `candyriya.toml`, jar `candyriya.jar`)
+- Renamed `candyriya` → `candyriya` everywhere (package `kz.bejiihiu.candyriya`, config `candyriya.toml`, jar `candyriya.jar`)
 - `candyriya.default.toml` now includes `[backend]`, `[security]`, `[threads]`, `[scheduler]` sections
 
 ### Fixed
@@ -31,3 +31,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Unreleased]: https://github.com/bejiihiu/Candyriya/compare/main...dev
 [0.1.0]: https://github.com/bejiihiu/Candyriya/releases/tag/v0.1.0
+

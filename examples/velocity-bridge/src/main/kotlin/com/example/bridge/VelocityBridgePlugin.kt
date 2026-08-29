@@ -1,20 +1,20 @@
-package com.example.bridge
+﻿package com.example.bridge
 
 import java.nio.file.Files
 import java.nio.file.Path
-import kz.bejiihiu.candiriya.plugin.Plugin
-import kz.bejiihiu.candiriya.plugin.PluginContext
+import kz.bejiihiu.candyriya.plugin.Plugin
+import kz.bejiihiu.candyriya.plugin.PluginContext
 
 /**
- * Sketch — how one Candiriya plugin can host Velocity plugins.
+ * Sketch — how one candyriya plugin can host Velocity plugins.
  *
  * You do NOT need to wait for core to add Velocity support.
- * Implement the bridge as a normal Candiriya plugin:
+ * Implement the bridge as a normal candyriya plugin:
  *
  * 1. add `velocity-api` as `compileOnly` (so proxy jar stays free of it)
  * 2. scan `plugins/VelocityBridge/velocity-plugins/*.jar`
  * 3. instantiate each with Velocity's own `PluginDescription` logic inside your isolated ClassLoader
- * 4. adapt Candiriya events/commands to Velocity equivalents via [PluginContext.server] and [PluginContext.events]
+ * 4. adapt candyriya events/commands to Velocity equivalents via [PluginContext.server] and [PluginContext.events]
  *
  * This file is just a sketch to show the seam. Copy-paste and expand.
  */
@@ -35,13 +35,13 @@ public class VelocityBridgePlugin : Plugin {
         // example: expose a command that lists bridged plugins
         ctx.commands.register(
             "vplugins",
-            object : kz.bejiihiu.candiriya.plugin.PluginCommand {
+            object : kz.bejiihiu.candyriya.plugin.PluginCommand {
                 override val permission: String? = "velocitybridge.list"
                 override val description: String = "list bridged Velocity plugins"
                 override val usage: String = ""
 
                 override fun execute(
-                    source: kz.bejiihiu.candiriya.plugin.PluginCommandSource,
+                    source: kz.bejiihiu.candyriya.plugin.PluginCommandSource,
                     args: Array<String>,
                 ) {
                     source.sendMessage(
@@ -53,8 +53,8 @@ public class VelocityBridgePlugin : Plugin {
             },
         )
 
-        // adapt Candiriya event to Velocity event
-        ctx.events.on(ctx.description.id, kz.bejiihiu.candiriya.plugin.PlayerJoinEvent::class.java) { event ->
+        // adapt candyriya event to Velocity event
+        ctx.events.on(ctx.description.id, kz.bejiihiu.candyriya.plugin.PlayerJoinEvent::class.java) { event ->
             // here you would fire com.velocitypowered.api.event.connection.PostLoginEvent
             // via reflection / Velocity EventManager you embedded
             ctx.logger.info("would forward join {} to Velocity event bus", event.player.username)
@@ -63,3 +63,4 @@ public class VelocityBridgePlugin : Plugin {
 
     // private fun loadVelocityJar(jar: Path) { ... actual Velocity PluginManager code ... }
 }
+
