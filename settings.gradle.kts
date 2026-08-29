@@ -18,4 +18,4 @@ include(":scheduler")
 include(":permissions")
 include(":command")
 
-rootProject.name = "candiriya"
+rootProject.name = "candyriya"

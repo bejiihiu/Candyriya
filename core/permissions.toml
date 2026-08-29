@@ -1,0 +1,12 @@
+	[groups.op]
+		default = false
+		permissions = ["candyriya.*"]
+		parents = ["default"]
+
+	[groups.default]
+		default = true
+		permissions = ["candyriya.command.help", "candyriya.command.info", "candyriya.command.server"]
+		parents = []
+
+[ops]
+	list = []

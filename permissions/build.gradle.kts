@@ -1,6 +1,6 @@
 plugins {
     id("buildsrc.convention.kotlin-jvm")
-    id("candiriya.quality")
+    id("candyriya.quality")
 }
 
 spotbugs {

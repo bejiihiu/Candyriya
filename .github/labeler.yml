@@ -1,0 +1,28 @@
+area:core:
+  - core/**/*
+area:config:
+  - config/**/*
+  - candyriya.toml
+  - candyriya.default.toml
+area:network:
+  - network/**/*
+area:protocol:
+  - protocol/**/*
+area:permissions:
+  - permissions/**/* 
+  - permissions.toml
+area:command:
+  - command/**/*
+area:scheduler:
+  - scheduler/**/*
+area:launcher:
+  - launcher/**/*
+area:build:
+  - buildSrc/**/*
+  - gradle/**/*
+  - "*.gradle.kts"
+  - gradle.properties
+area:docs:
+  - "*.md"
+  - docs/**/*
+  - .github/**/*
