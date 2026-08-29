@@ -67,3 +67,11 @@ tickRateMs = 50
 # number of execution contexts (like Folia regions) — players spread across them
 # 0 = cpu count, max 32
 contexts = 4
+
+[plugins]
+# where to load plugin jars from
+directory = "plugins"
+# per-plugin enable timeout (ms) — plugin's onEnable runs on its own thread
+enableTimeoutMs = 10000
+# per-plugin disable timeout (ms)
+disableTimeoutMs = 5000

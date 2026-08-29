@@ -1,0 +1,11 @@
+{
+  "id": "hello",
+  "name": "HelloPlugin",
+  "version": "1.0.0",
+  "main": "com.example.HelloPlugin",
+  "apiVersion": "1",
+  "description": "Example Candiriya plugin — shows lifecycle, commands, events and scheduler",
+  "authors": ["bejiihiu"],
+  "depends": [],
+  "isolated": true
+}

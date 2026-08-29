@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference
 import kz.bejiihiu.candyriya.command.CommandManager
 import kz.bejiihiu.candyriya.command.builtin.CandyriyaCommand
 import kz.bejiihiu.candyriya.command.builtin.GlistCommand
+import kz.bejiihiu.candyriya.command.builtin.PluginInfo
 import kz.bejiihiu.candyriya.command.builtin.SendCommand
 import kz.bejiihiu.candyriya.command.builtin.ServerCommand
 import kz.bejiihiu.candyriya.command.builtin.ShutdownCommand
@@ -17,6 +18,7 @@ import kz.bejiihiu.candyriya.network.NetworkServer
 import kz.bejiihiu.candyriya.permission.PermissionManager
 import kz.bejiihiu.candyriya.permission.PermissionsFile
 import kz.bejiihiu.candyriya.player.PlayerManager
+import kz.bejiihiu.candiriya.plugin.loader.PluginManager
 import kz.bejiihiu.candyriya.scheduler.DefaultScheduler
 import kz.bejiihiu.candyriya.scheduler.Scheduler
 import kz.bejiihiu.candyriya.scheduler.context.ContextRegistry
@@ -45,6 +47,14 @@ public class Candyriya(
     private val playerManager: PlayerManager = PlayerManager(contextRegistry)
     private val permissionManager: PermissionManager = PermissionManager(permissionsFile)
     private val commandManager: CommandManager = CommandManager()
+    private val pluginManager: PluginManager = PluginManager(
+        pluginsDir = Paths.get(config.plugins.directory),
+        threadController = threadController,
+        config = config,
+        playerManager = playerManager,
+        permissionManager = permissionManager,
+        commandManager = commandManager
+    )
 
     public fun getState(): LifecycleState = state.get()
 
@@ -64,6 +74,10 @@ public class Candyriya(
 
     public fun getPermissionsFile(): Path = permissionsFile
 
+    public fun getPluginManager(): PluginManager = pluginManager
+
+    public fun getEventBus(): kz.bejiihiu.candiriya.plugin.EventBus = pluginManager.getEventBus()
+
     public fun start() {
         // only STOPPED -> STARTING is valid
         if (!state.compareAndSet(LifecycleState.STOPPED, LifecycleState.STARTING)) {
@@ -79,8 +93,22 @@ public class Candyriya(
         }
         // register builtin commands — mirrors Velocity's built-ins but with candyriya name
         try {
-            val candyriyaCmd = CandyriyaCommand(commandManager, permissionManager, permissionsFile)
-            commandManager.register("candyriya", candyriyaCmd, "candiriya", "velocity")
+            val candyriyaCmd = CandyriyaCommand(
+                commandManager = commandManager,
+                permissionManager = permissionManager,
+                permissionsFile = permissionsFile,
+                pluginsProvider = {
+                    pluginManager.getPlugins().map {
+                        PluginInfo(
+                            id = it.description.id,
+                            name = it.description.name,
+                            version = it.description.version,
+                            state = it.state.name
+                        )
+                    }
+                }
+            )
+            commandManager.register("candyriya", candyriyaCmd, "candiriya", "candirya", "velocity")
             commandManager.register("server", ServerCommand(playerManager, config))
             commandManager.register("glist", GlistCommand(playerManager))
             commandManager.register("send", SendCommand(playerManager, config))
@@ -91,6 +119,20 @@ public class Candyriya(
         }
         threadController.start()
         tickScheduler.start()
+        // load + enable plugins before binding — so they can register commands/listeners
+        try {
+            val loaded = pluginManager.loadAll()
+            logger.info("loaded {} plugins", loaded.size)
+            pluginManager.enableAll()
+            logger.info(
+                "enabled {} plugins",
+                pluginManager.getPlugins().count {
+                    it.state == kz.bejiihiu.candiriya.plugin.loader.PluginContainer.State.ENABLED
+                }
+            )
+        } catch (e: Exception) {
+            logger.error("failed to load plugins", e)
+        }
         // yep, create server lazily here xd — groups come from ThreadController
         val server = NetworkServer(
             config,
@@ -148,6 +190,13 @@ public class Candyriya(
             networkServer?.stop()
         } catch (e: Exception) {
             logger.error("error during network shutdown", e)
+        }
+        // disable plugins before closing schedulers so they can finish tasks
+        try {
+            pluginManager.disableAll()
+            pluginManager.closeAll()
+        } catch (e: Exception) {
+            logger.error("error during plugin shutdown", e)
         }
         try {
             tickScheduler.close()

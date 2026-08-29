@@ -105,6 +105,9 @@ public object ConfigLoader {
         val asyncParallelism = config.getOrElse<Number>("threads.asyncParallelism", 0).toInt()
         val tickRateMs = config.getOrElse<Number>("scheduler.tickRateMs", 50).toLong()
         val contexts = config.getOrElse<Number>("scheduler.contexts", 4).toInt()
+        val pluginsDir = config.getOrElse<String>("plugins.directory", "plugins")
+        val pluginsEnableTimeoutMs = config.getOrElse<Number>("plugins.enableTimeoutMs", 10000).toLong()
+        val pluginsDisableTimeoutMs = config.getOrElse<Number>("plugins.disableTimeoutMs", 5000).toLong()
 
         // validation
         val port = try {
@@ -176,7 +179,12 @@ public object ConfigLoader {
                 scheduledCoreSize = scheduledCoreSize,
                 asyncParallelism = asyncParallelism
             ),
-            scheduler = SchedulerConfig(tickRateMs = tickRateMs, contexts = contexts)
+            scheduler = SchedulerConfig(tickRateMs = tickRateMs, contexts = contexts),
+            plugins = PluginsConfig(
+                directory = pluginsDir,
+                enableTimeoutMs = pluginsEnableTimeoutMs,
+                disableTimeoutMs = pluginsDisableTimeoutMs
+            )
         )
     }
 
@@ -239,5 +247,13 @@ public object ConfigLoader {
     # tick duration in ms (50ms = 20 tps, like Paper/Folia)
     tickRateMs = 50
     contexts = 4
+
+    [plugins]
+    # where to load plugin jars from
+    directory = "plugins"
+    # per-plugin enable timeout (ms)
+    enableTimeoutMs = 10000
+    # per-plugin disable timeout (ms)
+    disableTimeoutMs = 5000
     """.trimIndent()
 }

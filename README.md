@@ -103,16 +103,44 @@ level = "INFO"
 
 See [`docs/CONFIG.md`](docs/CONFIG.md) for full reference.
 
+## Plugins
+
+Candyriya has its own plugin API (not Velocity). See **[PLUGINS.md](./PLUGINS.md)** for the full 20-section guide, plus:
+- [`examples/hello-plugin/`](./examples/hello-plugin) — minimal Kotlin plugin (copy-paste starter)
+- [`examples/velocity-bridge/`](./examples/velocity-bridge) — sketch showing how one Candyriya plugin can host Velocity jars
+
+Quick peek:
+
+```json
+// plugin.json at jar root
+{ "id": "hello", "name": "Hello", "version": "1.0.0", "main": "com.example.HelloPlugin" }
+```
+
+```kotlin
+class HelloPlugin : Plugin {
+  override fun onEnable(ctx: PluginContext) {
+    ctx.logger.info("hi {}", ctx.description.id)
+    ctx.commands.register("hello", MyCommand())
+    ctx.scheduler.delayed(Duration.ofSeconds(2)) { ctx.server.broadcast(Component.text("hi")) }
+  }
+}
+```
+
+Build jar with `plugin.json` at root, drop into `plugins/`, restart proxy. `/candyriya plugins` lists it.  
+Hybrid ClassLoader (`isolated:true` default, `false` for suites) + per-plugin virtual thread via `ctx.scheduler`. No hot-reload — restart to update jars.
+
 ## Modules
 
 | Module | Responsibility |
 |---|---|
-| `core` | Lifecycle `STARTING → RUNNING → STOPPING → STOPPED` (`AtomicReference`) |
-| `config` | TOML via `night-config`, validation, `candyriya.default.toml` |
+| `core` | Lifecycle `STARTING → RUNNING → STOPPING → STOPPED` (`AtomicReference`) + `PluginManager` wiring |
+| `config` | TOML via `night-config`, validation, `candyriya.default.toml` (`[plugins] directory = "plugins"`) |
+| `plugin-api` | Public contracts (`Plugin`, `PluginContext`, `EventBus`, `PluginScheduler`, `ProxyServer`) |
+| `plugin-loader` | Private hybrid `PluginClassLoader` + `PluginContainer` per-plugin thread |
 | `network` | Netty bootstrap, pipeline, backend connection queue/backpressure |
 | `protocol` | Codec registry, VarInt, packet codecs, encryption/compression |
 | `permissions` | Wildcard + group inheritance, `Tristate` |
-| `command` | Brigadier-style manager, `candyriya` + `server`/`glist`/`send` builtins |
+| `command` | Brigadier-style manager, `candyriya` + `server`/`glist`/`send` builtins (now plugin-aware) |
 | `scheduler` | Virtual threads, `ThreadController`, `TickScheduler` (Folia-like) |
 | `launcher` | `Main.kt` + Log4j2 async + shadow jar |
 
